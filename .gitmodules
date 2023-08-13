@@ -1,0 +1,7 @@
+[submodule "src/external/xml.js"]
+	path = src/external/xml.js
+	url = https://github.com/kripken/xml.js.git
+
+[submodule "src/external/monaco-xsd-code-completion"]
+	path = src/external/monaco-xsd-code-completion
+	url = https://github.com/BellCubedev/monaco-xsd-code-completion.git

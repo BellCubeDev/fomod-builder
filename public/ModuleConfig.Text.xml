@@ -1,0 +1,23 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://qconsulting.ca/fo3/ModConfig5.0.xsd">
+
+    <moduleName>Example Mod</moduleName>
+
+    <installSteps>
+        <installStep name="1">
+            <optionalFileGroups>
+                <group name="123" type="SelectAtLeastOne">
+                    <plugins>
+                        <plugin name="Select Me First!">
+                        <description></description>
+                        <files />
+                        <typeDescriptor>
+                            <type name="Optional" />
+                        </typeDescriptor>
+                        </plugin>
+                    </plugins>
+                </group>
+            </optionalFileGroups>
+        </installStep>
+    </installSteps>
+
+</config>

@@ -1,0 +1,63 @@
+name: Build & Deploy to Pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["production"]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "lts/*"
+          cache: npm
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Restore Build Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            .next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
+
+      - name: Install dependencies
+        run: npm i
+
+      - name: Build with Next.js
+        run: npm run build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: ./out
+
+  # Deployment job
+  deploy:
+    environment:
+      name: 'GitHub Pages'
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2

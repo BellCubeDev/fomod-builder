@@ -1,0 +1,37 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+            "label": "Dev Server",
+            "detail": "next dev",
+
+            "type": "npm",
+            "script": "dev",
+
+            "problemMatcher": [
+                {
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": "> .* Restarting the server to apply the changes...|[^\\-\\w]*?wait[^\\-]*  - compiling.*",
+                        "endsPattern": "[^\\-\\w]*?ready[^\\-]*- started server on .*?, url: .*|[^\\-\\w]*?event[^\\-]* - compiled.*"
+                    },
+                    "pattern": {
+                        "regexp": "9{2147483647}"
+                    }
+                }
+            ],
+
+            "isBackground": true,
+
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+
+            "icon": {
+                "id": "server-environment",
+                "color": "terminal.ansiCyan"
+            },
+        },
+	]
+}

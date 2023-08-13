@@ -1,0 +1,142 @@
+.tabbedUI {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+.tabBar {
+    user-select: none;
+
+    background: #080808;
+
+    > :first-child {
+        margin-top: 12px;
+        margin-bottom: 8px;
+    }
+
+    > :last-child {
+        margin-top: auto;
+    }
+
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    height: 100vh;
+
+    z-index: 8;
+
+    width: 70px;
+    &[data-extended=true] {
+        width: max-content;
+    }
+
+    overflow: clip;
+}
+
+%logoAndItem {
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    min-width: 100%;
+
+    > * {
+        font-size: 20px;
+        margin: 0;
+    }
+}
+
+.tabBarTitle {
+    @extend %logoAndItem;
+    > * { font-size: 24px; }
+    > :last-child { padding-right: 20px}
+}
+
+.tabButtons {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.tabButton {
+    outline: none;
+    border: none;
+    background: none;
+
+    @extend %logoAndItem;
+
+    &:hover { cursor: pointer; }
+    &:hover, &:focus {
+        background: #fff1
+    }
+
+
+}
+
+.icon {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    padding: 16px 9px;
+
+    > svg {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+// Arrow icon that moves to the active tab button to indicate the active tab
+.tabIndicator {
+    position: absolute;
+    left: 5px;
+
+    fill: #ccc;
+    opacity: 0;
+
+    transition-property: top, opacity;
+    transition-duration: 0.4s;
+    transition-timing-function: ease-in-out;
+}
+
+
+
+.tabPanels {
+    z-index: 0;
+    position: absolute;
+    top: 0;
+    left: 70px;
+    width: calc(100vw - 70px); // TODO: Set with JS when extending the tab bar
+    height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.tabPanel {
+    transition-property: opacity, margin-left;
+    transition-duration: 0.35s;
+    transition-timing-function: ease-in-out;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    padding: 32px 48px;
+
+    margin-left: 0;
+    opacity: 1;
+}
+
+.panelTransitioningOut {
+    z-index: -1;
+    margin-left: -100vw;
+}
+
+.inactivePanel {
+    margin-left: 100vw;
+    opacity: 0;
+}
+

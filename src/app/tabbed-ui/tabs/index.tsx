@@ -1,0 +1,26 @@
+import {TranslationTableKeys} from '@/app/components/localization';
+
+export interface Tab {
+    name: Extract<keyof TranslationTableKeys, TabName>;
+    Page: React.FunctionComponent;
+    icon: JSX.Element,
+}
+
+import tab_mission_control from './mission_control';
+import tab_install_editor from './install_editor';
+import tab_step_builder from './builder';
+import tab_xml_editor from './xml_editor';
+
+const tabs = {
+    tab_mission_control,
+    tab_step_builder,
+    tab_install_editor,
+    tab_xml_editor,
+};
+
+export default tabs;
+
+export type Tabs = typeof tabs;
+export type TabName = keyof Tabs;
+
+

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="root">
+        <xs:annotation><xs:documentation>Some documentation for the ROOT ELEMENT</xs:documentation></xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:any minOccurs="0" processContents="skip" />
+                <xs:element name="Name" minOccurs="0" maxOccurs="1" type="xs:string">
+                    <xs:annotation><xs:documentation>Some documentation for the NAME ELEMENT</xs:documentation></xs:annotation>
+                </xs:element>
+                <xs:element name="Id" minOccurs="0" maxOccurs="1">
+                    <xs:annotation><xs:documentation>Some documentation for the ID ELEMENT</xs:documentation></xs:annotation>
+                    <xs:complexType>
+                        <xs:simpleContent>
+                            <xs:extension base="xs:integer">
+                                <xs:attribute name="type" type="xs:string" />
+                            </xs:extension>
+                        </xs:simpleContent>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
