@@ -7,7 +7,7 @@ import Monaco, {useMonaco} from '@monaco-editor/react';
 import styles from './FomodMonacoEditor.module.scss';
 
 
-import { useFomod } from '@/app/utils/loaders';
+import { useFomod } from '@/app/components/loaders';
 import getXmlCompletionProvider, { SchemaPromise } from './XmlSchema';
 
 import applyXmlSchemasToMonaco from './XmlSchema';

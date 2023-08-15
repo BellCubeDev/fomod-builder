@@ -21,7 +21,6 @@ npm run dev
 * [ ] Step/Group/Option Editing
 * [ ] Dependency Editing
   * [X] Read ESP/L/M dependencies automatically
-  * [ ] Discourage use of Required & NotUsable
 * [ ] Install Editing
 
 ### Important Tooltips
