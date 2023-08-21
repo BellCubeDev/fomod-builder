@@ -8,10 +8,17 @@ import LocaleSelector from "@/app/components/localization/LocaleSelector";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretRight } from "@fortawesome/free-solid-svg-icons";
+import { useSettings } from '../components/SettingsContext';
 
+
+// TODO: Implement `alt+num`/`option+num` for tab switching
 const tabsForKeybinds = Object.keys(tabs);
 
+// TODO: Fix prefers-reduced-motion media query always returning false
+
 export default function FomodBuilderTabbedUI() {
+    const settings = useSettings();
+
     const [activeTab, setActiveTab] = React.useState<TabName>('tab_mission_control');
     const activeTabButtonRef = React.useRef<HTMLButtonElement|null>(null);
     const activeTabIndicatorRef = React.useRef<SVGSVGElement|null>(null);
@@ -35,7 +42,7 @@ export default function FomodBuilderTabbedUI() {
 
         if (!transitioningFromTab || !transitioningFromTabRef.current) return;
 
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        if (settings?.reducedMotion || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
             return setTransitioningFromTab(null);
         }
 
@@ -50,6 +57,7 @@ export default function FomodBuilderTabbedUI() {
 
         return () => {  fromTab.removeEventListener('transitionend', transitionEndHandler);  };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- settings.reducedMotion is checked, not depended on
     }, [activeTabButtonRef, transitioningFromTabRef, transitioningFromTab]);
 
     React.useEffect(() => {
@@ -63,13 +71,18 @@ export default function FomodBuilderTabbedUI() {
             setIsNearlyTransitioningIn(false);
         })));
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- It's literally wrong; it doesn't update, at least on my machine, without .current
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- It's literally wrong; it doesn't update, at least on my machine, without .current
     }, [activeTabPanelRef, activeTabPanelRef.current]);
 
+    const reducedMotionClassName = (settings?.reducedMotion || (typeof window !== "undefined" && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) ? styles.reducedMotion : '';
 
     const tabButtons = Object.values(tabs).map((tab: Tab, i) => {
         const active = activeTab === tab.name;
-        return <button  key={i} className={styles.tabButton} onClick={active ? (e) => e.currentTarget.blur() : (e) => { e.currentTarget.blur(); setTransitioningFromTab(activeTab); setActiveTab(tab.name); setIsNearlyTransitioningIn(true); }}
+        return <button  key={i} className={`${styles.tabButton} ${reducedMotionClassName}`}
+                        onClick={active ? (e) => e.currentTarget.blur() : (e) => {
+                            e.currentTarget.blur();
+                            setTransitioningFromTab(activeTab); setActiveTab(tab.name); setIsNearlyTransitioningIn(true);
+                        }}
                         ref={active ? activeTabButtonRef : undefined}
                         role='tab' aria-selected={active} aria-expanded={active} aria-controls={`panel-${tab.name}`} id={`tab-${tab.name}`}
                 >
@@ -115,7 +128,7 @@ export default function FomodBuilderTabbedUI() {
                 {tabButtons}
             </div>
 
-            <FontAwesomeIcon icon={faCaretRight} className={styles.tabIndicator} ref={activeTabIndicatorRef} width={16} height={16} />
+            <FontAwesomeIcon icon={faCaretRight} className={`${styles.tabIndicator} ${reducedMotionClassName}`} ref={activeTabIndicatorRef} width={16} height={16} />
 
             <div className={styles.tabFooter}>
                 <LocaleSelector />

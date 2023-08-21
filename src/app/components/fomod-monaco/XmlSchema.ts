@@ -2,8 +2,8 @@ import type monacoNS from 'monaco-editor';
 
 import x from '@/external/xml.js/xmllint';
 
-import XsdManager from '@/external/monaco-xsd-code-completion/src/XsdManager';
-import XsdFeatures from '@/external/monaco-xsd-code-completion/src/XsdFeatures';
+import XsdManager from 'monaco-xsd-code-completion/src/XsdManager';
+import XsdFeatures from 'monaco-xsd-code-completion/src/XsdFeatures';
 
 async function getInfoSchema() {
     let response = await fetch('/info.xsd');

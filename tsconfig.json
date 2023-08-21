@@ -26,7 +26,8 @@
     "types": [
       "node",
       "react-dom",
-      "./next-env.d.ts"
+      "./next-env.d.ts",
+      "@types/wicg-file-system-access"
     ],
     "plugins": [
       {

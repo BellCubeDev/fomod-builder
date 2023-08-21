@@ -117,7 +117,7 @@
 
 .tabPanel {
     transition-property: opacity, margin-left;
-    transition-duration: 0.35s;
+    transition-duration: 0.12s;
     transition-timing-function: ease-in-out;
 
     position: absolute;
@@ -138,5 +138,9 @@
 .inactivePanel {
     margin-left: 100vw;
     opacity: 0;
+}
+
+.reducedMotion {
+    transition-property: none !important;
 }
 

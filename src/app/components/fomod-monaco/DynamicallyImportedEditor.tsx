@@ -92,8 +92,8 @@ export default function FomodMonacoEditorForDynamicImportOnly() {
             onChange={ (value, e) => {
                 if (!value) return;
 
-                if (isInfoMode) c.fomod.infoDocText = value;
-                else c.fomod.moduleDocText = value;
+                if (isInfoMode) c.fomod.infoText = value;
+                else c.fomod.moduleText = value;
             }}
             height='500px'
             onMount={handleNewEditor}

@@ -4,6 +4,8 @@ import './global.scss';
 
 import { config as FontAwesomeConfig } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
+import { SettingsProvider } from './components/SettingsContext';
+import { FomodLoaderProvider } from './components/loaders/index';
 FontAwesomeConfig.autoAddCss = false;
 
 // Exported directly in page.js as well to avoid a strange bugs or two
@@ -58,9 +60,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return <html lang='en'>
             <body>
-                <LocaleProvider>
+                <LocaleProvider><SettingsProvider><FomodLoaderProvider>
                     {children}
-                </LocaleProvider>
+                </FomodLoaderProvider></SettingsProvider></LocaleProvider>
             </body>
     </html>;
 }
