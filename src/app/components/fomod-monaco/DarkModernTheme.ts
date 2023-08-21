@@ -81,9 +81,9 @@ export async function getDarkModernTheme() {
     const release = await getReleaseVersion();
 
     const [dark, darkPlusRaw, darkModernRaw] = await Promise.all<Promise<RawTheme>>([
-        fetch(`https://main.vscode-cdn.net/stable/${release}/extensions/theme-defaults/themes/dark_vs.json`),
-        fetch(`https://main.vscode-cdn.net/stable/${release}/extensions/theme-defaults/themes/dark_plus.json`),
-        fetch(`https://main.vscode-cdn.net/stable/${release}/extensions/theme-defaults/themes/dark_modern.json`),
+        fetch(`https://corsproxy.io/?https://main.vscode-cdn.net/stable/${release}/extensions/theme-defaults/themes/dark_vs.json`),
+        fetch(`https://corsproxy.io/?https://main.vscode-cdn.net/stable/${release}/extensions/theme-defaults/themes/dark_plus.json`),
+        fetch(`https://corsproxy.io/?https://main.vscode-cdn.net/stable/${release}/extensions/theme-defaults/themes/dark_modern.json`),
     ].map(p => p.then(res => res.json()))) as [RawTheme, RawTheme, RawTheme];
 
     const darkModern = mergeObjects(mergeObjects(dark, darkPlusRaw), darkModernRaw) as RawTheme;
