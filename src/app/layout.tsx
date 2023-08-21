@@ -11,7 +11,7 @@ FontAwesomeConfig.autoAddCss = false;
 // Exported directly in page.js as well to avoid a strange bugs or two
 export const metadata: Metadata = {
     title: "Fomod Builder",
-    description: "A tool for building Fomod mod installers. Fomod is a format associated with Bethesda games.",
+    description: "Build Fomod installers with ease, no download necessary!\n\nFomod is an XML-based installer format typically used for Bethesda game mods. This XML format is a little burdensome and a lot XML, so this tool exists to make it *not* that.",
     applicationName: "Fomod Builder",
     authors: [{
         name: "BellCube",
