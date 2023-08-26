@@ -35,6 +35,9 @@ export interface TranslationTableKeys {
     tab_step_builder: (selected: boolean) => React.ReactNode;
 
     // Loaders
+    loaders_header_unloaded: () => React.ReactNode;
+    loaders_header_loaded: (type: keyof TranslationTableKeys & `loader_${string}`) => React.ReactNode;
+
     loader_filesystem: (inPopup: boolean) => React.ReactNode;
     loader_filesystem_description: () => React.ReactNode;
     loader_filesystem_select_folder: () => React.ReactNode;
@@ -87,6 +90,14 @@ export const translationTable = {
 
     tab_step_builder: {
         en: ()=> 'Step Builder',
+    },
+
+    loaders_header_loaded: {
+        en: ()=> 'You Have A Loaded Fomod',
+    },
+
+    loaders_header_unloaded: {
+        en: ()=> 'No Fomod Is Currently Loaded',
     },
 
     loader_filesystem: {

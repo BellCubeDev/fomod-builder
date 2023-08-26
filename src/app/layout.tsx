@@ -6,7 +6,24 @@ import { config as FontAwesomeConfig } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import { SettingsProvider } from './components/SettingsContext';
 import { FomodLoaderProvider } from './components/loaders/index';
+import HistoryStateManager from './components/loaders/HistoryManager';
 FontAwesomeConfig.autoAddCss = false;
+
+import { Rubik } from 'next/font/google';
+const rubik = Rubik({
+    display: 'block',
+    weight: ['400', '600', '700'],
+    subsets: ['latin-ext'],
+})
+
+import {Source_Code_Pro} from 'next/font/google';
+export const SourceCodePro = Source_Code_Pro({
+    weight: '400',
+    display: 'swap',
+    preload: false,
+    subsets: ['cyrillic', 'cyrillic-ext', 'greek', 'greek-ext', 'latin', 'latin-ext', 'vietnamese'],
+    variable: '--code-font',
+});
 
 // Exported directly in page.js as well to avoid a strange bugs or two
 export const metadata: Metadata = {
@@ -52,17 +69,21 @@ export const metadata: Metadata = {
         determiner: 'the',
         alternateLocale: Object.keys(Languages) as (keyof typeof Languages)[],
         locale: 'en',
-    }
+    },
+    twitter: {
+        card: 'summary',
+    },
+    themeColor: '#0074a9',
 };
 
 
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return <html lang='en'>
-            <body>
-                <LocaleProvider><SettingsProvider><FomodLoaderProvider>
+            <body className={rubik.className + ' ' + SourceCodePro.variable}>
+                <LocaleProvider><SettingsProvider><FomodLoaderProvider><HistoryStateManager>
                     {children}
-                </FomodLoaderProvider></SettingsProvider></LocaleProvider>
+                </HistoryStateManager></FomodLoaderProvider></SettingsProvider></LocaleProvider>
             </body>
     </html>;
 }

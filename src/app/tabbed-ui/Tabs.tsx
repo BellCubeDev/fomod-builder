@@ -108,8 +108,8 @@ export default function FomodBuilderTabbedUI() {
                     }}
                     tabIndex={active ? 0 : -1}
                 >
-            <tab.Page />
-        </div>;
+            {transitioningFrom || active ? <tab.Page /> : null}
+        </div> ;
     });
 
     return <div className={styles.tabbedUI}>

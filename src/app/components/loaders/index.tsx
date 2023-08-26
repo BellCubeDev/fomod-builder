@@ -1,138 +1,10 @@
 'use client';
 
 import React from "react";
-import xmlFormat from 'xml-formatter';
 import { useSettings } from '../SettingsContext';
-import { TranslationTableKeys } from '../localization/strings';
-import { parseInfoDoc, Fomod, FomodInfo } from 'fomod';
+import { FomodLoader } from './LoaderBase';
 
-// TODO: Test that any of this actually does what I want it to
-
-export abstract class FomodLoader {
-    abstract getFileByPath(path: string): Promise<File|null>;
-
-    static CanUse: boolean;
-    static Name: keyof TranslationTableKeys;
-    static LoaderUI: React.FunctionComponent<{}>;
-    static LoaderUIClickEvent: (...params: Parameters<React.MouseEventHandler<HTMLButtonElement>>) => Promise<[false, FomodLoader] | [Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges>]>;
-
-    abstract commission?(): Promise<false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges> >;
-    abstract decommission(): Promise<void>;
-
-    abstract save(): Promise<false | Exclude<FomodSaveRejectReason, FomodSaveRejectReason.NoLoader> >;
-
-    abstract reloadFromText(text: string, info?: boolean): Promise<false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges> >;
-
-
-
-
-
-
-    protected abstract _infoDoc: Document | null;
-    protected abstract _info: FomodInfo | null;
-    protected abstract _infoText: string | null;
-    lastInfoDocEditType: 'doc'|'text'|null = null;
-
-
-    get infoDoc() {
-        if (this.lastModuleDocEditType === 'text' && this._infoText !== this._infoDoc?.textContent)
-            this._info = this._infoDoc ? parseInfoDoc(new DOMParser().parseFromString(this._infoText ?? '', 'application/xml')) : null;
-
-        return this._info;
-    }
-
-    get info() {
-        if (this.lastInfoDocEditType === 'doc' && this._infoText !== this._infoDoc?.textContent) {
-
-            this._info = this._infoDoc ? parseInfoDoc(this._infoDoc) : null;
-        }
-
-        return this._info;
-    }
-
-    set infoText(text: string) {
-        this._infoText = text;
-        this.lastInfoDocEditType = 'text';
-    }
-
-
-    get infoText() {
-        if (this.lastInfoDocEditType === 'doc' && this._infoText !== this._infoDoc?.textContent)
-            if (this._info && this._infoDoc) this._info.asElement(this._infoDoc);
-            this._infoText = this._info && this._infoDoc ? xmlFormat(new XMLSerializer().serializeToString(this._info.asElement(this._infoDoc)), {
-                forceSelfClosingEmptyTag: true,
-                indentation: '    ',
-                strictMode: true,
-                whiteSpaceAtEndOfSelfclosingTag: true,
-                lineSeparator: '\n',
-            }) : null;
-
-        return this._infoText || '';
-    }
-
-    get infoTextForSaving() {
-        return xmlFormat(this.infoText, {
-            forceSelfClosingEmptyTag: true,
-            indentation: '',
-            strictMode: true,
-            whiteSpaceAtEndOfSelfclosingTag: false,
-            lineSeparator: '',
-            collapseContent: true,
-        });
-    }
-
-
-
-
-
-
-    protected abstract _moduleDoc: Document | null;
-    protected abstract _module: Fomod<false> | null;
-    protected abstract _moduleText: string | null;
-    lastModuleDocEditType: 'doc'|'text'|null = null;
-
-
-    get moduleDoc() {
-        if (this.lastModuleDocEditType === 'text' && this._moduleText !== this._moduleDoc?.textContent)
-            this.reloadFromText(this._moduleText ?? '', false);
-        return this._moduleDoc;
-    }
-
-
-    set moduleText(text: string) {
-        this._moduleText = text;
-        this.lastModuleDocEditType = 'text';
-    }
-
-
-    get moduleText() {
-        if (this.lastModuleDocEditType === 'doc' && this._moduleText !== this._moduleDoc?.textContent){
-            if (this._module && this._moduleDoc) this._module.asElement(this._moduleDoc);
-            this._moduleText = xmlFormat(new XMLSerializer().serializeToString(this._moduleDoc ?? document.implementation.createDocument(null, null, null)), {
-                forceSelfClosingEmptyTag: true,
-                indentation: '    ',
-                strictMode: true,
-                whiteSpaceAtEndOfSelfclosingTag: true,
-                lineSeparator: '\n',
-            });
-        }
-
-        return this._moduleText || '';
-    }
-
-    get moduleDocForSaving() {
-        return xmlFormat(this.moduleText, {
-            forceSelfClosingEmptyTag: true,
-            indentation: '',
-            strictMode: true,
-            whiteSpaceAtEndOfSelfclosingTag: false,
-            lineSeparator: '',
-            collapseContent: true,
-        });
-    }
-}
-
-
+export * from './LoaderBase';
 
 export enum FomodLoadRejectReason {
     UnsavedChanges = 1,
@@ -155,29 +27,35 @@ export enum FomodSaveRejectReason {
 
 /** The current Fomod state shared across the editor */
 export interface FomodLoaderContext {
-    readonly fomod: FomodLoader | null;
+    readonly loader: FomodLoader | null;
     load(newLoader: FomodLoader, discard?: boolean): Promise<false|FomodLoadRejectReason>;
     autoSave(): Promise<false|FomodSaveRejectReason>;
 }
 
 export const loaderContext = React.createContext<FomodLoaderContext>({
-    fomod: null,
+    loader: null,
     load() { throw new Error('Cannot call load on the default context; add a FomodLoaderProvider to the tree first!'); },
     autoSave() { throw new Error('Cannot call autoSave on the default context; add a FomodLoaderProvider to the tree first!');}
 });
 
 /** Provides the current Fomod state shared across the editor */
 export function useFomod(requireLoader?: false): FomodLoaderContext
-export function useFomod(requireLoader: true): false | (FomodLoaderContext & { fomod: NonNullable<FomodLoaderContext['fomod']> })
+export function useFomod(requireLoader: true): false | (FomodLoaderContext & { loader: NonNullable<FomodLoaderContext['loader']> })
 export function useFomod(requireLoader = false) {
     const c = React.useContext(loaderContext);
-    if (requireLoader && !c.fomod) return false;
+    if (requireLoader && !c.loader) return false;
     return c;
 }
 
 export class NoLoaderError extends Error {
     constructor() {
         super('No Fomod loader provided');
+    }
+}
+
+declare global {
+    interface Window {
+        fomod: FomodLoaderContext;
     }
 }
 
@@ -218,7 +96,11 @@ export function FomodLoaderProvider({ children }: { children: React.ReactNode })
         });
     }, [loader, delay]);
 
-    return <loaderContext.Provider value={{ fomod: loader, load, autoSave }}>
+    React.useEffect(() => {
+        window.fomod = { loader, load, autoSave };
+    }, [loader, load, autoSave]);
+
+    return <loaderContext.Provider value={{ loader, load, autoSave }}>
         {children}
     </loaderContext.Provider>;
 }

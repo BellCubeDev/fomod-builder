@@ -124,6 +124,9 @@
     top: 0;
     left: 0;
 
+    width: calc(100vw - 166px); // TODO: Set with JS when extending the tab bar
+    height: calc(100vh - 64px);
+
     padding: 32px 48px;
 
     margin-left: 0;

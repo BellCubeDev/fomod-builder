@@ -44,8 +44,11 @@ Listed here so I don't forget to add these later
 * [ ] Differences Between Mod Manager Implementations
   * [ ] `SelectAtLeastOne` Groups
   * [ ] (MO2) Name from Info.xml `<Name>` vs (Vortex) ModuleConfig.xml's `<ModuleName>`
+  * [ ] MO2's `CouldBeUsable` extea space at start (needs further investigation)
 * [ ] Pseudo-Deprecated Features
   * [ ] `CouldBeUsable` Options
 * [ ] Problematic Features
   * [ ] `NotUsable` and `Required` Options
   * [ ] `fommDependency`
+* [ ] Intuition Breakers
+  * [ ] First matching `pattern` determines Option behavior type

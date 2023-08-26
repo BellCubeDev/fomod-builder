@@ -1,12 +1,11 @@
-import { FomodLoader } from '.';
 import path from 'path';
 
-import styles from 'FolderLoader.module.scss';
-import { TranslationTableKeys } from '../localization/strings';
+import styles from './FolderLoader.module.scss';
+import { TranslationTableKeys } from '../../localization/strings';
 import { T } from '@/app/components/localization';
-import { FomodSaveRejectReason, FomodLoadRejectReason } from './index';
+import { FomodLoader, FomodSaveRejectReason, FomodLoadRejectReason } from '..';
 
-import { parseInfoDoc, parseModuleDoc, Fomod, FomodInfo } from 'fomod';
+import { parseInfoDoc, parseModuleDoc, Fomod, BlankModuleConfig, FomodInfo, BlankInfoDoc, getOrCreateElementByTagName } from 'fomod';
 
 // TODO: Test that any of this actually does what I want it to
 
@@ -32,7 +31,7 @@ export default class FileSystemFolderLoader extends FomodLoader {
     async commission(): Promise<false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges> > {
         const [infoFile, moduleFile] = await Promise.all([
             this.folder.getBypath('fomod/Info.xml', true),
-            this.folder.getBypath('fomod/module.xml', true),
+            this.folder.getBypath('fomod/ModuleConfig.xml', true),
         ]);
 
         if (infoFile instanceof BCDFolder || moduleFile instanceof BCDFolder) return FomodLoadRejectReason.FileFolderMismatch;
@@ -47,11 +46,14 @@ export default class FileSystemFolderLoader extends FomodLoader {
             this.reloadModuleFromText(moduleText),
         ]);
 
+        this.history.add([this.module, this.info]);
+
         return infoResult || moduleResult;
     }
 
     async decommission(): Promise<void> {
-
+        if (this.moduleDoc) this._module?.destroy(this.moduleDoc);
+        if (this.infoDoc) this._info?.destroy(this.infoDoc);
     }
 
     async getFileByPath(path: string): Promise<File | null> {
@@ -61,45 +63,76 @@ export default class FileSystemFolderLoader extends FomodLoader {
         else return null;
     }
 
-    reloadFromText(text: string, info?: boolean | undefined): Promise<false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges> > {
-        if (info) return this.reloadInfoFromText(text);
-        else return this.reloadModuleFromText(text);
-    }
+    reloadFromText(text: string, info?: boolean | undefined): false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges> {
+        let result;
 
-    async reloadInfoFromText(text: string): Promise<false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges> > {
-        let doc: Document;
+        if (info) result = this.reloadInfoFromText(text);
+        else result = this.reloadModuleFromText(text);
 
-        try {
-            doc = new DOMParser().parseFromString(text, 'application/xml');
-        } catch (e) {
-            if (e instanceof Error && e.name === 'SyntaxError') return FomodLoadRejectReason.InvalidXML;
-            else throw e;
-        }
+        if (result) return result;
 
-        const result = parseInfoDoc(doc);
-        if (!result) return FomodLoadRejectReason.UnsalvageableInfoDoc;
-
-        this._info = result;
-        this.infoText = text;
+        this.history.add([this.module, this.info]);
 
         return false;
     }
 
-    async reloadModuleFromText(text: string): Promise<false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges> > {
+    // TODO: Come up with some clever way to notify the user when their Monaco-edited XML is invalid
+
+    reloadInfoFromText(text: string): false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges> {
+        text ||= BlankInfoDoc;
+
         let doc: Document;
 
         try {
             doc = new DOMParser().parseFromString(text, 'application/xml');
+            if (doc.body?.firstElementChild?.tagName === 'parsererror' || doc.documentElement?.firstElementChild?.tagName === 'parsererror') return FomodLoadRejectReason.InvalidXML;
         } catch (e) {
             if (e instanceof Error && e.name === 'SyntaxError') return FomodLoadRejectReason.InvalidXML;
             else throw e;
         }
 
-        const result = parseModuleDoc(doc);
-        if (!result) return FomodLoadRejectReason.UnsalvageableModuleDoc;
+        let result = parseInfoDoc(doc);
+        if (!result) {
+            if (doc.documentElement.getElementsByTagName(FomodInfo.tagName).length) return FomodLoadRejectReason.UnsalvageableInfoDoc;
+            result = new FomodInfo();
+            result.assignElement(getOrCreateElementByTagName(doc.documentElement, FomodInfo.tagName));
+        }
+
+        const asElement = result.asElement(doc);
+
+        this._info = result;
+        this._infoDoc = asElement.ownerDocument!;
+        this._infoText = asElement.outerHTML;
+
+        return false;
+    }
+
+    reloadModuleFromText(text: string): false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges> {
+        text ||=  BlankModuleConfig;
+
+        let doc: Document;
+
+        try {
+            doc = new DOMParser().parseFromString(text, 'application/xml');
+            if (doc.body?.firstElementChild?.tagName === 'parsererror' || doc.documentElement?.firstElementChild?.tagName === 'parsererror') return FomodLoadRejectReason.InvalidXML;
+        } catch (e) {
+            if (e instanceof Error && e.name === 'SyntaxError') return FomodLoadRejectReason.InvalidXML;
+            else throw e;
+        }
+
+
+        let result = parseModuleDoc(doc);
+        if (!result) {
+            if (doc.documentElement.getElementsByTagName(Fomod.tagName).length) return FomodLoadRejectReason.UnsalvageableModuleDoc;
+            result = new Fomod();
+            result.assignElement(getOrCreateElementByTagName(doc.documentElement, Fomod.tagName));
+        }
+
+        const asElement = result.asElement(doc);
 
         this._module = result;
-        this.moduleText = text;
+        this._moduleDoc = asElement.ownerDocument!;
+        this._moduleText = asElement.outerHTML;
 
         return false;
     }
@@ -119,10 +152,10 @@ export default class FileSystemFolderLoader extends FomodLoader {
         return infoResult || moduleResult;
     }
 
-    static override CanUse = FileSystemDirectoryHandle && !!window.showDirectoryPicker; // Firefox and Safari sadly don't not support this...
+    static override CanUse = typeof FileSystemDirectoryHandle !== 'undefined' && !!window.showDirectoryPicker; // Firefox and Safari sadly don't not support this...
     static override readonly Name = 'loader_filesystem' satisfies keyof TranslationTableKeys;
     static override async LoaderUIClickEvent(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<[false, FileSystemFolderLoader] | [Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges>]> {
-        const folder = await window.showDirectoryPicker();
+        let folder = await window.showDirectoryPicker().catch((e) => e instanceof DOMException && e.name === 'AbortError' ? null : Promise.reject(e));
         if (!folder) return [FomodLoadRejectReason.NoFolderSelected];
 
         const loader = new FileSystemFolderLoader(folder);
@@ -133,9 +166,8 @@ export default class FileSystemFolderLoader extends FomodLoader {
     }
     static override LoaderUI() {
         return <div className={styles.fsLoader}>
-            <h1><T tkey='loader_filesystem' params={[true]} /></h1>
+            <h2><T tkey='loader_filesystem' params={[true]} /></h2>
             <p><T tkey='loader_filesystem_description' /></p>
-            <button> <T tkey='loader_filesystem_select_folder' /> </button>
         </div>;
     }
 
@@ -172,8 +204,6 @@ export class BCDFolder extends BCDFileSystemObjectBase {
 
     children: Record<string, BCDFileSystemObject> = {};
 
-
-
     constructor(handle: FileSystemDirectoryHandle, parent: BCDFolder | null = null) {
         super();
         this.handle = handle;
@@ -181,15 +211,15 @@ export class BCDFolder extends BCDFileSystemObjectBase {
         handle.queryPermission({ mode: 'readwrite' }).then(v => this.thisIsExplicitlyWritable = v === 'granted');
     }
 
-    async getDirectChild(name: string, create: true): Promise<BCDFileSystemObject>
-    async getDirectChild(name: string, create?: false): Promise<BCDFileSystemObject | null>
-    async getDirectChild(name: string, create?: boolean): Promise<BCDFileSystemObject | null>
-    async getDirectChild(name: string, create = false): Promise<BCDFileSystemObject | null> {
+    async getDirectChild(name: string, create: true, directory: boolean): Promise<BCDFileSystemObject>
+    async getDirectChild(name: string, create?: false, directory?: boolean): Promise<BCDFileSystemObject | null>
+    async getDirectChild(name: string, create?: boolean, directory?: boolean): Promise<BCDFileSystemObject | null>
+    async getDirectChild(name: string, create = false, directory = false): Promise<BCDFileSystemObject | null> {
         if (name in this.children) return this.children[name]!;
 
         try {
-            const nextHandle = await this.handle.getFileHandle(name, { create });
-            this.children[name] = new BCDFile(nextHandle, this);
+            const nextHandle = await this.handle[directory ? 'getDirectoryHandle' : 'getFileHandle'](name, { create });
+            this.children[name] = nextHandle instanceof FileSystemFileHandle ? new BCDFile(nextHandle, this) : new BCDFolder(nextHandle, this);
             return this.children[name]!;
         } catch (e) {
             if (e && e instanceof Error && e.name === 'NotFoundError') return null;
@@ -218,7 +248,7 @@ export class BCDFolder extends BCDFileSystemObjectBase {
                 continue;
             }
 
-            const next = await current.getDirectChild(item, create);
+            const next = await current.getDirectChild(item, create, i !== items.length - 1);
             if (next === null) return null;
 
             if (next instanceof BCDFile) {

@@ -16,11 +16,11 @@ const FomodMonacoEditorDynamicImport = dynamic(() => import('./DynamicallyImport
     },
 });
 
-// A sort of cache so we don't have to run that dreaded 2-second delay EVERY SINGLE TIME the tab is revealed
+// A sort of cache so we don't have to run that dreaded 1.5-second delay EVERY SINGLE TIME the tab is revealed
 let editor: Awaited<ReturnType<typeof FomodMonacoEditorDynamicImportDelayed>> | null = null;
 
 async function FomodMonacoEditorDynamicImportDelayed() {
-    await new Promise((r,) => setTimeout(r, 2000));
+    await new Promise((r,) => setTimeout(r, 1500));
     editor = <FomodMonacoEditorDynamicImport />;
     return <FomodMonacoEditorDynamicImport />;
 }

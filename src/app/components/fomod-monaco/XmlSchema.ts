@@ -6,7 +6,7 @@ import XsdManager from 'monaco-xsd-code-completion/src/XsdManager';
 import XsdFeatures from 'monaco-xsd-code-completion/src/XsdFeatures';
 
 async function getInfoSchema() {
-    let response = await fetch('/info.xsd');
+    let response = await fetch('/schemas/info.xsd');
     return await response.text();
 }
 
