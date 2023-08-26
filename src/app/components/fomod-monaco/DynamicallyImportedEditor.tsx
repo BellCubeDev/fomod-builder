@@ -12,7 +12,7 @@ import getXmlCompletionProvider, { SchemaPromise } from './XmlSchema';
 
 import applyXmlSchemasToMonaco from './XmlSchema';
 import DarkModernThemePromise from './DarkModernTheme';
-import { SourceCodePro } from '../../layout';
+import { SourceCodePro } from '../../SourceCodePro';
 
 const darkModernTheme: Awaited<typeof DarkModernThemePromise> = await DarkModernThemePromise;
 const schemas: Awaited<typeof SchemaPromise> = await SchemaPromise;

@@ -10,19 +10,11 @@ import HistoryStateManager from './components/loaders/HistoryManager';
 FontAwesomeConfig.autoAddCss = false;
 
 import { Rubik } from 'next/font/google';
+import { SourceCodePro } from './SourceCodePro';
 const rubik = Rubik({
     display: 'block',
     weight: ['400', '600', '700'],
     subsets: ['latin-ext'],
-})
-
-import {Source_Code_Pro} from 'next/font/google';
-export const SourceCodePro = Source_Code_Pro({
-    weight: '400',
-    display: 'swap',
-    preload: false,
-    subsets: ['cyrillic', 'cyrillic-ext', 'greek', 'greek-ext', 'latin', 'latin-ext', 'vietnamese'],
-    variable: '--code-font',
 });
 
 // Exported directly in page.js as well to avoid a strange bugs or two

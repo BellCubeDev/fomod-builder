@@ -52,8 +52,7 @@ export default class FileSystemFolderLoader extends FomodLoader {
     }
 
     async decommission(): Promise<void> {
-        if (this.moduleDoc) this._module?.destroy(this.moduleDoc);
-        if (this.infoDoc) this._info?.destroy(this.infoDoc);
+        if (this.moduleDoc) this._module?.decommission(this.moduleDoc);
     }
 
     async getFileByPath(path: string): Promise<File | null> {
