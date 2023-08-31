@@ -11,7 +11,8 @@ export default function HistoryStateManager(props: Omit<React.DetailedHTMLProps<
     const undoOnKey = React.useCallback((e: KeyboardEvent) => {
         if (!fomod) return;
 
-        if (!(e.key === 'z' && e.ctrlKey && !e.shiftKey)) return;
+        const k = e.key.toLowerCase();
+        if (  !(k === 'z' && e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey)  ) return;
 
         fomod.undo();
     }, [fomod]);
@@ -19,24 +20,25 @@ export default function HistoryStateManager(props: Omit<React.DetailedHTMLProps<
     const redoOnKey = React.useCallback((e: KeyboardEvent) => {
         if (!fomod) return;
 
-        if (!(e.ctrlKey && e.shiftKey && e.key === 'z' && e.shiftKey) && !(e.ctrlKey && e.key === 'y')) return;
+        const k = e.key.toLowerCase();
+        if (  !((k === 'z' && e.ctrlKey && e.shiftKey && !e.altKey && !e.metaKey) || (k === 'y' && e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey))  ) return;
 
         fomod.redo();
     }, [fomod]);
 
     React.useEffect(() => {
         if (!divRef.current) return;
-
         const div = divRef.current;
 
-        div.addEventListener('keydown', undoOnKey);
-        div.addEventListener('keydown', redoOnKey);
+        div.ownerDocument.addEventListener('keydown', undoOnKey);
+        div.ownerDocument.addEventListener('keydown', redoOnKey);
 
         return () => {
-            div.removeEventListener('keydown', undoOnKey);
-            div.removeEventListener('keydown', redoOnKey);
+            div.ownerDocument.removeEventListener('keydown', undoOnKey);
+            div.ownerDocument.removeEventListener('keydown', redoOnKey);
         };
     }, [divRef, undoOnKey, redoOnKey]);
 
     return <div {...props} ref={divRef}></div>;
 }
+

@@ -31,7 +31,7 @@ const tab: Tab = {
                 editorChoice === 'builder' ? <FomodEditor />
                 : editorChoice === 'vortex' ? <VortexFomodEditor />
                 : editorChoice === 'mo2' ? <MO2FomodEditor />
-                : null
+                : 'ERROR: Invalid editor choice!'
             }
 
         </div>;

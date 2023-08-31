@@ -12,7 +12,7 @@ export default function FomodLoaderUI() {
 
     const clickEvent = React.useCallback(async (loader: Omit<typeof FomodLoaderClass, 'new'>, e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 
-        const loaderResult = await loader.LoaderUIClickEvent(e);
+        const loaderResult = await loader.LoaderUIClickEvent(core.eventTarget, e);
 
         if (loaderResult[0]) return console.error(FomodLoadRejectReason[loaderResult[0]]);
 

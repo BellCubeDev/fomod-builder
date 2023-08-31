@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
+import React from 'react';
 
 const FomodMonacoEditorDynamicImport = dynamic(() => import('./DynamicallyImportedEditor'), {
     ssr: false,
@@ -14,15 +15,14 @@ const FomodMonacoEditorDynamicImport = dynamic(() => import('./DynamicallyImport
 
         return <p>Loading Monaco editor... (UNKNOWN STATE)</p>;
     },
-});
+}) as React.FunctionComponent;
 
 // A sort of cache so we don't have to run that dreaded 1.5-second delay EVERY SINGLE TIME the tab is revealed
-let editor: Awaited<ReturnType<typeof FomodMonacoEditorDynamicImportDelayed>> | null = null;
+let editor: ReturnType<Awaited<typeof FomodMonacoEditorDynamicImport>> | null = null;
 
 async function FomodMonacoEditorDynamicImportDelayed() {
-    await new Promise((r,) => setTimeout(r, 1500));
     editor = <FomodMonacoEditorDynamicImport />;
-    return <FomodMonacoEditorDynamicImport />;
+    return editor!;
 }
 
 export default function FomodMonacoEditor() {

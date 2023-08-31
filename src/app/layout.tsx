@@ -6,7 +6,7 @@ import { config as FontAwesomeConfig } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import { SettingsProvider } from './components/SettingsContext';
 import { FomodLoaderProvider } from './components/loaders/index';
-import HistoryStateManager from './components/loaders/HistoryManager';
+import HistoryStateManager from './components/loaders/HistoryKeybindManager';
 FontAwesomeConfig.autoAddCss = false;
 
 import { Rubik } from 'next/font/google';

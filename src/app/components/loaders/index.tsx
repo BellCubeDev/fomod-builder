@@ -25,17 +25,25 @@ export enum FomodSaveRejectReason {
     FileFolderMismatch,
 }
 
+export interface FomodEventTarget extends EventTarget {
+    addEventListener(type: 'info-update'|'module-update', callback: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean): void;
+    dispatchEvent(event: Event): boolean;
+    removeEventListener(type: 'info-update'|'module-update', callback: EventListenerOrEventListenerObject | null, options?: EventListenerOptions | boolean): void;
+}
+
 /** The current Fomod state shared across the editor */
 export interface FomodLoaderContext {
     readonly loader: FomodLoader | null;
     load(newLoader: FomodLoader, discard?: boolean): Promise<false|FomodLoadRejectReason>;
     autoSave(): Promise<false|FomodSaveRejectReason>;
+    eventTarget: FomodEventTarget;
 }
 
 export const loaderContext = React.createContext<FomodLoaderContext>({
     loader: null,
     load() { throw new Error('Cannot call load on the default context; add a FomodLoaderProvider to the tree first!'); },
-    autoSave() { throw new Error('Cannot call autoSave on the default context; add a FomodLoaderProvider to the tree first!');}
+    autoSave() { throw new Error('Cannot call autoSave on the default context; add a FomodLoaderProvider to the tree first!');},
+    eventTarget: new EventTarget(),
 });
 
 /** Provides the current Fomod state shared across the editor */
@@ -82,6 +90,8 @@ export function FomodLoaderProvider({ children }: { children: React.ReactNode })
     const settings = useSettings();
     const delay = settings?.autoSave;
 
+    const {current: eventTarget} = React.useRef(new EventTarget());
+
     let autoSaveTimer = React.useRef<ReturnType<typeof setTimeout>|null>(null);
 
     const autoSave = React.useCallback(() => {
@@ -97,10 +107,10 @@ export function FomodLoaderProvider({ children }: { children: React.ReactNode })
     }, [loader, delay]);
 
     React.useEffect(() => {
-        window.fomod = { loader, load, autoSave };
-    }, [loader, load, autoSave]);
+        window.fomod = { loader, load, autoSave, eventTarget };
+    }, [loader, load, autoSave, eventTarget]);
 
-    return <loaderContext.Provider value={{ loader, load, autoSave }}>
+    return <loaderContext.Provider value={{ loader, load, autoSave, eventTarget }}>
         {children}
     </loaderContext.Provider>;
 }

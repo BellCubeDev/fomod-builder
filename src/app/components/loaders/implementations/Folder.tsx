@@ -6,6 +6,7 @@ import { T } from '@/app/components/localization';
 import { FomodLoader, FomodSaveRejectReason, FomodLoadRejectReason } from '..';
 
 import { parseInfoDoc, parseModuleDoc, Fomod, BlankModuleConfig, FomodInfo, BlankInfoDoc, getOrCreateElementByTagName } from 'fomod';
+import { FomodEventTarget } from '../index';
 
 // TODO: Test that any of this actually does what I want it to
 
@@ -18,10 +19,10 @@ export default class FileSystemFolderLoader extends FomodLoader {
     protected override _moduleDoc: Document | null = null;
     protected override _moduleText: string | null = null;
 
-    constructor(folder: FileSystemDirectoryHandle | BCDFolder) {
+    constructor(eventTarget: FomodEventTarget, folder: FileSystemDirectoryHandle | BCDFolder) {
         if (folder instanceof FileSystemDirectoryHandle) folder = new BCDFolder(folder);
 
-        super();
+        super(eventTarget);
 
         this.folder = folder;
     }
@@ -70,7 +71,7 @@ export default class FileSystemFolderLoader extends FomodLoader {
 
         if (result) return result;
 
-        this.history.add([this.module, this.info]);
+        this.history.add([this._module!, this._info!]);
 
         return false;
     }
@@ -153,11 +154,11 @@ export default class FileSystemFolderLoader extends FomodLoader {
 
     static override CanUse = typeof FileSystemDirectoryHandle !== 'undefined' && !!window.showDirectoryPicker; // Firefox and Safari sadly don't not support this...
     static override readonly Name = 'loader_filesystem' satisfies keyof TranslationTableKeys;
-    static override async LoaderUIClickEvent(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<[false, FileSystemFolderLoader] | [Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges>]> {
+    static override async LoaderUIClickEvent(eventTarget: FomodEventTarget, e: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<[false, FileSystemFolderLoader] | [Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges>]> {
         let folder = await window.showDirectoryPicker().catch((e) => e instanceof DOMException && e.name === 'AbortError' ? null : Promise.reject(e));
         if (!folder) return [FomodLoadRejectReason.NoFolderSelected];
 
-        const loader = new FileSystemFolderLoader(folder);
+        const loader = new FileSystemFolderLoader(eventTarget, folder);
         const commissionResult = await loader.commission();
         if (commissionResult) return [commissionResult];
 

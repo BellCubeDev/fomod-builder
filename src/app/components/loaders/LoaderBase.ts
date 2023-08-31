@@ -2,18 +2,23 @@
 
 import React from "react";
 import xmlFormat from 'xml-formatter';
-import { XmlParserElementNode }from 'xml-parser-xo';
 import { Fomod, FomodInfo } from 'fomod';
 import { useImmer } from 'use-immer';
-import { Immutable, enableMapSet } from 'immer';
+import { Immutable, enableMapSet, immerable } from 'immer';
 enableMapSet();
 
 import { TranslationTableKeys } from '../localization/strings';
 import { FomodLoadRejectReason, FomodSaveRejectReason } from '.';
-import { metadata } from '../../layout';
 
+import * as fomodLib from 'fomod';
+import { FomodEventTarget } from './index';
 
-// TODO: Test that any of this actually does what I want it to
+for (const item of Object.values(fomodLib)) {
+    if ((typeof item === 'function' || typeof item === 'object') && 'prototype' in item) {
+        item.prototype ??= {};
+        item.prototype[immerable] = true;
+    }
+}
 
 export abstract class FomodLoader {
     abstract getFileByPath(path: string): Promise<File|null>;
@@ -21,7 +26,7 @@ export abstract class FomodLoader {
     static CanUse: boolean;
     static Name: keyof TranslationTableKeys & `loader_${string}`;
     static LoaderUI: React.FunctionComponent<{}>;
-    static LoaderUIClickEvent: (...params: Parameters<React.MouseEventHandler<HTMLButtonElement>>) => Promise<[false, FomodLoader] | [Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges>]>;
+    static LoaderUIClickEvent: (eventTarget: FomodEventTarget, ...params: Parameters<React.MouseEventHandler<HTMLButtonElement>>) => Promise<[false, FomodLoader] | [Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges>]>;
 
     abstract commission?(): Promise<false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges> >;
     abstract decommission(): Promise<void>;
@@ -30,6 +35,11 @@ export abstract class FomodLoader {
 
     abstract reloadFromText(text: string, info?: boolean): false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges>;
 
+
+    protected eventTarget: FomodEventTarget;
+    constructor(eventTarget: FomodEventTarget) {
+        this.eventTarget = eventTarget;
+    }
 
 
     formatXMLForEditing(text: string) {
@@ -150,9 +160,24 @@ export abstract class FomodLoader {
         const this_ = this as FomodLoader;
 
         const item: HistoryStates<[Fomod<false>, FomodInfo]> = {
-            add: add<[Fomod<false>, FomodInfo]>,
-            move: moveBase<[Fomod<false>, FomodInfo]>,
-            moveBase: moveBase<[Fomod<false>, FomodInfo]>,
+            add: function (this: HistoryStates<[Fomod<false>, FomodInfo]>, s: TupleOfImmutable<[Fomod<false>, FomodInfo]>) {
+                const lastState = this.current;
+
+                if (lastState && lastState[0] === s[0] && lastState[1] === s[1]) return;
+
+                addBase.bind<typeof addBase<[Fomod<false>, FomodInfo]>>(this)(s);
+
+                if (lastState?.[0] !== this.current![0]) this_.eventTarget.dispatchEvent(new Event('module-update', {cancelable: false}));
+                if (lastState?.[1] !== this.current![1]) this_.eventTarget.dispatchEvent(new Event('info-update', {cancelable: false}));
+            },
+            move: function (this: HistoryStates<[Fomod<false>, FomodInfo]>, howMuch: number) {
+                const lastState = this.current!;
+                const newState = moveBase.bind<typeof moveBase<[Fomod<false>, FomodInfo]>>(this)(howMuch);
+
+                if (!newState) return;
+                if (lastState[0] !== newState[0]) this_.eventTarget.dispatchEvent(new Event('module-update', {cancelable: false}));
+                if (lastState[1] !== newState[1]) this_.eventTarget.dispatchEvent(new Event('info-update', {cancelable: false}));
+            },
             forward: [],
             backward: [],
             get current() { return this_._module && this_._info ? [this_._module, this_._info] : null; },
@@ -188,27 +213,37 @@ export interface HistoryStates<T> {
     backward: TupleOfImmutable<T>[],
     current: TupleOfImmutable<T> | null,
     move(howMuch: number): void,
-    moveBase: typeof moveBase<T>,
-    add: typeof add<T>,
+    add: typeof addBase<T>,
 };
 
 export function moveBase<T>(this: HistoryStates<T>, howMuch: number): TupleOfImmutable<T>|null {
 
+    const oldState = this.current!;
     let newState: TupleOfImmutable<T>|null;
-    if (howMuch === 0) newState = this.current;
+
+    if (howMuch === 0) newState = oldState;
     else if (howMuch > 0) {
-        newState = this.forward[howMuch - 1] || this.current;
-        this.backward = [...this.backward, ...(this.current ? [this.current] : []), ...this.forward.slice(0, howMuch - 1)];
+        if (this.forward.length < 1) return oldState;
+        const lengthToSlice = Math.min(howMuch, this.forward.length);
+
+        newState = this.forward.shift()!;
+        this.backward = [...this.backward, oldState];
+        this.forward = this.forward.slice(0, this.forward.length - lengthToSlice + 1);
+    } else {
+        if (this.backward.length < 1) return oldState;
+        const lengthToSlice = Math.min(-howMuch, this.backward.length);
+
+        newState = this.backward.pop()!;
+        this.forward = [oldState, ...this.forward];
+        this.backward = this.backward.slice(0, this.backward.length - lengthToSlice + 1);
     }
-    else {
-        newState = this.backward[Math.abs(howMuch) - 1] || this.current;
-        this.forward = [...this.forward.slice(Math.abs(howMuch) - 1), ...(this.current ? [this.current] : []), ...this.backward];
-    }
+
+    this.current = newState;
 
     return newState;
 }
 
-export function add<T>(this: HistoryStates<T>, newState: TupleOfImmutable<T>) {
+export function addBase<T>(this: HistoryStates<T>, newState: TupleOfImmutable<T>) {
     if (this.current) this.backward = [...this.backward, this.current];
     this.current = newState;
     this.forward = [];
