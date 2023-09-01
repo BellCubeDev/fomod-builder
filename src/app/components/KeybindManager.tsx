@@ -5,8 +5,8 @@ export interface Keybind {
     key: string;
     control?: boolean;
     shift?: boolean;
-    alt?: boolean;
-    meta?: boolean;
+    altOrOption?: boolean;
+    windowsOrCommand?: boolean;
     action: (e: KeyboardEvent) => unknown;
     doNotPreventDefault?: boolean;
     doNotBreak?: boolean;
@@ -39,7 +39,7 @@ export default function KeybindManager({keybinds, ...props}: {keybinds: Keybind[
     const handleKeybind = React.useCallback((providedKeybinds: Keybind[], e: KeyboardEvent) => {
         for (const keybind of providedKeybinds) {
             //console.log(`Evaluating keybind ${stringifyKeybind(keybind)} against ${stringifyKeybindFromEvent(e)}`);
-            if (keybind.key !== e.key.toLowerCase() || !!keybind.control !== e.ctrlKey || !!keybind.shift !== e.shiftKey || !!keybind.alt !== e.altKey || !!keybind.meta !== e.metaKey)
+            if (keybind.key !== e.key.toLowerCase() || !!keybind.control !== e.ctrlKey || !!keybind.shift !== e.shiftKey || !!keybind.altOrOption !== e.altKey || !!keybind.windowsOrCommand !== e.metaKey)
                 continue;
 
             //console.log(`Executing keybind ${stringifyKeybind(keybind)}`);
