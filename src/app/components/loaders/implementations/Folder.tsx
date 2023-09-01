@@ -140,7 +140,7 @@ export default class FileSystemFolderLoader extends FomodLoader {
     async save(): Promise<false | Exclude<FomodSaveRejectReason, FomodSaveRejectReason.NoLoader> > {
         const [infoFile, moduleFile] = await Promise.all([
             this.folder.getBypath('fomod/Info.xml', true),
-            this.folder.getBypath('fomod/module.xml', true),
+            this.folder.getBypath('fomod/ModuleConfig.xml', true),
         ]);
         if (infoFile instanceof BCDFolder || moduleFile instanceof BCDFolder) return FomodSaveRejectReason.FileFolderMismatch;
 
@@ -295,10 +295,10 @@ export class BCDFile extends BCDFileSystemObjectBase {
         }).bind(this), 1000);
     }
 
-    async getWriteStream(): Promise<FileSystemWritableFileStream> {
+    async getWriteStream(options?: FileSystemCreateWritableOptions): Promise<FileSystemWritableFileStream> {
         if (this._writeStream) return this._writeStream;
 
-        const newStream = await this.handle.createWritable();
+        const newStream = await this.handle.createWritable(options);
         this.newWriteStream = newStream;
 
         return newStream;
@@ -314,7 +314,7 @@ export class BCDFile extends BCDFileSystemObjectBase {
             return FomodSaveRejectReason.CouldNotCreateWritable;
         }
 
-        await this.newWriteStream.write(content);
+        await this._writeStream!.write(content);
 
         return false;
     }

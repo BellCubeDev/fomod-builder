@@ -22,7 +22,5 @@ export default function GlobalKeybinds(props: Omit<React.DetailedHTMLProps<React
         {key: 'z', windowsOrCommand: true, shift: true, action: loader?.redo.bind(loader)},
     ] as Keybind[]).map(k => (k.global = true) && k ), [loader]);
 
-    console.log(keybinds);
-
     return <KeybindManager keybinds={keybinds} {...props} />;
 }
