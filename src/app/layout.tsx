@@ -4,10 +4,11 @@ import './global.scss';
 
 import { config as FontAwesomeConfig } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
+FontAwesomeConfig.autoAddCss = false;
+
 import { SettingsProvider } from './components/SettingsContext';
 import { FomodLoaderProvider } from './components/loaders/index';
-import HistoryStateManager from './components/loaders/HistoryKeybindManager';
-FontAwesomeConfig.autoAddCss = false;
+import GlobalKeybinds from './GlobalKeybinds';
 
 import { Rubik } from 'next/font/google';
 import { SourceCodePro } from './SourceCodePro';
@@ -73,9 +74,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return <html lang='en'>
             <body className={rubik.className + ' ' + SourceCodePro.variable}>
-                <LocaleProvider><SettingsProvider><FomodLoaderProvider><HistoryStateManager>
+                <LocaleProvider><SettingsProvider><FomodLoaderProvider><GlobalKeybinds>
                     {children}
-                </HistoryStateManager></FomodLoaderProvider></SettingsProvider></LocaleProvider>
+                </GlobalKeybinds></FomodLoaderProvider></SettingsProvider></LocaleProvider>
             </body>
     </html>;
 }

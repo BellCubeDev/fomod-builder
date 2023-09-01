@@ -4,8 +4,7 @@ import React from "react";
 import xmlFormat from 'xml-formatter';
 import { Fomod, FomodInfo } from 'fomod';
 import { useImmer } from 'use-immer';
-import { Immutable, enableMapSet, immerable } from 'immer';
-enableMapSet();
+import { Immutable, immerable } from 'immer';
 
 import { TranslationTableKeys } from '../localization/strings';
 import { FomodLoadRejectReason, FomodSaveRejectReason } from '.';

@@ -4,6 +4,8 @@ import React from "react";
 import { useSettings } from '../SettingsContext';
 import { FomodLoader } from './LoaderBase';
 
+import { enableMapSet } from 'immer';
+
 export * from './LoaderBase';
 
 export enum FomodLoadRejectReason {
@@ -69,6 +71,10 @@ declare global {
 
 export function FomodLoaderProvider({ children }: { children: React.ReactNode }) {
     const [loader, setLoader] = React.useState<FomodLoader|null>(null);
+
+    React.useEffect(() => {
+        enableMapSet();
+    }, []);
 
     const load = React.useCallback((newLoader: FomodLoader, discard = false) => {
         if (loader && !discard) return Promise.resolve<false>(false);
