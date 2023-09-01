@@ -29,7 +29,7 @@
     "downshift": "^8.1.0",
     "eslint": "8.42.0",
     "eslint-config-next": "13.4.4",
-    "fomod": "^0.1.3",
+    "fomod": "^0.1.4",
     "immer": "^10.0.2",
     "monaco-xsd-code-completion": "file:src/external/monaco-xsd-code-completion",
     "next": "^13.4.19",
