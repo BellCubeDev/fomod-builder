@@ -55,6 +55,11 @@ export interface TranslationTableKeys {
     loader_text_input_description: () => React.ReactNode;
 
     // Settings
+
+    // Steps
+    step_add_button: () => React.ReactNode;
+    step_button: (name: string) => React.ReactNode;
+    step_header: (name: string) => React.ReactNode;
 }
 
 
@@ -148,6 +153,18 @@ export const translationTable = {
 
     loader_text_input_description: {
         en: ()=> <>Enter the contents of ModuleConfig.xml and Info.xml below. We&lsquo;ll use that text for your editing session.</>
-    }
+    },
+
+    step_add_button: {
+        en: ()=> '+',
+    },
+
+    step_button: {
+        en: (name: string) => name || <i>Unnamed Step</i>,
+    },
+
+    step_header: {
+        en: (name: string) => name ? <>Step &ldquo;{name}&rdquo;</> : <>Unnamed Step</>,
+    },
 
 } as const satisfies TranslationTable;

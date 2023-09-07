@@ -1,0 +1,66 @@
+@use './vars' as *;
+
+.builderBody {
+    margin-top: 8px;
+}
+
+.stepSelector {
+    overflow-y: hidden;
+    overflow-x: auto;
+    white-space: nowrap;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+
+    button {
+        background-color: $step-inactive;
+
+        padding: 8px 16px;
+
+        font-size: 1em;
+        color: white;
+        i { color: #aaa; }
+
+        border: 2px solid #888;
+
+        outline: none;
+
+        transition: all 0.15s ease-in-out;
+        transition-property: background-color, border-color;
+
+        &:hover { background-color: mix($step-inactive, $step-background, 50%); }
+        &:focus {
+            background-color: $step-background;
+            border-color: white;
+        }
+
+        &.active { background-color: $step-background; }
+
+        &[aria-selected="true"] {
+            background-color: $step-background !important;
+            border-color: white;
+            border-bottom-color: $step-background;
+        }
+    }
+
+    .stepAddButton {
+        background-color: #222;
+
+        padding: 6px 10px;
+        margin-left: 4px;
+        border-radius: 32px;
+        height: 32px;
+
+        font-weight: bold;
+    }
+}
+
+.stepBody {
+    display: block;
+    background: $step-background;
+    > :first-child {margin-top: 0;}
+    padding: 16px;
+}
+
+

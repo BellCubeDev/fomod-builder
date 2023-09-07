@@ -1,11 +1,23 @@
 'use client';
 
-import { Immutable } from 'immer';
-import { Step } from 'fomod';
+import React from 'react';
 
-export default function BuilderStep({step}: {step: Immutable<Step>}) {
+import { Immutable, Draft } from 'immer';
+import { Step } from 'fomod';
+import { T } from '@/app/components/localization';
+
+export default function BuilderStep({step, edit}: {step: Immutable<Step>, edit: (recipe: (draft: Draft<Step>) => Step | undefined | void) => void}) {
+    const editName = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        edit(draft => {
+            draft.name = e.target.value;
+        });
+    }, [edit]);
+
+
     return <>
-        <h2>{step.name}</h2>
+        <h2><T tkey='step_header' params={[step.name]} /></h2>
+
+        <input type="text" value={step.name} onInput={editName} onChange={editName} />
     </>;
 }
 
