@@ -3,7 +3,7 @@
 import { GroupBehaviorType, OptionType, SortingOrder } from 'fomod';
 import React from 'react';
 
-interface Settings {
+export interface Settings {
     defaultOptionType: OptionType,
     defaultGroupBehavior: GroupBehaviorType,
     defaultOptionSortingOrder: SortingOrder,
@@ -45,7 +45,7 @@ function defaultUpdate<TKey extends keyof SettingsValues | undefined = undefined
     localStorage.setItem('settings', JSON.stringify(this, (key, v) => key === 'update' ? undefined : v));
 }
 
-const defaultSettings = {
+export const defaultSettings = {
     update: defaultUpdate,
 
     defaultOptionType: OptionType.Optional,
@@ -76,7 +76,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         const settings = JSON.parse(fromStorage);
         if ('update' in settings) delete settings.update;
 
-        setValue(Object.assign({}, defaultSettings, settings));
+        setValue(Object.assign({}, defaultSettings, settings, { update(this: Settings, ...args: any[]) {
+            defaultUpdate.bind(this, ...args)();
+            setValue(Object.assign({}, this)); // Hack to get React to re-render
+        }}));
     }, []);
 
     React.useEffect(() => {

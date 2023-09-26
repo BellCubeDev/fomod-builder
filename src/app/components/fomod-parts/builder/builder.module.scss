@@ -4,63 +4,163 @@
     margin-top: 8px;
 }
 
-.stepSelector {
-    overflow-y: hidden;
-    overflow-x: auto;
-    white-space: nowrap;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
+.addButton {
+    background-color: #222;
+    color: white;
 
-    button {
-        background-color: $step-inactive;
+    padding: 6px 10px;
+    margin-left: 4px;
+    border-radius: 32px;
+    height: 32px;
 
-        padding: 8px 16px;
+    font-weight: bold;
+    outline: none;
 
-        font-size: 1em;
-        color: white;
-        i { color: #aaa; }
+    font-size: 1em;
+    color: white;
 
-        border: 2px solid #888;
+    border: 2px solid #666;
 
-        outline: none;
+    outline: none;
 
-        transition: all 0.15s ease-in-out;
-        transition-property: background-color, border-color;
+    transition: all 0.15s ease-in-out;
+    transition-property: background-color, border-color;
 
-        &:hover { background-color: mix($step-inactive, $step-background, 50%); }
-        &:focus {
-            background-color: $step-background;
-            border-color: white;
-        }
-
-        &.active { background-color: $step-background; }
-
-        &[aria-selected="true"] {
-            background-color: $step-background !important;
-            border-color: white;
-            border-bottom-color: $step-background;
-        }
+    &:hover { background-color: #333; }
+    &:focus {
+        background-color: #333;
+        border-color: #777;
     }
 
-    .stepAddButton {
-        background-color: #222;
+    &.active { background-color: #999; }
+}
 
-        padding: 6px 10px;
-        margin-left: 4px;
-        border-radius: 32px;
-        height: 32px;
+.deleteButton {
+    background: none;
+    outline: none;
+    border: none;
 
-        font-weight: bold;
+    margin-left: 8px;
+    padding: 0;
+
+    font-size: 1.1em;
+    margin-top: 0.2em;
+    margin-bottom: 0.1em;
+
+    transition: color 0.15s ease-in-out;
+    color: #ccc;
+    &:hover { color: #fff; }
+    &:focus { color: #fff; }
+}
+
+@keyframes scaleInX {
+    0% {
+        max-width: 0%;
+        scale: 0 1;
+    }
+
+    100% {
+        max-width: 100%;
+        scale: 1 1;
     }
 }
 
-.stepBody {
-    display: block;
-    background: $step-background;
-    > :first-child {margin-top: 0;}
-    padding: 16px;
+.scaleInX {
+    animation: scaleInX 0.15s ease-out;
+    max-width: 100%;
+    scale: 1 1;
+    transform-origin: left center;
 }
 
+.scaleOutX {
+    animation: scaleInX 0.15s ease-out reverse;
+    max-width: 0%;
+    scale: 0 1;
+    transform-origin: left center;
+}
 
+@mixin bodyStyling($color-bg-inactive, $color-bg-active) {
+    width: 100%;
+
+    > .childSelector {
+        width: 100%;
+        height: 43px;
+
+        overflow-y: hidden;
+        overflow-x: auto;
+        white-space: nowrap;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+
+        > span {
+            color: #aaa;
+            font-size: 1em;
+            padding: 12px 0;
+        }
+
+        button:not(.addButton, .deleteButton) {
+            background-color: $color-bg-inactive;
+
+            padding: 8px 16px;
+
+            font-size: 1em;
+            color: white;
+            i { color: #aaa; }
+
+            border: 2px solid #888;
+
+            outline: none;
+
+            transition: all 0.15s ease-in-out;
+            transition-property: background-color, border-color;
+
+            &:hover { background-color: mix($color-bg-inactive, $color-bg-active, 50%); }
+            &:focus {
+                background-color: $color-bg-active;
+                border-color: white;
+            }
+
+            &.active { background-color: $color-bg-active; }
+
+            &[aria-selected="true"] {
+                background-color: $color-bg-active !important;
+                border-color: white;
+                border-bottom-color: $color-bg-active;
+            }
+        }
+    }
+
+    > .body {
+        width: calc(100% - 32px);
+        &:not(:has(> *)) { display: none; }
+
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 16px;
+
+        background: $color-bg-active;
+        > :first-child {margin-top: 0;}
+        padding: 16px;
+    }
+}
+
+.builderBody {
+    @include bodyStyling($step-inactive, $step-background);
+
+    > .body {
+        width: calc(100% - 32px);
+    }
+
+    .groupWrapper {
+        @include bodyStyling($group-inactive, $group-background);
+
+        .optionWrapper {
+            @include bodyStyling($option-inactive, $option-background);
+        }
+    }
+}

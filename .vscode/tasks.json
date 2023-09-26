@@ -12,8 +12,8 @@
                 {
                     "background": {
                         "activeOnStart": true,
-                        "beginsPattern": "> .* Restarting the server to apply the changes...|[^\\-\\w]*?wait[^\\-]*  - compiling.*",
-                        "endsPattern": "[^\\-\\w]*?ready[^\\-]*- started server on .*?, url: .*|[^\\-\\w]*?event[^\\-]* - compiled.*"
+                        "beginsPattern": "\\s*▲ Next.js|○ compiling",
+                        "endsPattern": "✓ Ready |✓ Compiled"
                     },
                     "pattern": {
                         "regexp": "9{2147483647}"

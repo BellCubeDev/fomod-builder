@@ -28,10 +28,14 @@ npm i
 npm run dev
 ```
 
+# FIXME
+
+* Scrollbar pushes step/option/group selection up
+  * Figure out how VS Code does their tab selection scrollbar
 
 # TODO
 
-* [ ] Loader APIs
+* [X] Loader APIs
 * [ ] Step/Group/Option Editing
 * [ ] Dependency Editing
   * [X] Read ESP/L/M dependencies automatically
@@ -44,7 +48,7 @@ Listed here so I don't forget to add these later
 * [ ] Differences Between Mod Manager Implementations
   * [ ] `SelectAtLeastOne` Groups
   * [ ] (MO2) Name from Info.xml `<Name>` vs (Vortex) ModuleConfig.xml's `<ModuleName>`
-  * [ ] MO2's `CouldBeUsable` extea space at start (needs further investigation)
+  * [ ] MO2's `CouldBeUsable` extra space at start (needs further investigation)
 * [ ] Pseudo-Deprecated Features
   * [ ] `CouldBeUsable` Options
 * [ ] Problematic Features

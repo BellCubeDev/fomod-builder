@@ -1,7 +1,5 @@
 'use client';
 
-import styles from './localizationFadeIn.module.scss';
-
 import React, { useEffect } from "react";
 
 import {TranslationTableKeys, Languages, translationTable} from './strings';
@@ -43,7 +41,7 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
 }
 
 
-type ParamOptionForKey<T extends keyof TranslationTableKeys> = Parameters<TranslationTableKeys[T]> extends [somethingRequired: any] ? {
+export type ParamOptionForKey<T extends keyof TranslationTableKeys> = Parameters<TranslationTableKeys[T]> extends [somethingRequired: any] ? {
     /** Parameters passed to the translation function */
     params: Parameters<TranslationTableKeys[T]>
 } : Parameters<TranslationTableKeys[T]> extends [somethingOptional?: any] ? {
@@ -66,13 +64,13 @@ export function T<TKey extends keyof TranslationTableKeys>({ tkey, params }: {
 
     // @ts-expect-error: There's no reason it shouldn't work (and, in fact, the error only comes up sometimes when the compiler is run).
     //                   What I know is that it works in practice. TypeScript just hates me.
-    return <span className={`${styles.translated}`}>{translationTable[tkey][locale](...params ?? [])}</span>;
+    return translationTable[tkey][locale](...params ?? []);
 }
 /** Provides a translation for the specified key. Requires the key as the first parameter and the translation function's parameters as the rest.
  *
  * Hook version of <T />.
  */
-export function useTranslate<T extends keyof TranslationTableKeys>(key: T, ...params: Parameters<TranslationTableKeys[T]>) {
+export function useTranslate<T extends keyof TranslationTableKeys>(key: T, ...params: Parameters<TranslationTableKeys[T]>): ReturnType<TranslationTableKeys[T]> {
     const { locale } = useLocale();
 
     // @ts-expect-error: There's no reason it shouldn't work (and, in fact, the error only comes up sometimes when the compiler is run).

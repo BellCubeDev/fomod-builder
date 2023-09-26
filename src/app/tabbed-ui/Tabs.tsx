@@ -129,10 +129,6 @@ export default function FomodBuilderTabbedUI() {
             </div>
 
             <FontAwesomeIcon icon={faCaretRight} className={`${styles.tabIndicator} ${reducedMotionClassName}`} ref={activeTabIndicatorRef} width={16} height={16} />
-
-            <div className={styles.tabFooter}>
-                <LocaleSelector />
-            </div>
         </div>
 
         <div className={styles.tabPanels}>

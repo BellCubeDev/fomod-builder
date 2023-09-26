@@ -1,4 +1,5 @@
 import {TranslationTable} from '.';
+import { GroupBehaviorType } from 'fomod';
 
 
 
@@ -33,6 +34,7 @@ export interface TranslationTableKeys {
     tab_install_editor: (selected: boolean) => React.ReactNode;
     tab_xml_editor: (selected: boolean) => React.ReactNode;
     tab_step_builder: (selected: boolean) => React.ReactNode;
+    tab_settings: (selected: boolean) => React.ReactNode;
 
     // Loaders
     loaders_header_unloaded: () => React.ReactNode;
@@ -56,12 +58,36 @@ export interface TranslationTableKeys {
 
     // Settings
 
+    // Fomod Lingo
+    sorting_order_ascending: () => string;
+    sorting_order_descending: () => string;
+    sorting_order_explicit: () => string;
+    behavior_type_selectany: () => string;
+    behavior_type_selectatleastone: () => string;
+    behavior_type_selectatmostone: () => string;
+    behavior_type_selectexactlyone: () => string;
+    behavior_type_selectall: () => string;
+
     // Steps
+    steps_no_steps: () => React.ReactNode;
     step_add_button: () => React.ReactNode;
     step_button: (name: string) => React.ReactNode;
     step_header: (name: string) => React.ReactNode;
-}
 
+    // Groups
+    groups_no_groups: () => React.ReactNode;
+    group_add_button: () => React.ReactNode;
+    group_button: (name: string) => React.ReactNode;
+    group_header: (name: string) => React.ReactNode;
+
+    // Options
+    options_no_options: () => React.ReactNode;
+    option_add_button: () => React.ReactNode;
+    option_button: (name: string) => React.ReactNode;
+    option_header: (name: string) => React.ReactNode;
+
+
+}
 
 
 
@@ -95,6 +121,10 @@ export const translationTable = {
 
     tab_step_builder: {
         en: ()=> 'Step Builder',
+    },
+
+    tab_settings: {
+        en: ()=> 'Settings',
     },
 
     loaders_header_loaded: {
@@ -155,6 +185,42 @@ export const translationTable = {
         en: ()=> <>Enter the contents of ModuleConfig.xml and Info.xml below. We&lsquo;ll use that text for your editing session.</>
     },
 
+    sorting_order_ascending: {
+        en: ()=> 'Alphabetical: Ascending (A–Z)',
+    },
+
+    sorting_order_descending: {
+        en: ()=> 'Alphabetical: Descending (Z–A)',
+    },
+
+    sorting_order_explicit: {
+        en: ()=> 'Explicit (As Specified)',
+    },
+
+    behavior_type_selectany: {
+        en: ()=> 'No Restriction',
+    },
+
+    behavior_type_selectatleastone: {
+        en: ()=> 'Require At Least One Selection',
+    },
+
+    behavior_type_selectatmostone: {
+        en: ()=> 'Require One Or Empty Selection',
+    },
+
+    behavior_type_selectexactlyone: {
+        en: ()=> 'Require One Selection (Radio Buttons)',
+    },
+
+    behavior_type_selectall: {
+        en: ()=> 'Forcibly Select Everything (No Choice)',
+    },
+
+    steps_no_steps: {
+        en: ()=> 'No Steps',
+    },
+
     step_add_button: {
         en: ()=> '+',
     },
@@ -165,6 +231,38 @@ export const translationTable = {
 
     step_header: {
         en: (name: string) => name ? <>Step &ldquo;{name}&rdquo;</> : <>Unnamed Step</>,
+    },
+
+    groups_no_groups: {
+        en: ()=> 'No Groups',
+    },
+
+    group_add_button: {
+        en: ()=> '+',
+    },
+
+    group_button: {
+        en: (name: string) => name || <i>Unnamed Group</i>,
+    },
+
+    group_header: {
+        en: (name: string) => name ? <>Group &ldquo;{name}&rdquo;</> : <>Unnamed Group</>,
+    },
+
+    options_no_options: {
+        en: ()=> 'No Options',
+    },
+
+    option_add_button: {
+        en: ()=> '+',
+    },
+
+    option_button: {
+        en: (name: string) => name || <i>Unnamed Option</i>,
+    },
+
+    option_header: {
+        en: (name: string) => name ? <>Option &ldquo;{name}&rdquo;</> : <>Unnamed Option</>,
     },
 
 } as const satisfies TranslationTable;

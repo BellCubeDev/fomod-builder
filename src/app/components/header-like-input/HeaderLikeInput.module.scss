@@ -1,0 +1,29 @@
+.header {
+    outline: none;
+    background: none;
+    border: none;
+
+    color: #fff;
+
+    font-size: 1.2em;
+    letter-spacing: 0.15px;
+    line-height: 24.96px;
+    word-spacing: 0.3px;
+    margin: 0;
+    margin-bottom: 0.5em;
+    width: max-content;
+    font-family: inherit;
+    padding: 4px;
+
+    display: block;
+
+    &:focus::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -2px;
+        height: 2px;
+        background-color: #fff;
+    }
+}

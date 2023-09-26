@@ -1,24 +1,24 @@
 'use client';
 
 import { useFomod } from '../../loaders/index';
-import BuilderStep from './step/step';
+import BuilderStep from './step';
 import { Immutable, produce, Draft } from 'immer';
-import { Step, SortingOrder } from 'fomod';
+import { Fomod, Step, SortingOrder } from 'fomod';
 import React from 'react';
-import { useSettings } from '../../SettingsContext';
-import { editSetByIndex } from '../../../../SetUtils';
+import { useSettings, Settings } from '../../SettingsContext';
+import BuilderChildren from './BuilderChildren';
 import styles from './builder.module.scss';
-import { T } from '../../localization/index';
+import { createNewGroup } from './step';
 
 export default function FomodEditor() {
     const {loader, eventTarget} = useFomod();
 
-    const [,reRender_] = React.useState({});
+    const [reRenderRef, reRender_] = React.useState({});
 
     React.useEffect(() => {
         const reRender = () => {
-            console.log('reRender'); // TODO: Figure out why this event won't fire
             reRender_({});
+            console.log('marking for re-render...');
         };
 
         eventTarget.addEventListener('module-update', reRender);
@@ -26,50 +26,32 @@ export default function FomodEditor() {
 
     }, [eventTarget]);
 
+    console.log('rendering the whole thing...', loader?.module);
+
+    const edit = React.useCallback((recipe: (draft: Draft<Fomod<false>>) => Draft<Fomod<false>> | undefined | void) => {
+        if (!loader) return;
+        console.log('editing...');
+        loader.module = produce(loader.module, recipe) as Immutable<Fomod<false>>;
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [loader, loader?.module, reRenderRef]);
+
     const setting = useSettings();
 
-    const addStep = React.useCallback(() => {
-        if (!loader) return;
+    if (!loader) return null;
 
-        loader.module = produce(loader.module, draft => {
-            draft.steps.add(new Step('', setting?.defaultGroupSortingOrder ?? SortingOrder.Explicit));
-        });
-    }, [loader, setting]);
+    return <BuilderChildren
+        createChildClass={createNewStep.bind(null, setting)}
+        edit={edit}
+        className={styles.builderBody}
+        childKey='steps'
+        ChildComponent={BuilderStep}
+        type='step'
+    >{loader.module.steps}</BuilderChildren>;
+}
 
-    const steps = Array.from(loader?.module.steps.values() || []);
-
-    const [stepNum, setStepNum] = React.useState(0);
-
-    if (!loader) {
-        if (stepNum) setStepNum(0);
-        return null;
-    }
-
-
-    const editToBeBound = function editStep(i: number, recipe: (draft: Draft<Step>) => Step | undefined | void) {
-        console.log('editToBeBound ' + i, steps[i]);
-
-        loader.module = produce(loader.module, draft => {
-            const thisStep = Array.from(draft.steps.values())[i];
-            const recipeResult = produce(thisStep, recipe);
-            editSetByIndex(draft.steps, i, recipeResult);
-        });
-    };
-
-    return <div className={styles.builderBody}>
-        <div className={styles.stepSelector} role='tablist'>
-            {steps.map(
-                (step, i) => <button key={i} onClick={() => setStepNum(i)} role='tab' aria-selected={i === stepNum} aria-controls={`builder-step-${i+1}`}>
-                    <T tkey='step_button' params={[step.name]} />
-                </button>
-            )}
-            <button key={steps?.length} onClick={addStep} className={styles.stepAddButton}>
-                <T tkey='step_add_button' />
-            </button>
-        </div>
-
-        <div className={styles.stepBody} role='tabpanel' id={`builder-step-${stepNum+1}`}>
-            {!steps[stepNum] ? null : <BuilderStep step={steps[stepNum] as Immutable<Step>} edit={editToBeBound.bind(undefined, stepNum)} />}
-        </div>
-    </div>;
+export function createNewStep(settings: Settings | null) {
+    const step = new Step('', SortingOrder.Explicit);
+    step.groups.add(createNewGroup(settings));
+    return step;
 }

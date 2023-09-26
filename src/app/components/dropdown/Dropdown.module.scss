@@ -1,0 +1,87 @@
+.dropdown {
+    color: #fff;
+    width: max-content;
+    min-width: 400px;
+}
+
+.container {
+    color: #fff;
+}
+
+.control {
+    background: #282828;
+}
+
+.dropdownIndicator {
+    color: #fff;
+}
+
+.group {
+    color: #fff;
+}
+
+.groupHeading {
+    color: #fff;
+}
+
+.indicatorsContainer {
+    color: #fff;
+    padding: 0 16px;
+}
+
+.indicatorSeparator {
+    color: #fff;
+}
+
+.input {
+    color: #fff;
+    padding: 14px;
+}
+
+.menu {
+    color: #fff;
+    background: #181818;
+    border-radius: 8px;
+    overflow: clip;
+    border: 2px solid #383838;
+    margin-top: 4px;
+}
+
+.menuList {
+    color: #fff;
+}
+
+.menuPortal {
+    color: #fff;
+}
+
+.option {
+    color: #fff;
+    padding: 16px;
+
+    &--focused {
+        background: #282828;
+
+    }
+
+    //&--selected {
+    //    background: #333;
+    //}
+
+    &--disabled {
+        background: #000;
+    }
+}
+
+.placeholder {
+    color: #fff;
+}
+
+.singleValue {
+    color: #fff !important;
+    padding: 10px 16px;
+}
+
+.valueContainer {
+    color: #fff !important;
+}

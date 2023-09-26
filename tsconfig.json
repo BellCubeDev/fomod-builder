@@ -38,6 +38,8 @@
     "noErrorTruncation": true,
     "noImplicitOverride": true,
     "noUncheckedIndexedAccess": true,
+    "useUnknownInCatchVariables": true,
+    "disableSizeLimit": true,
   },
   "include": [
     "next-env.d.ts",
