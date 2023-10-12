@@ -14,7 +14,7 @@ function fileToDataURI(file: File) {
     });
 }
 
-export default function DynamicImageDisplay({ path, ...props }: {path: string, alt: string} & Omit<React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>, 'src'>) {
+export default function DynamicImageDisplay({ path, ...props }: {path: string | null, alt: string} & Omit<React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>, 'src'>) {
     const {loader} = useFomod();
     const [src, setSrc] = React.useState<string>('');
 
@@ -23,6 +23,8 @@ export default function DynamicImageDisplay({ path, ...props }: {path: string, a
         let canceled = false;
 
         setSrc('');
+
+        if (!path) return;
 
         (async () => {
             const loadedFile = await loader?.getFileByPath(path);;

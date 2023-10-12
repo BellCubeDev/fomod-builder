@@ -60,9 +60,13 @@ export default function FomodBuilderTabbedUI() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- settings.reducedMotion is checked, not depended on
     }, [activeTabButtonRef, transitioningFromTabRef, transitioningFromTab]);
 
+    const [firstRenderCountdown, setFirstRenderCountdown] = React.useState(2);
+
     React.useEffect(() => {
         const activeTab = activeTabPanelRef.current;
         if (!activeTab) return;
+
+        if (firstRenderCountdown) return setFirstRenderCountdown(firstRenderCountdown - 1);
 
         activeTab.focus();
 

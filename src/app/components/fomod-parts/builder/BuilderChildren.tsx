@@ -31,7 +31,7 @@ export default function BuilderChildren<
     TTypeString extends ValidTypeString,
     TParentInstance extends {},
     TChildInstance extends {name: string},
-> ({ children, className, type, edit, childKey, createChildClass, ChildComponent }: {
+> ({ children, className, type, edit, childKey, createChildClass, ChildComponent, showAll }: {
     children: TrueImmutable<Set<TChildInstance>>,
     className?: string,
     type: TTypeString,
@@ -39,6 +39,7 @@ export default function BuilderChildren<
     childKey: KeyForType<TrueImmutable<TParentInstance>, TrueImmutable<Set<TChildInstance>>>,
     createChildClass: () => Draft<TChildInstance>,
     ChildComponent: (params: {[T in TTypeString]: TrueImmutable<TChildInstance>} & { edit: (recipe: (draft: TrueDraft<TChildInstance>) => Draft<TChildInstance> | undefined | void) => void}) => JSX.Element,
+    showAll?: boolean;
 }) {
     const addChild = React.useCallback(() => {
         tryCallingEdit(()=> edit(draft => {
@@ -90,6 +91,20 @@ export default function BuilderChildren<
         }));
     };
 
+    if (showAll) return <div className={`${className} ${styles.wrapperAll}`}>
+        {childArr.length ? childArr.map(
+            (child, i) => <div key={i} id={`builder-${type}-${i+1}`}>
+                <ChildComponent
+                    {...{[type as TTypeString]: child as TrueImmutable<TChildInstance>} as {[T in TTypeString]: TrueImmutable<TChildInstance>}}
+                    edit={editToBeBound.bind(undefined, i)}
+                />
+                <DeleteButton onActivation={deleteToBeBound.bind(undefined, i)} className={styles.deleteButton} disabled={type !== 'step' && childArr.length < 2} />
+            </div>
+        ) : <T tkey={`${type}s_no_${type}s` as TypesNoTypesStrings} />}
+        <button key={childArr?.length} onClick={addChild} className={styles.addButton}>
+            <T tkey={`${type as ValidTypeString}_add_button`} />
+        </button>
+    </div>;
 
     return <div className={className}>
         <div className={styles.childSelector} role='tablist'>

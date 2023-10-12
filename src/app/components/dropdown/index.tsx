@@ -25,7 +25,7 @@ export default function Dropdown<T extends string>({options, value, onChange, cl
         return ()=> { el.removeEventListener('keydown', keydownPropStopper); };
     }, [ref]);
 
-    return <div ref={ref}><Select
+    return <div ref={ref} className={styles.keydownPropStopper}><Select
         {...props}
         className={[styles.dropdown, className].join(' ')}
         options={options}

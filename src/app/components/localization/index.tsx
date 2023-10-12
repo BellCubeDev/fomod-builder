@@ -59,7 +59,7 @@ export type ParamOptionForKey<T extends keyof TranslationTableKeys> = Parameters
 export function T<TKey extends keyof TranslationTableKeys>({ tkey, params }: {
     /** The translation key to use */
     tkey: TKey
-} & ParamOptionForKey<TKey>) {
+} & ParamOptionForKey<TKey>): ReturnType<TranslationTableKeys[TKey]> {
     const { locale } = useLocale();
 
     // @ts-expect-error: There's no reason it shouldn't work (and, in fact, the error only comes up sometimes when the compiler is run).
@@ -70,7 +70,7 @@ export function T<TKey extends keyof TranslationTableKeys>({ tkey, params }: {
  *
  * Hook version of <T />.
  */
-export function useTranslate<T extends keyof TranslationTableKeys>(key: T, ...params: Parameters<TranslationTableKeys[T]>): ReturnType<TranslationTableKeys[T]> {
+export function useTranslate<TKey extends keyof TranslationTableKeys>(key: TKey, ...params: Parameters<TranslationTableKeys[TKey]>): ReturnType<TranslationTableKeys[TKey]> {
     const { locale } = useLocale();
 
     // @ts-expect-error: There's no reason it shouldn't work (and, in fact, the error only comes up sometimes when the compiler is run).

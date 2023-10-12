@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { Immutable, Draft, produce } from 'immer';
+import { Immutable, Draft, castDraft } from 'immer';
 import { Step, Group, SortingOrder, TypeDescriptor, TypeNameDescriptor, OptionType, Option, GroupBehaviorType } from 'fomod';
 import { T } from '@/app/components/localization';
 import SortingOrderDropdown from './SortingOrderDropdown';
@@ -42,14 +42,7 @@ export default function BuilderStep({step, edit}: {step: Immutable<Step<false>>,
             childKey='groups'
             type='group'
             edit={edit}
-            createChildClass={() => {
-                const group = new Group('', settings?.defaultGroupBehavior ?? GroupBehaviorType.SelectAny, settings?.defaultOptionSortingOrder ?? SortingOrder.Explicit);
-
-                const typeDescriptor = new TypeDescriptor(new TypeNameDescriptor('type', OptionType.Optional, false));
-                group.options.add(new Option('', '', '', typeDescriptor));
-
-                return group;
-            }}
+            createChildClass={createNewGroup.bind(null, settings)}
             className={styles.groupWrapper}
         >
             {step.groups}
@@ -58,8 +51,8 @@ export default function BuilderStep({step, edit}: {step: Immutable<Step<false>>,
     </>;
 }
 
-export function createNewGroup(settings: Settings | null) {
-    const group = new Group('', settings?.defaultGroupBehavior ?? GroupBehaviorType.SelectAny, settings?.defaultOptionSortingOrder ?? SortingOrder.Explicit);
+export function createNewGroup(settings: Settings | null): Draft<Group> {
+    const group = castDraft(new Group('', settings?.defaultGroupBehavior ?? GroupBehaviorType.SelectAny, settings?.defaultOptionSortingOrder ?? SortingOrder.Explicit));
     group.options.add(createNewOption(settings));
 
     return group;

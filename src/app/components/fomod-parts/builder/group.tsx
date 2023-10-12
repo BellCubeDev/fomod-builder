@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { Immutable, Draft, produce } from 'immer';
+import { Immutable, Draft, castDraft } from 'immer';
 import { Group, Option, OptionType, TypeDescriptor, TypeNameDescriptor, GroupBehaviorType } from 'fomod';
 import { T } from '@/app/components/localization';
 import SortingOrderDropdown from './SortingOrderDropdown';
@@ -64,7 +64,7 @@ export default function BuilderGroup({group, edit}: {group: Immutable<Group<fals
 
 export function createNewOption(settings: Settings | null) {
     const typeDescriptor = new TypeDescriptor(new TypeNameDescriptor('type', settings?.defaultOptionType ?? OptionType.Optional, false));
-    return new Option('', '', '', typeDescriptor);
+    return castDraft(new Option('', '', '', typeDescriptor));
 }
 
 import Dropdown from '../../dropdown/index';

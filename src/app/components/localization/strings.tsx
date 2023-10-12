@@ -1,5 +1,6 @@
 import {TranslationTable} from '.';
-import { GroupBehaviorType } from 'fomod';
+import { GroupBehaviorType, Option, FlagSetter } from 'fomod';
+import { Immutable } from 'immer';
 
 
 
@@ -86,6 +87,19 @@ export interface TranslationTableKeys {
     option_button: (name: string) => React.ReactNode;
     option_header: (name: string) => React.ReactNode;
 
+    option_description_placeholder: (option: Immutable<Option>) => string;
+    option_image_alt: (option: Immutable<Option>) => string;
+    option_image_placeholder: (option: Immutable<Option>) => string;
+    flag_value_placeholder: (setter: Immutable<FlagSetter>) => string;
+
+    // Flags
+    flags_no_flags: () => React.ReactNode;
+    flag_add_button: () => React.ReactNode;
+    flag_button: (name: string) => React.ReactNode;
+    flag_header: (name: string) => React.ReactNode;
+    
+    flag_name_placeholder: (setter: Immutable<FlagSetter>) => string;
+    flag_sentence: (setter: Immutable<FlagSetter>, nameInput: React.ReactNode, valueInput: React.ReactNode) => React.ReactNode;
 
 }
 
@@ -263,6 +277,48 @@ export const translationTable = {
 
     option_header: {
         en: (name: string) => name ? <>Option &ldquo;{name}&rdquo;</> : <>Unnamed Option</>,
+    },
+
+    option_description_placeholder: {
+        en: () => `Describe your option! Let people know what's happening!`,
+    },
+
+    option_image_alt: {
+        en: () => `The image you specified for this option`,
+    },
+
+    option_image_placeholder: {
+        en: () => `Path to the image for this option`,
+    },
+
+    flags_no_flags: {
+        en: ()=> 'No Flags to be Set',
+    },
+
+    flag_add_button: {
+        en: ()=> '+',
+    },
+
+    flag_button: {
+        en: (name: string) => name || <i>Unnamed Flag</i>,
+    },
+
+    flag_header: {
+        en: (name: string) => name ? <>Flag &ldquo;{name}&rdquo;</> : <>Unnamed Flag</>,
+    },
+
+    flag_value_placeholder: {
+        en: () => `this value`,
+    },
+
+    flag_name_placeholder: {
+        en: () => `this flag`,
+    },
+
+    flag_sentence: {
+        en: (setter: Immutable<FlagSetter>, nameInput: React.ReactNode, valueInput: React.ReactNode) => {
+            return <>Set {nameInput} to {valueInput}</>;
+        },
     },
 
 } as const satisfies TranslationTable;

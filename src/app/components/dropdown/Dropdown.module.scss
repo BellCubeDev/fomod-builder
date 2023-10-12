@@ -10,6 +10,7 @@
 
 .control {
     background: #282828;
+    border-radius: 6px;
 }
 
 .dropdownIndicator {
@@ -84,4 +85,8 @@
 
 .valueContainer {
     color: #fff !important;
+}
+
+.keydownPropStopper {
+    display: inline-block;
 }

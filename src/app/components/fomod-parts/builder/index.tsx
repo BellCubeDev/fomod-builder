@@ -2,7 +2,7 @@
 
 import { useFomod } from '../../loaders/index';
 import BuilderStep from './step';
-import { Immutable, produce, Draft } from 'immer';
+import { Immutable, produce, Draft, castDraft } from 'immer';
 import { Fomod, Step, SortingOrder } from 'fomod';
 import React from 'react';
 import { useSettings, Settings } from '../../SettingsContext';
@@ -51,7 +51,8 @@ export default function FomodEditor() {
 }
 
 export function createNewStep(settings: Settings | null) {
-    const step = new Step('', SortingOrder.Explicit);
+    const step = castDraft(new Step('', SortingOrder.Explicit));
     step.groups.add(createNewGroup(settings));
+    
     return step;
 }
