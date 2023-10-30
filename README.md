@@ -56,3 +56,7 @@ Listed here so I don't forget to add these later
   * [ ] `fommDependency`
 * [ ] Intuition Breakers
   * [ ] First matching `pattern` determines Option behavior type
+
+### Potential Warnings
+* Using an ESP module at all. ESM/L modules are preferred as they are handled more gracefully by the game engine.
+* Importing more 3 or more files from a single folder in an option. Encourage using folders instead for maintainability.

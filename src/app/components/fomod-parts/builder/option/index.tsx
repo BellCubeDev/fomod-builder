@@ -80,7 +80,7 @@ export function BuilderFlag({flag, edit}: {flag: Immutable<FlagSetter>, edit: (r
         <T tkey='flag_sentence' params={[
             flag,
             <HeaderLikeInput style={{width: 'max-content'}} key='name' value={flag.name} noValue={<T tkey='flag_name_placeholder' params={[flag]} />} onChange={editFlagName} />,
-            <HeaderLikeInput style={{width: 'max-content'}} key='name' value={flag.value} noValue={<T tkey='flag_value_placeholder' params={[flag]} />} onChange={editFlagValue} />,
+            <HeaderLikeInput style={{width: 'max-content'}} key='value' value={flag.value} noValue={<T tkey='flag_value_placeholder' params={[flag]} />} onChange={editFlagValue} />,
         ]}/>
     </div>;
 }

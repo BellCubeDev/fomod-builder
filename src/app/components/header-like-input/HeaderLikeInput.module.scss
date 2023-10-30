@@ -7,7 +7,7 @@
 
     font-size: 1.2em;
     letter-spacing: 0.15px;
-    line-height: 24.96px;
+    line-height: 18px;
     word-spacing: 0.3px;
     margin: 0;
     margin-bottom: 0.5em;
@@ -15,29 +15,80 @@
     padding: 4px;
 
     display: inline-block;
-    
-    &[data-header-like-input-div] { width: max-content; }
-    &[data-header-like-input-input] { width: calc(100% - 40x); }
 
-    position: relative;
+    &[data-header-like-input-div] { width: max-content; }
+    &[data-header-like-input-input] { width: calc(100% - 4px); }
 
     white-space: nowrap;
+}
 
-    &::after {
+@keyframes animateToHover {
+    0% {
+        transform: scaleX(0);
+        transform-origin: center;
+    }
+    100% {
+        transform: scaleX(.75);
+        transform-origin: center;
+    }
+}
+
+@keyframes animateToFull {
+    0% {
+        transform: scaleX(0);
+        transform-origin: center;
+        background-color: hsla(0, 0%, 63%, 25%);
+    }
+    100% {
+        transform: scaleX(.75);
+        transform-origin: center;
+        background-color: hsla(0, 0%, 82%, 100%);
+    }
+}
+
+.underlineProvider{
+    transition: width 0.33s ease-in-out;
+    position: relative;
+
+    &::before, &::after {
         content: ' ';
         position: absolute;
         left: 0;
         right: 0;
-        bottom: -2px;
+        bottom: -3px;
+        height: 1px;
+        background-color: hsla(0, 0%, 63%, 25%);
+    }
+
+    &::after {
+        transform: scaleX(0) scaleY(0.5);
+        transform-origin: center;
+
+        transition-timing-function: cubic-bezier(0, 1, 1, 1);
+        transition-property: transform, background-color;
+
+        animation: animateToHover 0.3s cubic-bezier(0, 1, 1, 1) reverse;
+        transition-duration: 0.3s;
+
+        bottom: -3px;
         height: 2px;
-        background-color: #a0a0a0;
+    }
 
-        &:hover {
-            background-color: #c7c7c7;
-        }
+    &:hover::after {
+        background-color: hsla(0, 0%, 78%, 100%);
+        transform: scaleX(.75) scaleY(0.75);
 
-        &:focus {
-            background-color: #d1d1d1;
-        }
+        transition-timing-function: cubic-bezier(1, 0, 1, 1);
+        transition-duration: 0.15s;
+        animation: animateToHover 0.15s cubic-bezier(1, 0, 1, 1);
+    }
+
+    &[data-editing="true"]::after {
+        background-color: hsla(0, 0%, 82%, 100%);
+        transform: scaleX(1) scaleY(0.75);
+
+        transition-timing-function: cubic-bezier(1, 0, 1, 1);
+        transition-duration: 0.2s;
+        animation: animateToHover 0.2s cubic-bezier(1, 0, 1, 1);
     }
 }

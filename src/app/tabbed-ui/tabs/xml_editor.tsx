@@ -14,6 +14,8 @@ const tab: Tab = {
     },
 
     icon: <FontAwesomeIcon icon={faCode} />,
+
+    disabled: ({fomod: loader}) => !loader.loader,
 };
 
 export default tab;

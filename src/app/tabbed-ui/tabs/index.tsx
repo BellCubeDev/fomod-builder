@@ -1,9 +1,15 @@
 import {TranslationTableKeys} from '@/app/components/localization';
+import { FomodLoaderContext } from '../../components/loaders/index';
+
+export interface TabDisabledContext {
+    fomod: FomodLoaderContext
+}
 
 export interface Tab {
     name: Extract<keyof TranslationTableKeys, TabName>;
     Page: React.FunctionComponent;
     icon: JSX.Element,
+    disabled?: (context: TabDisabledContext) => boolean;
 }
 
 import tab_mission_control from './mission_control';
@@ -24,5 +30,3 @@ export default tabs;
 
 export type Tabs = typeof tabs;
 export type TabName = keyof Tabs;
-
-

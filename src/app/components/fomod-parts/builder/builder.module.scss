@@ -48,9 +48,19 @@
     margin-bottom: 0.1em;
 
     transition: color 0.15s ease-in-out;
-    color: #ccc;
-    &:hover { color: #fff; }
-    &:focus { color: #fff; }
+
+    color: #aaa;
+    opacity: 0.5;
+    cursor: disabled;
+
+    &:not([disabled]) {
+        color: #ccc;
+        opacity: 1;
+        cursor: pointer;
+
+        &:hover { color: #fff; }
+        &:focus { color: #fff; }
+    }
 }
 
 @keyframes scaleInX {
@@ -119,6 +129,8 @@
 
             transition: all 0.15s ease-in-out;
             transition-property: background-color, border-color;
+
+            cursor: pointer;
 
             &:hover { background-color: mix($color-bg-inactive, $color-bg-active, 50%); }
             &:focus {
@@ -201,13 +213,14 @@
     width: 100%;
 
     > div {
-        overflow-y: hidden;
-        overflow-x: auto;
-        white-space: nowrap;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: flex-start;
+        overflow-y: hidden !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        width: max-content !important;
     }
 }
 
@@ -219,4 +232,8 @@
     flex-wrap: nowrap;
     width: max-content;
     gap: 8px;
+}
+
+:has(> .flagToSet) {
+    padding: 0 24px;
 }

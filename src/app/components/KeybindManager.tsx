@@ -7,7 +7,7 @@ export interface Keybind {
     shift?: boolean;
     altOrOption?: boolean;
     windowsOrCommand?: boolean;
-    action: (e: KeyboardEvent) => unknown;
+    action: (e: KeyboardEvent & { currentTarget: HTMLDivElement}) => unknown;
     doNotPreventDefault?: boolean;
     doNotBreak?: boolean;
 
@@ -37,6 +37,8 @@ export default function KeybindManager({keybinds, ...props}: {keybinds: Keybind[
     const localKeybinds = React.useMemo(() => keybinds.filter(keybind => !keybind.global), [keybinds]);
 
     const handleKeybind = React.useCallback((providedKeybinds: Keybind[], e: KeyboardEvent) => {
+        if (!divRef.current) return;
+
         for (const keybind of providedKeybinds) {
             //console.log(`Evaluating keybind ${stringifyKeybind(keybind)} against ${stringifyKeybindFromEvent(e)}`);
             if (keybind.key !== e.key.toLowerCase() || !!keybind.control !== e.ctrlKey || !!keybind.shift !== e.shiftKey || !!keybind.altOrOption !== e.altKey || !!keybind.windowsOrCommand !== e.metaKey)
@@ -44,11 +46,13 @@ export default function KeybindManager({keybinds, ...props}: {keybinds: Keybind[
 
             //console.log(`Executing keybind ${stringifyKeybind(keybind)}`);
 
-            keybind.action(e);
+            if (e.currentTarget !== divRef.current) throw new Error(`KeybindManager: Keybinds should only be attached to the KeybindManager's root div.`);
+
+            keybind.action(e as KeyboardEvent & { currentTarget: HTMLDivElement});
             if (!keybind.doNotPreventDefault) e.preventDefault();
             if (!keybind.doNotBreak) e.stopPropagation();
         }
-    }, []);
+    }, [divRef]);
 
     const handleGlobalKeybinds = React.useCallback((e: KeyboardEvent) => handleKeybind(globalKeybinds, e), [globalKeybinds, handleKeybind]);
     const handleLocalKeybinds = React.useCallback((e: KeyboardEvent) => handleKeybind(localKeybinds, e), [localKeybinds, handleKeybind]);
@@ -64,7 +68,7 @@ export default function KeybindManager({keybinds, ...props}: {keybinds: Keybind[
             div.removeEventListener('keydown', handleLocalKeybinds);
             div.ownerDocument.removeEventListener('keydown', handleGlobalKeybinds);
         };
-    }, [handleGlobalKeybinds, handleLocalKeybinds]);
+    }, [divRef, handleGlobalKeybinds, handleLocalKeybinds]);
 
     return <div {...props} ref={divRef} />;
 }

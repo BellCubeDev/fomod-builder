@@ -37,8 +37,9 @@ const tab: Tab = {
         </div>;
     },
 
+    disabled: ({fomod: loader}) => !loader.loader,
+
     icon: <FontAwesomeIcon icon={faCubesStacked} />
 };
 
 export default tab;
-

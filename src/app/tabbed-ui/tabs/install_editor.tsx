@@ -11,6 +11,8 @@ const tab: Tab = {
         return <></>;
     },
 
+    disabled: ({fomod: loader}) => !loader.loader,
+
     icon: <FontAwesomeIcon icon={faFolderTree} />
 };
 
