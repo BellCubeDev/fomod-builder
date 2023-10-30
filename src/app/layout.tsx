@@ -37,7 +37,6 @@ export const metadata: Metadata = {
         telephone: false,
         url: true,
     },
-    generator: 'Next.js',
     icons: undefined, // TODO: Create icon
     keywords: [
         'Fomod',
@@ -67,6 +66,15 @@ export const metadata: Metadata = {
         card: 'summary',
     },
     themeColor: '#0074a9',
+
+    generator: 'Next.js',
+
+    referrer: 'strict-origin',
+    other: {
+        'opener': 'noopener',
+        'darkreader-lock': 'true',
+    },
+
 };
 
 
