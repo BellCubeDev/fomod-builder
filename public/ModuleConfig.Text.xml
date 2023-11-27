@@ -2,7 +2,7 @@
 
     <moduleName>Example Mod</moduleName>
 
-    <installSteps>
+    <installSteps order="Ascending">
         <installStep name="1">
             <optionalFileGroups>
                 <group name="123" type="SelectAtLeastOne">

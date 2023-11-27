@@ -40,8 +40,3 @@ export const ScaleInButton = React.forwardRef<HTMLButtonElement, React.ButtonHTM
     }
 );
 export default ScaleInButton;
-
-
-
-
-

@@ -26,10 +26,24 @@ h3 {
     color: #ddd;
 }
 
+a {
+    &, * { color: #519aff !important; }
+    text-decoration: none;
+}
+
 code {
     font-family: var(--code-font);
     color: #ddd;
     padding: 1px 4px;
     background: #282828;
     border-radius: 5px;
+}
+
+label {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 8px;
 }

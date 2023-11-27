@@ -4,13 +4,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAtom } from "@fortawesome/free-solid-svg-icons";
 import FomodLoaderUI from '../../components/loaders/FomodLoaderUI';
 import LocaleSelector from '../../components/localization/LocaleSelector';
+import { T } from '../../components/localization/index';
 
 const tab: Tab = {
     name: 'tab_mission_control',
-
-    Page: MissionControl,
-
+    alwaysRendered: true,
     icon: <FontAwesomeIcon icon={faAtom} />,
+    Page: MissionControl,
 };
 
 export default tab;
@@ -18,6 +18,9 @@ export default tab;
 function MissionControl() {
     return <>
         <LocaleSelector />
+        <h1><T tkey='tab_mission_control_title' /></h1>
+        <T tkey='tab_mission_control_text' />
+        <br />
         <FomodLoaderUI />
     </>;
 }

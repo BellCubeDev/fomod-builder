@@ -6,14 +6,13 @@ import { faFolderTree } from "@fortawesome/free-solid-svg-icons";
 
 const tab: Tab = {
     name: 'tab_install_editor',
-
-    Page() {
-        return <></>;
-    },
-
+    icon: <FontAwesomeIcon icon={faFolderTree} />,
     disabled: ({fomod: loader}) => !loader.loader,
 
-    icon: <FontAwesomeIcon icon={faFolderTree} />
+    Page() {
+        return <>Pardon our dust!</>;
+    },
+
 };
 
 export default tab;

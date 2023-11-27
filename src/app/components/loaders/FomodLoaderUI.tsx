@@ -20,11 +20,11 @@ export default function FomodLoaderUI() {
     }, [core]);
 
     return <div className={styles.wrapper}>
-        <h1>{
+        <h2>{
             core.loader
                 ? <T tkey='loaders_header_loaded' params={[(core.loader.constructor as typeof FomodLoaderClass).Name]} />
                 : <T tkey='loaders_header_unloaded' />
-        }</h1>
+        }</h2>
 
         <div className={styles.loader}>
             <FileSystemFolderLoader.LoaderUI />

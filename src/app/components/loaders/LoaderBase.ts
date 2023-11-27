@@ -19,6 +19,18 @@ for (const item of Object.values(fomodLib)) {
     }
 }
 
+export class FomodLoadingError extends Error {
+    constructor(message: string, public reason: FomodLoadRejectReason) {
+        super(message);
+    }
+}
+
+export class FomodSavingError extends Error {
+    constructor(message: string, public reason: FomodSaveRejectReason) {
+        super(message);
+    }
+}
+
 export abstract class FomodLoader {
     abstract getFileByPath(path: string): Promise<File|null>;
 
@@ -28,10 +40,11 @@ export abstract class FomodLoader {
     static LoaderUIClickEvent: (eventTarget: FomodEventTarget, ...params: Parameters<React.MouseEventHandler<HTMLButtonElement>>) => Promise<[false, FomodLoader] | [Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges>]>;
 
     abstract commission?(): Promise<false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges> >;
-    abstract decommission(): Promise<void>;
+    abstract decommission(): Promise<unknown>;
 
     abstract save(): Promise<false | Exclude<FomodSaveRejectReason, FomodSaveRejectReason.NoLoader> >;
 
+    /** This MUST set the _x, _xDoc, and _xText properties. MUST! */
     abstract reloadFromText(text: string, info?: boolean): false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges>;
 
 
@@ -66,13 +79,17 @@ export abstract class FomodLoader {
     private reloadInfoIfNeeded() {
         const el = this._infoDoc ? this._info?.asElement(this._infoDoc) : null;
         if (this._infoText !== el?.outerHTML ?? '')
-            this.reloadFromText(this._infoText ?? '', false);
+            return this.reloadFromText(this._infoText ?? '', false);
+        else
+            return false;
     }
 
     private reloadModuleIfNeeded() {
         const el = this._moduleDoc ? this._module?.asElement(this._moduleDoc) : null;
         if (this._moduleText !== el?.outerHTML ?? '')
-            this.reloadFromText(this._moduleText ?? '', false);
+            return this.reloadFromText(this._moduleText ?? '', false);
+        else
+            return false;
     }
 
 
@@ -83,14 +100,17 @@ export abstract class FomodLoader {
     protected abstract _infoText: string | null;
 
     get infoDoc(): Document | null {
-        this.reloadInfoIfNeeded();
+        const reloadRejection = this.reloadInfoIfNeeded();
+        if (reloadRejection) throw new FomodLoadingError('Failed to reload Info.xml from text', reloadRejection);
+
         return this._infoDoc;
     }
 
     get info(): Immutable<FomodInfo> {
-        this.reloadInfoIfNeeded();
-        if (!this._info) throw new Error('Info has not been initialized on this loader!');
+        const reloadRejection = this.reloadInfoIfNeeded();
+        if (reloadRejection) throw new FomodLoadingError('Failed to reload Info.xml from text', reloadRejection);
 
+        if (!this._info) throw new Error('Info has not been initialized on this loader!');
         return this._info;
     }
 
@@ -99,8 +119,9 @@ export abstract class FomodLoader {
     }
 
     get infoText(): string {
-        this.reloadInfoIfNeeded();
-        return this.formatXMLForEditing(this._infoText || '<ERROR />');
+        const string = this.formatXMLForEditing(this.info.asElement(this.infoDoc!).outerHTML);
+        console.log('infoText', string);
+        return string;
     }
 
     set infoText(text: string) {
@@ -108,7 +129,7 @@ export abstract class FomodLoader {
     }
 
     get infoTextForSaving(): string {
-        return this.formatXMLForSaving(this.infoText);
+        return this.formatXMLForSaving(this.info.asElement(this.infoDoc!).outerHTML);
     }
 
 
@@ -121,12 +142,16 @@ export abstract class FomodLoader {
     protected abstract _moduleText: string | null;
 
     get moduleDoc(): Document | null {
-        this.reloadModuleIfNeeded();
+        const reloadRejection = this.reloadModuleIfNeeded();
+        if (reloadRejection) throw new FomodLoadingError('Failed to reload ModuleConfig.xml from text', reloadRejection);
+
         return this._moduleDoc;
     }
 
     get module(): Immutable<Fomod<false>> {
-        this.reloadModuleIfNeeded();
+        const reloadRejection = this.reloadModuleIfNeeded();
+        if (reloadRejection) throw new FomodLoadingError('Failed to reload ModuleConfig.xml from text', reloadRejection);
+
         if (!this._module) throw new Error('ModuleConfig has not been initialized on this loader!');
 
         return this._module;
@@ -140,8 +165,7 @@ export abstract class FomodLoader {
 
 
     get moduleText(): string {
-        this.reloadModuleIfNeeded();
-        return this.formatXMLForEditing(this._moduleText || '<ERROR />');
+        return this.formatXMLForEditing(this.module.asElement(this.moduleDoc!).outerHTML);
     }
 
     set moduleText(text: string) {
@@ -149,7 +173,7 @@ export abstract class FomodLoader {
     }
 
     get moduleDocForSaving(): string {
-        return this.formatXMLForSaving(this.moduleText);
+        return this.formatXMLForSaving(this.module.asElement(this.moduleDoc!).outerHTML);
     }
 
 
@@ -211,7 +235,7 @@ export interface HistoryStates<T> {
     forward: TupleOfImmutable<T>[],
     backward: TupleOfImmutable<T>[],
     current: TupleOfImmutable<T> | null,
-    move(howMuch: number): void,
+    move(howMuch: number): unknown,
     add: typeof addBase<T>,
 };
 
@@ -257,4 +281,3 @@ export function useProducer<T>(initialState: TupleOfImmutable<T>, history: Histo
 
     return [val, setter] as const;
 }
-

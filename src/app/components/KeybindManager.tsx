@@ -7,7 +7,7 @@ export interface Keybind {
     shift?: boolean;
     altOrOption?: boolean;
     windowsOrCommand?: boolean;
-    action: (e: KeyboardEvent & { currentTarget: HTMLDivElement}) => unknown;
+    action: (e: KeyboardEvent & { currentTarget: HTMLSpanElement}) => unknown;
     doNotPreventDefault?: boolean;
     doNotBreak?: boolean;
 
@@ -26,8 +26,8 @@ export interface Keybind {
 //    return `${e.ctrlKey ? 'Ctrl + ' : ''}${e.shiftKey ? 'Shift + ' : ''}${e.altKey ? 'Alt + ' : ''}${e.metaKey ? 'Option + ' : ''}${e.key}`;
 //}
 
-export default function KeybindManager({keybinds, ...props}: {keybinds: Keybind[]} & Omit<React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>, 'ref'>) {
-    const divRef = React.useRef<HTMLDivElement>(null);
+export default function KeybindManager({keybinds, ...props}: {keybinds: Keybind[]} & Omit<React.DetailedHTMLProps<React.HTMLAttributes<HTMLSpanElement>, HTMLSpanElement>, 'ref'>) {
+    const spanRef = React.useRef<HTMLSpanElement>(null);
 
     React.useEffect(() => {
         keybinds.forEach(k => k.key = k.key.toLowerCase());
@@ -37,7 +37,8 @@ export default function KeybindManager({keybinds, ...props}: {keybinds: Keybind[
     const localKeybinds = React.useMemo(() => keybinds.filter(keybind => !keybind.global), [keybinds]);
 
     const handleKeybind = React.useCallback((providedKeybinds: Keybind[], e: KeyboardEvent) => {
-        if (!divRef.current) return;
+        const span = spanRef.current;
+        if (!span) return;
 
         for (const keybind of providedKeybinds) {
             //console.log(`Evaluating keybind ${stringifyKeybind(keybind)} against ${stringifyKeybindFromEvent(e)}`);
@@ -46,29 +47,30 @@ export default function KeybindManager({keybinds, ...props}: {keybinds: Keybind[
 
             //console.log(`Executing keybind ${stringifyKeybind(keybind)}`);
 
-            if (e.currentTarget !== divRef.current) throw new Error(`KeybindManager: Keybinds should only be attached to the KeybindManager's root div.`);
+            if (e.currentTarget !== (keybind.global ? span.ownerDocument : span)) throw new Error(`KeybindManager: Keybinds should only be attached to the KeybindManager's root span or, for global commands, the document.`);
 
-            keybind.action(e as KeyboardEvent & { currentTarget: HTMLDivElement});
+
+            keybind.action(e as KeyboardEvent & { currentTarget: HTMLSpanElement});
             if (!keybind.doNotPreventDefault) e.preventDefault();
             if (!keybind.doNotBreak) e.stopPropagation();
         }
-    }, [divRef]);
+    }, [spanRef]);
 
     const handleGlobalKeybinds = React.useCallback((e: KeyboardEvent) => handleKeybind(globalKeybinds, e), [globalKeybinds, handleKeybind]);
     const handleLocalKeybinds = React.useCallback((e: KeyboardEvent) => handleKeybind(localKeybinds, e), [localKeybinds, handleKeybind]);
 
     React.useEffect(() => {
-        if (!divRef.current) return;
-        const div = divRef.current;
+        const span = spanRef.current;
+        if (!span) return;
 
-        div.addEventListener('keydown', handleLocalKeybinds);
-        div.ownerDocument.addEventListener('keydown', handleGlobalKeybinds);
+        span.addEventListener('keydown', handleLocalKeybinds);
+        span.ownerDocument.addEventListener('keydown', handleGlobalKeybinds);
 
         return () => {
-            div.removeEventListener('keydown', handleLocalKeybinds);
-            div.ownerDocument.removeEventListener('keydown', handleGlobalKeybinds);
+            span.removeEventListener('keydown', handleLocalKeybinds);
+            span.ownerDocument.removeEventListener('keydown', handleGlobalKeybinds);
         };
-    }, [divRef, handleGlobalKeybinds, handleLocalKeybinds]);
+    }, [spanRef, handleGlobalKeybinds, handleLocalKeybinds]);
 
-    return <div {...props} ref={divRef} />;
+    return <span {...props} ref={spanRef} />;
 }

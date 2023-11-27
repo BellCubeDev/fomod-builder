@@ -6,6 +6,8 @@ import { faCode } from "@fortawesome/free-solid-svg-icons";
 
 const tab: Tab = {
     name: 'tab_xml_editor',
+    icon: <FontAwesomeIcon icon={faCode} />,
+    disabled: ({fomod: loader}) => !loader.loader,
 
     Page() {
         return <>
@@ -13,9 +15,6 @@ const tab: Tab = {
         </>;
     },
 
-    icon: <FontAwesomeIcon icon={faCode} />,
-
-    disabled: ({fomod: loader}) => !loader.loader,
 };
 
 export default tab;

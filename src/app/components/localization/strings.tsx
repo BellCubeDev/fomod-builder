@@ -1,6 +1,8 @@
 import {TranslationTable} from '.';
 import { GroupBehaviorType, Option, FlagSetter } from 'fomod';
 import { Immutable } from 'immer';
+import tab from '../../tabbed-ui/tabs/about';
+import { Settings } from '../SettingsContext';
 
 
 
@@ -32,10 +34,29 @@ export interface TranslationTableKeys {
 
     // Tabs
     tab_mission_control: (selected: boolean) => React.ReactNode;
+    tab_mission_control_title: () => React.ReactNode;
+    tab_mission_control_text: () => React.ReactNode;
+
     tab_install_editor: (selected: boolean) => React.ReactNode;
     tab_xml_editor: (selected: boolean) => React.ReactNode;
     tab_step_builder: (selected: boolean) => React.ReactNode;
+
+    tab_documentation: (selected: boolean) => React.ReactNode;
+
+    tab_about: (selected: boolean) => React.ReactNode;
+    tab_about_basics: () => React.ReactNode;
+    tab_about_more: () => React.ReactNode;
+    tab_about_created_by: () => React.ReactNode;
+    tab_about_bellcube: () => React.ReactNode;
+    tab_about_licensing: () => React.ReactNode;
+
     tab_settings: (selected: boolean) => React.ReactNode;
+    tab_settings_header: () => React.ReactNode;
+    tab_settings_note: () => React.ReactNode;
+
+    // UI stuff
+    dropdown_no_options: () => React.ReactNode;
+    dropdown_loading: () => React.ReactNode;
 
     // Loaders
     loaders_header_unloaded: () => React.ReactNode;
@@ -58,16 +79,34 @@ export interface TranslationTableKeys {
     loader_text_input_description: () => React.ReactNode;
 
     // Settings
+    setting_defaultOptionType: (value: Settings['defaultOptionType']) => React.ReactNode;
+    setting_defaultGroupBehavior: (value: Settings['defaultGroupBehavior']) => React.ReactNode;
+    setting_defaultOptionSortingOrder: (value: Settings['defaultOptionSortingOrder']) => React.ReactNode;
+    setting_defaultGroupSortingOrder: (value: Settings['defaultGroupSortingOrder']) => React.ReactNode;
+    setting_defaultStepSortingOrder: (value: Settings['defaultStepSortingOrder']) => React.ReactNode;
+    setting_autoSave: (value: Settings['autoSave']) => React.ReactNode;
+    setting_autoSaveInterval: (value: Settings['autoSaveInterval']) => React.ReactNode;
+    setting_reducedMotion: (value: Settings['reducedMotion']) => React.ReactNode;
 
     // Fomod Lingo
     sorting_order_ascending: () => string;
     sorting_order_descending: () => string;
     sorting_order_explicit: () => string;
+
     behavior_type_selectany: () => string;
     behavior_type_selectatleastone: () => string;
     behavior_type_selectatmostone: () => string;
     behavior_type_selectexactlyone: () => string;
     behavior_type_selectall: () => string;
+
+    behavior_type_required: () => string;
+    behavior_type_recommended: () => string;
+    behavior_type_optional: () => string;
+    behavior_type_couldbeusable: () => string;
+    behavior_type_notusable: () => string;
+
+    // Builder-Specific Labels
+    builder_step_sorting_order: () => React.ReactNode;
 
     // Steps
     steps_no_steps: () => React.ReactNode;
@@ -87,9 +126,9 @@ export interface TranslationTableKeys {
     option_button: (name: string) => React.ReactNode;
     option_header: (name: string) => React.ReactNode;
 
-    option_description_placeholder: (option: Immutable<Option>) => string;
-    option_image_alt: (option: Immutable<Option>) => string;
-    option_image_placeholder: (option: Immutable<Option>) => string;
+    option_description_placeholder: (option: Immutable<Option<false>>) => string;
+    option_image_alt: (option: Immutable<Option<false>>) => string;
+    option_image_placeholder: (option: Immutable<Option<false>>) => string;
     flag_value_placeholder: (setter: Immutable<FlagSetter>) => string;
 
     // Flags
@@ -97,20 +136,17 @@ export interface TranslationTableKeys {
     flag_add_button: () => React.ReactNode;
     flag_button: (name: string) => React.ReactNode;
     flag_header: (name: string) => React.ReactNode;
-    
+
     flag_name_placeholder: (setter: Immutable<FlagSetter>) => string;
     flag_sentence: (setter: Immutable<FlagSetter>, nameInput: React.ReactNode, valueInput: React.ReactNode) => React.ReactNode;
 
 }
 
+type RecursiveReadonly<T extends Record<any, any>> = { readonly [P in keyof T]: T[P] extends (...args: any[]) => any ? T[P] : T[P] extends Record<any, any> ? RecursiveReadonly<T[P]> : T[P] };
 
 
-
-/** A list of keys that must be translated for each supported language.
- *
- * @see TranslationTableKeys
- */
-export const translationTable = {
+/** A list of keys that must be translated for each supported language. */
+export const translationTable: RecursiveReadonly<TranslationTable> = {
 
 
     fomod_builder: {
@@ -118,8 +154,30 @@ export const translationTable = {
     },
 
 
+
     tab_mission_control: {
         en: ()=> 'Mission Control',
+    },
+
+    tab_mission_control_title: {
+        en: ()=> 'Welcome to the Fomod Builder!',
+    },
+
+    tab_mission_control_text: {
+        en: ()=> <>
+            <p>
+                Go make you a Fomod installer!
+            </p>
+            <p>
+                This tool is still in development, so expect bugs and missing features.
+            </p>
+            {translationTable.tab_about_basics.en()}
+        </>,
+    },
+
+
+    tab_step_builder: {
+        en: ()=> 'Step Builder',
     },
 
 
@@ -133,13 +191,114 @@ export const translationTable = {
     },
 
 
-    tab_step_builder: {
-        en: ()=> 'Step Builder',
+
+    tab_documentation: {
+        en: ()=> 'Documentation',
     },
+
+
+    tab_about: {
+        en: ()=> 'About',
+    },
+
+    tab_about_basics: {
+        en: ()=> <p>
+            The Fomod Builder is an open-source Next.js website built on my <a href='https://npmjs.com/package/fomod' target='_blank'><code>fomod</code></a> library
+            . <a href="https://github.com/BellCubeDev/fomod-builder" target="_blank">Source code available on GitHub.</a>
+        </p>
+    },
+
+    tab_about_more: {
+        en: ()=> <>
+            <p>
+                I was initially frustrated by the lack of options for creating Fomod installers.
+                Your choices were either a dumbed-down UI that didn&rsquo;t give you all of the options (or tooltips), what amounts to an XML editor UI, and literally just writing the XML yourself.
+            </p>
+            <p>
+                So, I decided to make my own.
+            </p>
+            <p>
+                The Fomod Builder is a web app that lets you create Fomod installers with a simple, intuitive UI.
+                It gives you full access to every capability of the Fomod format, gives you tooltips where tooltips are needed, warnings about bad practices, and even gives you a built-in editor for the XML.
+
+            </p>
+        </>
+    },
+
+    tab_about_created_by: {
+        en: ()=> <>Created by <a href='https://github.com/BellCubeDev/'>BellCube</a></>,
+    },
+
+    tab_about_bellcube: {
+        en: ()=> <>
+            I&rsquo;m BellCube, a self-taught modder and web developer. I&rsquo;ve been modding since 2021 and learning web development since 2022. Yes, I <i>am</i> a nerd.
+        </>
+    },
+
+    tab_about_licensing: {
+        en: ()=> <>
+            <p>
+                The Fomod Builder is licensed under the MIT license.
+            </p>
+            <p>
+                The Fomod Builder <u><b>would not be possible</b></u> without the following open-source projects:
+            </p>
+        </>,
+    },
+
+
+
+
 
     tab_settings: {
         en: ()=> 'Settings',
     },
+
+    tab_settings_header: {
+        en: ()=> 'Settings',
+    },
+
+    tab_settings_note: {
+        en: ()=> <>These settings are saved to your browser&rsquo;s local storage. If you clear your browser&rsquo;s local storage, these settings will be lost.</>,
+    },
+
+
+
+    setting_autoSave: {
+        en: ()=> 'Auto-Save',
+    },
+
+    setting_autoSaveInterval: {
+        en: ()=> 'Auto-Save Interval',
+    },
+
+    setting_defaultOptionType: {
+        en: ()=> 'Default Option Type',
+    },
+
+    setting_defaultGroupBehavior: {
+        en: ()=> 'Default Group Behavior',
+    },
+
+    setting_defaultOptionSortingOrder: {
+        en: ()=> 'Default Option Sorting Order',
+    },
+
+    setting_defaultGroupSortingOrder: {
+        en: ()=> 'Default Group Sorting Order',
+    },
+
+    setting_defaultStepSortingOrder: {
+        en: ()=> 'Default Step Sorting Order',
+    },
+
+    setting_reducedMotion: {
+        en: ()=> 'Prefer Reduced Motion',
+    },
+
+
+    // Loaders
+
 
     loaders_header_loaded: {
         en: ()=> 'You Have A Loaded Fomod',
@@ -155,9 +314,9 @@ export const translationTable = {
 
     loader_filesystem_description: {
         en: ()=> <>
-            Select the root folder of your project. If it&lsquo;s not already a Fomod, we&lsquo;ll create one for you.
+            Select the root folder of your project. If it&rsquo;s not already set up for a Fomod, we&rsquo;ll handle that for you.
             <br/>
-            If it is already set up for a Fomod, select the folder above the <code>fomod</code> folder.
+            If it is already set up for a Fomod, there should be a <code>fomod</code> folder.
             <br />
             Note that this is a very new and shiny technique. If you run into issues, you may either need to update your browser or try a different method.
         </>,
@@ -196,8 +355,24 @@ export const translationTable = {
     },
 
     loader_text_input_description: {
-        en: ()=> <>Enter the contents of ModuleConfig.xml and Info.xml below. We&lsquo;ll use that text for your editing session.</>
+        en: ()=> <>Enter the contents of ModuleConfig.xml and Info.xml below. We&rsquo;ll use that text for your editing session.</>
     },
+
+
+    // UI stuff
+
+
+    dropdown_no_options: {
+        en: ()=> 'No Options',
+    },
+
+    dropdown_loading: {
+        en: ()=> 'Loading...',
+    },
+
+
+    // Fomod Lingo
+
 
     sorting_order_ascending: {
         en: ()=> 'Alphabetical: Ascending (A–Z)',
@@ -230,6 +405,37 @@ export const translationTable = {
     behavior_type_selectall: {
         en: ()=> 'Forcibly Select Everything (No Choice)',
     },
+
+    behavior_type_required: {
+        en: ()=> 'Force-Select This Option (No Choice)',
+    },
+
+    behavior_type_recommended: {
+        en: ()=> 'Selected by Default',
+    },
+
+    behavior_type_optional: {
+        en: ()=> 'Unselected by Default',
+    },
+
+    behavior_type_couldbeusable: {
+        en: ()=> 'Show a warning before selecting',
+    },
+
+    behavior_type_notusable: {
+        en: ()=> 'Disable This Option (No Choice)',
+    },
+
+
+    // Builder-Specific Labels
+
+    builder_step_sorting_order: {
+        en: ()=> <>Step Sorting Order:</>
+    },
+
+
+    // Steps
+
 
     steps_no_steps: {
         en: ()=> 'No Steps',
@@ -321,4 +527,4 @@ export const translationTable = {
         },
     },
 
-} as const satisfies TranslationTable;
+} as const;

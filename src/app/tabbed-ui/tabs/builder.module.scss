@@ -1,0 +1,34 @@
+@use '../../vars.module.scss' as *;
+
+.buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    margin-bottom: 24px;
+    gap: 16px;
+}
+
+.button {
+    border-radius: 6px;
+    border: none;
+    min-width: 133px;
+    padding: 16px 24px;
+
+    background-color: $blue;
+    &:hover { background-color: mix($blue, $bright-blue, 85%); }
+    &:active { background-color: mix($blue, $bright-blue, 70%); }
+}
+
+.buttonVortex {
+    background-color: $vortex-dark-orange;
+    &:hover { background-color: mix($vortex-dark-orange, $vortex-bright-orange, 80%); }
+    &:active { background-color: mix($vortex-dark-orange, $vortex-bright-orange, 60%); }
+}
+
+.buttonMO2 {
+    background-color: mix($mo2-dark-blue, $mo2-blue, 80%);
+    &:hover { background-color: mix($mo2-dark-blue, $mo2-blue, 60%); }
+    &:active { background-color: mix($mo2-dark-blue, $mo2-blue, 40%); }
+}

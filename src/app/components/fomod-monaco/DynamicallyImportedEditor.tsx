@@ -87,7 +87,7 @@ export default function FomodMonacoEditorForDynamicImportOnly() {
             path= {isInfoMode ? 'Info.xml' : 'ModuleConfig.xml'}
             value= { isInfoMode ? c.loader.infoText : c.loader.moduleText }
             onChange={ (value, e) => {
-                if (!value) return;
+                if (!value) throw new TypeError('How is there no value?!!');// return;
 
                 if (isInfoMode) c.loader.infoText = value;
                 else c.loader.moduleText = value;

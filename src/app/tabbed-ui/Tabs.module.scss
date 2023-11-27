@@ -75,10 +75,8 @@
         background: #fff1
     }
 
-    &:last-child {
-        margin-bottom: 8px;
-        margin-top: auto;
-    }
+    &:nth-child(5) { margin-top: auto; }
+    &:last-child { margin-bottom: 8px; }
 }
 
 .icon {
@@ -150,4 +148,3 @@
 .reducedMotion {
     transition-property: none !important;
 }
-

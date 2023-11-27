@@ -70,11 +70,11 @@ export function createNewOption(settings: Settings | null) {
 import Dropdown from '../../dropdown/index';
 import { useTranslate } from '../../localization/index';
 
-const orders = Object.values(GroupBehaviorType) as GroupBehaviorType[];
+export const GroupBehaviorTypes = Object.values(GroupBehaviorType) as GroupBehaviorType[];
 
 export function GroupBehaviorDropdown(props: Omit<Parameters<typeof Dropdown<string>>[0], 'options'>) {
     return <Dropdown<string>
-        options={   orders.map(order => ({
+        options={   GroupBehaviorTypes.map(order => ({
             value: order,
                    // eslint-disable-next-line react-hooks/rules-of-hooks -- This will always be called in the same order
             label: useTranslate(`behavior_type_${order.toLowerCase() as Lowercase<GroupBehaviorType>}`),
@@ -82,4 +82,3 @@ export function GroupBehaviorDropdown(props: Omit<Parameters<typeof Dropdown<str
         {...props}
     />;
 }
-

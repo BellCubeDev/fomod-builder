@@ -166,7 +166,7 @@ export default class FileSystemFolderLoader extends FomodLoader {
     }
     static override LoaderUI() {
         return <div className={styles.fsLoader}>
-            <h2><T tkey='loader_filesystem' params={[true]} /></h2>
+            <h3><T tkey='loader_filesystem' params={[true]} /></h3>
             <p><T tkey='loader_filesystem_description' /></p>
         </div>;
     }

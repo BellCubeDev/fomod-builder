@@ -94,23 +94,29 @@ export function FomodLoaderProvider({ children }: { children: React.ReactNode })
     }, [loader]);
 
     const settings = useSettings();
-    const delay = settings?.autoSave;
+    const doAutoSave = settings?.autoSave;
+    const autoSaveInterval = settings?.autoSaveInterval;
 
-    const {current: eventTarget} = React.useRef(new EventTarget());
+    const eventTarget = React.useMemo(()=> new EventTarget(), []);
 
     let autoSaveTimer = React.useRef<ReturnType<typeof setTimeout>|null>(null);
 
     const autoSave = React.useCallback(() => {
         if (!loader) return Promise.resolve(FomodSaveRejectReason.NoLoader);
+        if (!doAutoSave) return Promise.resolve<false>(false);
 
-        if (delay === false || delay === undefined) return Promise.resolve<false>(false);
-        if (delay === 0) return loader.save();
+        if (autoSaveInterval === 0) return loader.save();
 
         return new Promise<Awaited<ReturnType<FomodLoader['save']>>>((resolve, reject) => {
             if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
-            autoSaveTimer.current = setTimeout(  () => loader.save().then(resolve, reject),   delay);
+            autoSaveTimer.current = setTimeout(  () => loader.save().then(resolve, reject), autoSaveInterval);
         });
-    }, [loader, delay]);
+    }, [loader, doAutoSave, autoSaveInterval]);
+
+    React.useEffect(() => {
+        eventTarget.addEventListener('info-update', () => autoSave());
+        eventTarget.addEventListener('module-update', () => autoSave());
+    }, [autoSave, eventTarget]);
 
     React.useEffect(() => {
         window.fomod = { loader, load, autoSave, eventTarget };

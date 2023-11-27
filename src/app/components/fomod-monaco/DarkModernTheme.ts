@@ -3,18 +3,15 @@ import type {editor} from 'monaco-editor';
 async function getReleaseVersion() {
     // get redirect URL
 
-    const res = await fetch('https://corsproxy.io/?https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user', {
-        method: 'HEAD',
-        redirect: 'follow',
-    });
+    const releaseData = await fetch('https://api.github.com/repos/microsoft/vscode/releases/latest').then(res => res.json()).catch(() => null);
+    console.log('releaseData', releaseData);
+    if (!releaseData || !('tag_name' in releaseData) ) throw new Error('Failed to get latest VS Code release from GitHub');
 
-    const url = new URL(res.url);
+    const tagData = await fetch (`https://api.github.com/repos/microsoft/vscode/git/ref/tags/${encodeURI(releaseData.tag_name)}`).then(res => res.json()).catch(() => null);
+    console.log('tagData', tagData);
+    if (!tagData || !('object' in tagData) || typeof tagData.object !== 'object' || !('sha' in tagData.object) ) throw new Error('Failed to get release version');
 
-
-    const release = url.pathname.match(/\/stable\/([^\/]+)\//)?.[1];
-    if (!release) throw new Error('Failed to get release version');
-
-    return release;
+    return tagData.object.sha;
 }
 
 interface TokenColorDef {
@@ -99,4 +96,3 @@ export async function getDarkModernTheme() {
 
 const DarkModernThemePromise = getDarkModernTheme();
 export default DarkModernThemePromise;
-

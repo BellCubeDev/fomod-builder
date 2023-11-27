@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { Immutable, Draft, produce, castDraft } from 'immer';
-import { Option, FlagSetter, FlagInstance } from 'fomod';
+import { Option, FlagSetter, FlagInstance, OptionType } from 'fomod';
 import { T } from '@/app/components/localization';
 import { useSettings, Settings } from '../../../SettingsContext';
 import styles from '../builder.module.scss';
@@ -85,3 +85,17 @@ export function BuilderFlag({flag, edit}: {flag: Immutable<FlagSetter>, edit: (r
     </div>;
 }
 
+import Dropdown from '../../../dropdown/index';
+
+export const OptionBehaviorTypes = Object.values(OptionType).reverse() as OptionType[];
+
+export function OptionBehaviorDropdown(props: Omit<Parameters<typeof Dropdown<string>>[0], 'options'>) {
+    return <Dropdown<string>
+        options={   OptionBehaviorTypes.map(order => ({
+            value: order,
+                   // eslint-disable-next-line react-hooks/rules-of-hooks -- This will always be called in the same order
+            label: useTranslate(`behavior_type_${order.toLowerCase() as Lowercase<OptionType>}`),
+        }))   }
+        {...props}
+    />;
+}

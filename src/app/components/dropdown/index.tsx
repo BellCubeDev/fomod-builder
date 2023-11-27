@@ -3,6 +3,7 @@
 import Select, { GroupBase } from 'react-select';
 import styles from './Dropdown.module.scss';
 import React from 'react';
+import { useTranslate } from '../localization/index';
 
 type ParamsBase = Parameters<typeof Select>[0];
 
@@ -35,6 +36,8 @@ export default function Dropdown<T extends string>({options, value, onChange, cl
         closeMenuOnSelect={true}
         captureMenuScroll={true}
         blurInputOnSelect={true}
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        noOptionsMessage={()=>useTranslate('dropdown_no_options')}  loadingMessage={()=>useTranslate('dropdown_loading')}
         classNames={{
             container(props) { return styles.container!; },
             control(props) { return styles.control!; },

@@ -4,7 +4,6 @@ import React from "react";
 import {default as tabs, Tab, TabName} from "./tabs/index";
 import styles from './Tabs.module.scss';
 import { T } from "../components/localization";
-import LocaleSelector from "@/app/components/localization/LocaleSelector";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretRight } from "@fortawesome/free-solid-svg-icons";
@@ -12,14 +11,15 @@ import { useSettings } from '../components/SettingsContext';
 import { Keybind } from '../components/KeybindManager';
 import KeybindManager from '../components/KeybindManager';
 import { useFomod } from '../components/loaders/index';
+import type licenseChecker from 'license-checker-rseidelsohn';
 
 type TabEntry<T extends TabName> = [T, (typeof tabs)[T]];
 
 // TODO: Implement `alt+num`/`option+num` for tab switching
+
 const tabsForKeybinds = Object.entries(tabs) as TabEntry<TabName>[];
 
-
-export default function FomodBuilderTabbedUI() {
+export default function FomodBuilderTabbedUI({licenseInfo}: {licenseInfo: React.ReactNode}) {
     const settings = useSettings();
 
     const [activeTab, setActiveTab] = React.useState<TabName>('tab_mission_control');
@@ -129,7 +129,7 @@ export default function FomodBuilderTabbedUI() {
                     }}
                     tabIndex={active ? 0 : -1}
                 >
-            {transitioningFrom || active ? <tab.Page /> : null}
+            {transitioningFrom || active || tab.alwaysRendered ? <tab.Page licenseInfo={licenseInfo} /> : null}
         </div> ;
     });
 

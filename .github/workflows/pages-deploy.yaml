@@ -4,6 +4,13 @@ on:
   workflow_dispatch:
   push:
     branches: ["production"]
+    paths-ignore:
+      - "README.md"
+      - "LICENSE"
+      - "CODE_OF_CONDUCT.md"
+      - "CONTRIBUTING.md"
+      - ".vscode/**"
+      - ".gitignore"
 
 permissions:
   contents: read

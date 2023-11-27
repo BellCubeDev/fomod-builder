@@ -2,12 +2,8 @@
 
 import styles from './ToggleSwitch.module.scss';
 import React from 'react';
-
-// TOTO: Wants below
-// Follow cursor
-// Use css transitions
-// Do a toggle switch similar to MDL's
-// yeah
+import KeybindManager from '../KeybindManager';
+import { Keybind } from '../KeybindManager';
 
 export default function ToggleSwitch({ value, onChange, disabled, className, style }: {
     value: boolean;
@@ -20,22 +16,36 @@ export default function ToggleSwitch({ value, onChange, disabled, className, sty
 
     // TODO: useEffect to add and remove the classes for the values
 
-    return <label
+    return <KeybindManager keybinds={React.useMemo(()=> [{
+        action(e) {
+            onChange(!value);
+            e.preventDefault();
+        },
+        key: ' ',
+        doNotPreventDefault: true,
+    }, {
+        action(e) {
+            onChange(!value);
+            e.preventDefault();
+        },
+        key: 'Enter',
+        doNotPreventDefault: true,
+    }] satisfies Keybind[], [onChange, value])}><label
         className={`${className ?? ''} ${styles.wrapper} ${styles.wrapper}--${value ? 'checked' : 'unchecked'}`}
         style={style}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        tabIndex={0}
     >
         <input
             type="checkbox"
             checked={value}
             disabled={disabled}
             onChange={(e) => onChange(e.target.checked)}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
             hidden={true}
             aria-hidden={false}
         />
-        <div className={`${styles.tray} ${styles.tray}--${value ? 'checked' : 'unchecked'} ${styles.tray}--${focused ? 'focused' : 'unfocused'}`} />
-        <div className={`${styles.thumb} ${styles.thumb}--${value ? 'checked' : 'unchecked'} ${styles.thumb}--${focused ? 'focused' : 'unfocused'}`}
-        />
-    </label>;
+        <div className={`${styles.tray} ${value ? styles.checked : styles.unchecked} ${focused ? styles.focused : styles.unfocused} ${disabled ? styles.disabled : styles.enabled}`} />
+        <div className={`${styles.thumb} ${value ? styles.checked : styles.unchecked} ${focused ? styles.focused : styles.unfocused} ${disabled ? styles.disabled : styles.enabled}`} />
+    </label></KeybindManager> ;
 }

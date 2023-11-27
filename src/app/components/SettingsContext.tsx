@@ -8,9 +8,10 @@ export interface Settings {
     defaultGroupBehavior: GroupBehaviorType,
     defaultOptionSortingOrder: SortingOrder,
     defaultGroupSortingOrder: SortingOrder,
+    defaultStepSortingOrder: SortingOrder,
 
-    /** How many milliseconds to wait after the last change to save the open Fomod. If `false`, no save is performed. */
-    autoSave: false | number,
+    autoSave: boolean,
+    autoSaveInterval: number,
 
     /** The user requests reduced motion. This is offered both for accessibility and for editing speed (though, for accessibility, it's often better to go through the browser) */
     reducedMotion: boolean,
@@ -52,8 +53,10 @@ export const defaultSettings = {
     defaultGroupBehavior: GroupBehaviorType.SelectAny,
     defaultOptionSortingOrder: SortingOrder.Explicit,
     defaultGroupSortingOrder: SortingOrder.Explicit,
+    defaultStepSortingOrder: SortingOrder.Explicit,
 
-    autoSave: 500,
+    autoSave: true,
+    autoSaveInterval: 500,
 
     reducedMotion: false,
 
@@ -70,16 +73,13 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     const [value, setValue] = React.useState<Settings|null>(null);
 
     React.useEffect(() => {
-        const fromStorage = localStorage.getItem('settings');
-        if (!fromStorage) return setValue(Object.assign({}, defaultSettings));
-
-        const settings = JSON.parse(fromStorage);
-        if ('update' in settings) delete settings.update;
-
-        setValue(Object.assign({}, defaultSettings, settings, { update(this: Settings, ...args: any[]) {
+        const updateFObj = { update(this: Settings, ...args: any[]) {
             defaultUpdate.bind(this, ...args)();
             setValue(Object.assign({}, this)); // Hack to get React to re-render
-        }}));
+        }};
+
+        const fromStorage = localStorage.getItem('settings');
+        setValue(Object.assign({}, defaultSettings, fromStorage ? JSON.parse(fromStorage) : {}, updateFObj));
     }, []);
 
     React.useEffect(() => {
@@ -90,6 +90,3 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
         {children}
     </settingsContext.Provider>;
 }
-
-
-

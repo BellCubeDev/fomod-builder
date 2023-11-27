@@ -18,6 +18,8 @@ const rubik = Rubik({
     subsets: ['latin-ext'],
 });
 
+import Head from "next/head";
+
 // Exported directly in page.js as well to avoid a strange bugs or two
 export const metadata: Metadata = {
     title: "Fomod Builder",
@@ -81,6 +83,43 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return <html lang='en'>
+            <head>
+                <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(
+                    {
+                        "@context": "http://schema.org",
+                        "@type": "SoftwareApplication",
+                        name: "Fomod Builder",
+                        image: "https://fomod.bellcube.dev/logo/logo.webp",
+                        url: "https://fomod.bellcube.dev/",
+                        author: {
+                            "@type": "Person",
+                            name: "BellCube",
+                            givenName: "Zack",
+                        },
+                        applicationCategory: "BrowserApplication",
+                        applicationSubCategory: "WebApp",
+                        dateModified: new Date().toISOString(),
+                        isAccessibleForFree: true,
+                        license: 'MIT',
+                        maintainer: {
+                            "@type": "Person",
+                            name: "BellCube",
+                            givenName: "Zack",
+                        },
+                        offers: {
+                            "@type": "Offer",
+                            price: 0,
+                            priceCurrency: "USD",
+                        },
+                        aggregateRating: {
+                            "@type": "AggregateRating",
+                            ratingValue: 5,
+                            reviewCount: 0,
+                        },
+                        operatingSystem: "Windows, Mac, Linux"//, Android, iOS",
+                    }
+                ) }} />
+            </head>
             <body className={rubik.className + ' ' + SourceCodePro.variable}>
                 <LocaleProvider><SettingsProvider><FomodLoaderProvider><GlobalKeybinds>
                     {children}
