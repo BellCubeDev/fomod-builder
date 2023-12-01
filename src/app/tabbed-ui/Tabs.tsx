@@ -11,7 +11,6 @@ import { useSettings } from '../components/SettingsContext';
 import { Keybind } from '../components/KeybindManager';
 import KeybindManager from '../components/KeybindManager';
 import { useFomod } from '../components/loaders/index';
-import type licenseChecker from 'license-checker-rseidelsohn';
 
 type TabEntry<T extends TabName> = [T, (typeof tabs)[T]];
 

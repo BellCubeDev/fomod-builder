@@ -1,7 +1,6 @@
 'use client';
 
-import React, { Suspense } from 'react';
-import dynamic from "next/dynamic";
+import React from 'react';
 import type {editor} from 'monaco-editor';
 import Monaco, {useMonaco} from '@monaco-editor/react';
 import styles from './FomodMonacoEditor.module.scss';

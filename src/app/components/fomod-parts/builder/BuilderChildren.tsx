@@ -30,7 +30,7 @@ function tryCallingEdit(f: () => unknown) {
 export default function BuilderChildren<
     TTypeString extends ValidTypeString,
     TParentInstance extends {},
-    TChildInstance extends {name: string},
+    TChildInstance extends {name: string, decommission?: (currentDocument: Document) => unknown},
 > ({ children, className, type, edit, childKey, createChildClass, ChildComponent, showAll }: {
     children: TrueImmutable<Set<TChildInstance>>,
     className?: string,
@@ -70,7 +70,7 @@ export default function BuilderChildren<
     };
 
     const deleteToBeBound = function deleteChild(i: number, event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        console.log('delete', i, childArr);
+        //console.log('delete', i, childArr);
         if (i >= childArr.length) return;
 
         event.preventDefault();
@@ -85,8 +85,9 @@ export default function BuilderChildren<
         tryCallingEdit(()=> edit(draft => {
             const set = draft[childKey] as TrueDraft<Set<TChildInstance>>;
             const thisChild = Array.from(set.values())[i]!;
-            console.log({[childKey]: set, i, thisChild, hasIt: set.has(thisChild)});
+            //console.log({[childKey]: set, i, thisChild, hasIt: set.has(thisChild)});
             set.delete(thisChild);
+            thisChild.decommission?.(current(draft) as unknown as Document);
             resolveRecursiveDrafts(set);
         }));
     };

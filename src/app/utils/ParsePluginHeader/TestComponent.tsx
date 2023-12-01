@@ -31,8 +31,7 @@ export default function TestTes4StreamInput() {
             },
         });
 
-        console.log(byteStream);
-        ParseModTES4RecordFromStream(byteStream).then((...args: unknown[]) => {console.log(...args); byteStream.cancel('Done reading TES4 record');});
+        ParseModTES4RecordFromStream(byteStream).then(() => byteStream.cancel('Done reading TES4 record'));
     }, [file]);
 
     return <div>

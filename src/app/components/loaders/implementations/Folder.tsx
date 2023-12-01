@@ -114,7 +114,8 @@ export default class FileSystemFolderLoader extends FomodLoader {
 
         try {
             doc = new DOMParser().parseFromString(text, 'application/xml');
-            if (doc.body?.firstElementChild?.tagName === 'parsererror' || doc.documentElement?.firstElementChild?.tagName === 'parsererror') return FomodLoadRejectReason.InvalidXML;
+            if (doc.body?.firstElementChild?.tagName === 'parsererror' || doc.documentElement?.firstElementChild?.tagName === 'parsererror')
+                return FomodLoadRejectReason.InvalidXML;
         } catch (e) {
             if (e instanceof Error && e.name === 'SyntaxError') return FomodLoadRejectReason.InvalidXML;
             else throw e;
@@ -132,7 +133,7 @@ export default class FileSystemFolderLoader extends FomodLoader {
 
         this._module = result;
         this._moduleDoc = asElement.ownerDocument!;
-        this._moduleText = asElement.outerHTML;
+        this._moduleText = this.formatXMLForEditing(asElement.outerHTML);
 
         return false;
     }

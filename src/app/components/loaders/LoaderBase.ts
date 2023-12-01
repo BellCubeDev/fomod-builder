@@ -4,7 +4,7 @@ import React from "react";
 import xmlFormat from 'xml-formatter';
 import { Fomod, FomodInfo } from 'fomod';
 import { useImmer } from 'use-immer';
-import { Immutable, immerable } from 'immer';
+import { Immutable, immerable, createDraft } from 'immer';
 
 import { TranslationTableKeys } from '../localization/strings';
 import { FomodLoadRejectReason, FomodSaveRejectReason } from '.';
@@ -76,38 +76,55 @@ export abstract class FomodLoader {
         });
     }
 
-    private reloadInfoIfNeeded() {
-        const el = this._infoDoc ? this._info?.asElement(this._infoDoc) : null;
-        if (this._infoText !== el?.outerHTML ?? '')
-            return this.reloadFromText(this._infoText ?? '', false);
-        else
+    private reloadModuleIfNeeded(getType: 'document' | 'text') {
+        if (this._lastModuleEdit === null) return false;
+        if (this._lastModuleEdit === getType) return false;
+
+        this._lastModuleEdit = null;
+
+        if (getType === 'document') {
+            if (this._moduleText === null) return false;
+            return this.reloadFromText(this._moduleText, false);
+        } else {
+            if (!this._moduleDoc || !this._module) return false;
+            this._moduleText = this.formatXMLForEditing(createDraft(this._module).asElement(new DOMParser().parseFromString('', 'application/xml')).outerHTML);
             return false;
+        }
     }
 
-    private reloadModuleIfNeeded() {
-        const el = this._moduleDoc ? this._module?.asElement(this._moduleDoc) : null;
-        if (this._moduleText !== el?.outerHTML ?? '')
-            return this.reloadFromText(this._moduleText ?? '', false);
-        else
+    private reloadInfoIfNeeded(getType: 'document' | 'text') {
+        if (this._lastInfoEdit === null) return false;
+        if (this._lastInfoEdit === getType) return false;
+
+        this._lastInfoEdit = null;
+
+        if (getType === 'document') {
+            if (this._infoText === null) return false;
+            return this.reloadFromText(this._infoText, true);
+        } else {
+            if (!this._infoDoc || !this._info) return false;
+            this._infoText = this.formatXMLForEditing(createDraft(this._info).asElement(new DOMParser().parseFromString('', 'application/xml')).outerHTML);
             return false;
+        }
     }
 
 
 
 
+    protected _lastInfoEdit: 'document' | 'text' | null = null;
     protected abstract _infoDoc: Document | null;
     protected abstract _info: Immutable<FomodInfo> | null;
     protected abstract _infoText: string | null;
 
     get infoDoc(): Document | null {
-        const reloadRejection = this.reloadInfoIfNeeded();
+        const reloadRejection = this.reloadInfoIfNeeded('document');
         if (reloadRejection) throw new FomodLoadingError('Failed to reload Info.xml from text', reloadRejection);
 
         return this._infoDoc;
     }
 
     get info(): Immutable<FomodInfo> {
-        const reloadRejection = this.reloadInfoIfNeeded();
+        const reloadRejection = this.reloadInfoIfNeeded('document');
         if (reloadRejection) throw new FomodLoadingError('Failed to reload Info.xml from text', reloadRejection);
 
         if (!this._info) throw new Error('Info has not been initialized on this loader!');
@@ -116,64 +133,77 @@ export abstract class FomodLoader {
 
     set info(val: Immutable<FomodInfo>) {
         this.history.add([this.module, val]);
+        this._lastInfoEdit = 'document';
     }
 
     get infoText(): string {
-        const string = this.formatXMLForEditing(this.info.asElement(this.infoDoc!).outerHTML);
-        console.log('infoText', string);
-        return string;
+        const reloadRejection = this.reloadInfoIfNeeded('text');
+        if (reloadRejection) throw new FomodLoadingError('Failed to reload Info.xml from text', reloadRejection);
+
+        return this._infoText!;
     }
 
     set infoText(text: string) {
         this._infoText = text;
+        this._lastInfoEdit = 'text';
     }
 
     get infoTextForSaving(): string {
-        return this.formatXMLForSaving(this.info.asElement(this.infoDoc!).outerHTML);
+        const reloadRejection = this.reloadInfoIfNeeded('text');
+        if (reloadRejection) throw new FomodLoadingError('Failed to reload Info.xml from text', reloadRejection);
+
+        return this.formatXMLForSaving(this._infoText!);
     }
 
 
 
 
 
-
+    protected _lastModuleEdit: 'document' | 'text' | null = null;
     protected abstract _moduleDoc: Document | null;
     protected abstract _module: Immutable<Fomod<false>> | null;
     protected abstract _moduleText: string | null;
 
     get moduleDoc(): Document | null {
-        const reloadRejection = this.reloadModuleIfNeeded();
+        const reloadRejection = this.reloadModuleIfNeeded('document');
         if (reloadRejection) throw new FomodLoadingError('Failed to reload ModuleConfig.xml from text', reloadRejection);
+
+        if (!this._moduleDoc) throw new Error('ModuleConfig.xml has not been initialized on this loader!');
 
         return this._moduleDoc;
     }
 
     get module(): Immutable<Fomod<false>> {
-        const reloadRejection = this.reloadModuleIfNeeded();
+        const reloadRejection = this.reloadModuleIfNeeded('document');
         if (reloadRejection) throw new FomodLoadingError('Failed to reload ModuleConfig.xml from text', reloadRejection);
 
         if (!this._module) throw new Error('ModuleConfig has not been initialized on this loader!');
-
         return this._module;
     }
 
     set module(val: Immutable<Fomod<false>>) {
         this.history.add([val, this.info]);
+        this._lastModuleEdit = 'document';
     }
 
 
 
 
     get moduleText(): string {
-        return this.formatXMLForEditing(this.module.asElement(this.moduleDoc!).outerHTML);
+        const reloadRejection = this.reloadModuleIfNeeded('text');
+        if (reloadRejection) throw new FomodLoadingError('Failed to reload ModuleConfig.xml from text', reloadRejection);
+
+        return this.formatXMLForEditing(createDraft(this.module).asElement(this.moduleDoc!).outerHTML);
     }
 
     set moduleText(text: string) {
         this._moduleText = text;
+        this._lastModuleEdit = 'text';
     }
 
     get moduleDocForSaving(): string {
-        return this.formatXMLForSaving(this.module.asElement(this.moduleDoc!).outerHTML);
+
+        return this.formatXMLForSaving(createDraft(this.module).asElement(this.moduleDoc!).outerHTML);
     }
 
 
@@ -206,6 +236,7 @@ export abstract class FomodLoader {
             get current() { return this_._module && this_._info ? [this_._module, this_._info] : null; },
             set current(newState: [Immutable<Fomod<false>>, Immutable<FomodInfo>] | null) {
                 if (!newState) return;
+
                 this_._module = newState[0];
                 this_._info = newState[1];
             }

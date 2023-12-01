@@ -20,18 +20,18 @@ export default function FomodEditor() {
     React.useEffect(() => {
         const reRender = () => {
             reRender_({});
-            console.log('marking for re-render...');
+            //console.log('marking for re-render...');
         };
 
         eventTarget.addEventListener('module-update', reRender);
         return () =>  eventTarget.removeEventListener('module-update', reRender);
     }, [eventTarget]);
 
-    console.log('rendering the whole thing...', loader?.module);
+    //console.log('rendering the whole thing...', loader?.module);
 
     const edit = React.useCallback((recipe: (draft: Draft<Fomod<false>>) => Draft<Fomod<false>> | undefined | void) => {
         if (!loader) return;
-        console.log('editing...');
+        //console.log('editing...');
         loader.module = produce(loader.module, recipe) as Immutable<Fomod<false>>;
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
