@@ -8,6 +8,8 @@ import DeleteButton from '../../DeleteButton';
 import styles from './builder.module.scss';
 import { editSetByIndex } from '@/SetUtils';
 import { resolveRecursiveDrafts } from '../../../../SetUtils';
+import { useFomod } from '../../loaders/index';
+import { XmlRepresentation } from 'fomod';
 
 function tryMutation(f: () => unknown) {
     try {
@@ -30,7 +32,7 @@ function tryCallingEdit(f: () => unknown) {
 export default function BuilderChildren<
     TTypeString extends ValidTypeString,
     TParentInstance extends {},
-    TChildInstance extends {name: string, decommission?: (currentDocument: Document) => unknown},
+    TChildInstance extends XmlRepresentation & {name: string},
 > ({ children, className, type, edit, childKey, createChildClass, ChildComponent, showAll }: {
     children: TrueImmutable<Set<TChildInstance>>,
     className?: string,
@@ -41,6 +43,8 @@ export default function BuilderChildren<
     ChildComponent: (params: {[T in TTypeString]: TrueImmutable<TChildInstance>} & { edit: (recipe: (draft: TrueDraft<TChildInstance>) => Draft<TChildInstance> | undefined | void) => void}) => JSX.Element,
     showAll?: boolean;
 }) {
+    const {loader} = useFomod();
+
     const addChild = React.useCallback(() => {
         tryCallingEdit(()=> edit(draft => {
             const set = draft[childKey] as TrueDraft<Set<TChildInstance>>;
@@ -87,7 +91,18 @@ export default function BuilderChildren<
             const thisChild = Array.from(set.values())[i]!;
             //console.log({[childKey]: set, i, thisChild, hasIt: set.has(thisChild)});
             set.delete(thisChild);
-            thisChild.decommission?.(current(draft) as unknown as Document);
+
+            if (loader) {
+                if (loader.moduleDoc) {
+                    thisChild.decommission?.(loader.moduleDoc);
+                    thisChild.getElementForDocument?.(loader.moduleDoc)?.remove();
+                }
+                if (loader.infoDoc) {
+                    thisChild.decommission?.(loader.infoDoc);
+                    thisChild.getElementForDocument?.(loader.infoDoc)?.remove();
+                }
+            }
+
             resolveRecursiveDrafts(set);
         }));
     };

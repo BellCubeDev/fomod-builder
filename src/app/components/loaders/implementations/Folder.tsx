@@ -8,8 +8,6 @@ import { FomodLoader, FomodSaveRejectReason, FomodLoadRejectReason } from '..';
 import { parseInfoDoc, parseModuleDoc, Fomod, BlankModuleConfig, FomodInfo, BlankInfoDoc, getOrCreateElementByTagName } from 'fomod';
 import { FomodEventTarget } from '../index';
 
-// TODO: Test that any of this actually does what I want it to
-
 export default class FileSystemFolderLoader extends FomodLoader {
     protected override _info: FomodInfo | null = null;
     protected override _infoDoc: Document | null = null;

@@ -30,8 +30,8 @@ npm run dev
 
 # FIXME
 
-* Scrollbar pushes step/option/group selection up
-  * Figure out how VS Code does their tab selection scrollbar
+* Text-Like Input Jiggles On Input
+* Text-Like Input Can't Be Tab Navigation'd
 
 # TODO
 
