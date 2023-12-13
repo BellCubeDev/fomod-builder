@@ -1,12 +1,11 @@
 import path from 'path';
 
 import styles from './FolderLoader.module.scss';
-import { TranslationTableKeys } from '../../localization/strings';
-import { T } from '@/app/components/localization';
-import { FomodLoader, FomodSaveRejectReason, FomodLoadRejectReason } from '..';
+import { TranslationTableKeys } from '@/app/localization/strings';
+import { T } from '@/app/localization';
 
+import { FomodLoader, FomodSaveRejectReason, FomodLoadRejectReason, FomodEventTarget } from '..';
 import { parseInfoDoc, parseModuleDoc, Fomod, BlankModuleConfig, FomodInfo, BlankInfoDoc, getOrCreateElementByTagName } from 'fomod';
-import { FomodEventTarget } from '../index';
 
 export default class FileSystemFolderLoader extends FomodLoader {
     protected override _info: FomodInfo | null = null;

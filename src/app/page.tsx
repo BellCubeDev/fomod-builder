@@ -1,6 +1,6 @@
 import FomodBuilderTabbedUI from "./tabbed-ui/Tabs";
 
-export {metadata} from './layout';
+export {metadata, viewport} from './layout';
 
 import licenseChecker from 'license-checker-rseidelsohn';
 

@@ -1,8 +1,8 @@
 import {TranslationTable} from '.';
-import { GroupBehaviorType, Option, FlagSetter } from 'fomod';
+import { GroupBehaviorType, Option, FlagSetter, FomodInfo, Fomod } from 'fomod';
 import { Immutable } from 'immer';
-import tab from '../../tabbed-ui/tabs/about';
-import { Settings } from '../SettingsContext';
+import tab from '@/app/tabbed-ui/tabs/about';
+import { Settings } from '@/app/components/SettingsContext';
 
 
 
@@ -43,6 +43,7 @@ export interface TranslationTableKeys {
 
     tab_documentation: (selected: boolean) => React.ReactNode;
 
+    // About Tab
     tab_about: (selected: boolean) => React.ReactNode;
     tab_about_basics: () => React.ReactNode;
     tab_about_more: () => React.ReactNode;
@@ -50,11 +51,7 @@ export interface TranslationTableKeys {
     tab_about_bellcube: () => React.ReactNode;
     tab_about_licensing: () => React.ReactNode;
 
-    tab_settings: (selected: boolean) => React.ReactNode;
-    tab_settings_header: () => React.ReactNode;
-    tab_settings_note: () => React.ReactNode;
-
-    // UI stuff
+    // UI Stuff
     dropdown_no_options: () => React.ReactNode;
     dropdown_loading: () => React.ReactNode;
 
@@ -79,6 +76,9 @@ export interface TranslationTableKeys {
     loader_text_input_description: () => React.ReactNode;
 
     // Settings
+    tab_settings: (selected: boolean) => React.ReactNode;
+    tab_settings_header: () => React.ReactNode;
+    tab_settings_note: () => React.ReactNode;
     setting_defaultOptionType: (value: Settings['defaultOptionType']) => React.ReactNode;
     setting_defaultGroupBehavior: (value: Settings['defaultGroupBehavior']) => React.ReactNode;
     setting_defaultOptionSortingOrder: (value: Settings['defaultOptionSortingOrder']) => React.ReactNode;
@@ -87,6 +87,13 @@ export interface TranslationTableKeys {
     setting_autoSave: (value: Settings['autoSave']) => React.ReactNode;
     setting_autoSaveInterval: (value: Settings['autoSaveInterval']) => React.ReactNode;
     setting_reducedMotion: (value: Settings['reducedMotion']) => React.ReactNode;
+
+    // Metadata
+    tab_metadata: () => React.ReactNode;
+    metadata_id: (value: FomodInfo['data']['Id']) => React.ReactNode;
+    metadata_author: (value: FomodInfo['data']['Author']) => React.ReactNode;
+    metadata_website: (value: FomodInfo['data']['Website']) => React.ReactNode;
+    metadata_version: (value: FomodInfo['data']['Version']) => React.ReactNode;
 
     // Fomod Lingo
     sorting_order_ascending: () => string;
@@ -107,6 +114,10 @@ export interface TranslationTableKeys {
 
     // Builder-Specific Labels
     builder_step_sorting_order: () => React.ReactNode;
+    builder_module_name: (value: Fomod['moduleName']) => React.ReactNode;
+    builder_module_name_entangled: (moduleName: Fomod['moduleName'], infoName: FomodInfo['data']['Name']) => React.ReactNode;
+    builder_info_name: (value: FomodInfo['data']['Name']) => React.ReactNode;
+    builder_module_name_conflict_warning: (moduleName: Fomod['moduleName'], infoName: FomodInfo['data']['Name']) => React.ReactNode;
 
     // Steps
     steps_no_steps: () => React.ReactNode;
@@ -244,6 +255,10 @@ export const translationTable: RecursiveReadonly<TranslationTable> = {
                 The Fomod Builder <u><b>would not be possible</b></u> without the following open-source projects:
             </p>
         </>,
+    },
+
+    tab_metadata: {
+        en: ()=> <>Metadata</>
     },
 
 
@@ -433,6 +448,38 @@ export const translationTable: RecursiveReadonly<TranslationTable> = {
         en: ()=> <>Step Sorting Order:</>
     },
 
+    builder_module_name_entangled: {
+        en: ()=> <>Mod/Installer Name</>
+    },
+
+    builder_module_name: {
+        en: ()=> <>Installer Name (Module.xml):</>
+    },
+
+    metadata_author: {
+        en: ()=> <>Author:</>
+    },
+
+    metadata_id: {
+        en: ()=> <>(Nexus Mods) ID:</>
+    },
+
+    metadata_version: {
+        en: ()=> <>Version:</>
+    },
+
+    metadata_website: {
+        en: ()=> <>Website:</>
+    },
+
+
+    builder_info_name: {
+        en: ()=> <>Mod Name (Info.xml):</>
+    },
+
+    builder_module_name_conflict_warning: {
+        en: ()=> <>The names in Module.xml and Info.xml conflict. As soon as they align, they will no longer be entangled.</>
+    },
 
     // Steps
 
@@ -527,4 +574,4 @@ export const translationTable: RecursiveReadonly<TranslationTable> = {
         },
     },
 
-} as const;
+};

@@ -1,4 +1,4 @@
-type TranslationTableKeys = import('./src/app/components/localization/strings').TranslationTableKeys;
+type TranslationTableKeys = import('./src/app/localization/strings').TranslationTableKeys;
 type Draft<T> = import('immer').Draft<T>;
 type Immutable<T> = import('immer').Immutable<T>;
 
@@ -7,3 +7,8 @@ type KeyForType<TObject extends Record<any, any>, TTargetType extends any> = key
 
 type TrueImmutable<T> = Immutable<{a: T}>['a'];
 type TrueDraft<T> = Draft<{a: T}>['a'];
+
+declare module '*/public/schemas/Info.xsd' {
+    const value: string;
+    export default value;
+}

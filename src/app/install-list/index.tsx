@@ -1,6 +1,7 @@
-import { useFomod } from '../loaders/index';
-import React from 'react';
 'use client';
+
+import { useFomod } from '../loaders';
+import React from 'react';
 
 export default function InstallList() {
     const {loader, eventTarget} = useFomod();

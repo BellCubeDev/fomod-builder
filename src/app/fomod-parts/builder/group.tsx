@@ -4,11 +4,11 @@ import React from 'react';
 
 import { Immutable, Draft, castDraft } from 'immer';
 import { Group, Option, OptionType, TypeDescriptor, TypeNameDescriptor, GroupBehaviorType } from 'fomod';
-import { T } from '@/app/components/localization';
+import { T } from '@/app/localization';
 import SortingOrderDropdown from './SortingOrderDropdown';
-import { useSettings, defaultSettings, Settings } from '../../SettingsContext';
+import { useSettings, defaultSettings, Settings } from '@/app/components/SettingsContext';
 import styles from './builder.module.scss';
-import HeaderLikeInput from '../../header-like-input';
+import HeaderLikeInput from '@/app/components/header-like-input';
 import BuilderChildren from './BuilderChildren';
 import BuilderOption from './option/index';
 
@@ -67,7 +67,7 @@ export function createNewOption(settings: Settings | null) {
     return castDraft(new Option('', '', '', typeDescriptor));
 }
 
-import Dropdown from '../../dropdown/index';
+import Dropdown from '@/app/components/dropdown';
 import { useTranslate } from '../../localization/index';
 
 export const GroupBehaviorTypes = Object.values(GroupBehaviorType) as GroupBehaviorType[];

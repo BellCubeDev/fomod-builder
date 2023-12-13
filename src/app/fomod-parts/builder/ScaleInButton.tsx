@@ -2,7 +2,7 @@
 
 import React from 'react';
 import styles from './builder.module.scss';
-import { useSettings } from '../../SettingsContext';
+import { useSettings } from '@/app/components/SettingsContext';
 
 export function useScaleInX(ref: React.RefObject<HTMLElement>) {
     const settings = useSettings();

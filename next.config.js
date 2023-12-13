@@ -11,6 +11,9 @@ const nextConfig = {
     poweredByHeader: true,
     reactStrictMode: true,
 
+
+
+
     /** @type {import('sass').Options} */
     sassOptions: {
         alertColor: true,
@@ -18,6 +21,13 @@ const nextConfig = {
     },
 
     experimental: {
+        turbo: {
+            rules: { // load XSD files as strings
+                '*.xsd': {
+                    loaders: ['raw-loader'],
+                }
+            }
+        },
     },
 
     staticPageGenerationTimeout: 600,
@@ -33,6 +43,13 @@ const nextConfig = {
 
     webpack: (config) => {
         config.experiments = { ...config.experiments, topLevelAwait: true };
+
+        // load XSD files as strings
+        config.module.rules.push({
+            test: /\.xsd$/,
+            use: 'raw-loader',
+        });
+
         return config;
     },
 };

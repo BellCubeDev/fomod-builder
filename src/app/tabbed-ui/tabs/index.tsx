@@ -1,5 +1,5 @@
-import {TranslationTableKeys} from '@/app/components/localization';
-import { FomodLoaderContext } from '../../components/loaders/index';
+import {TranslationTableKeys} from '@/app/localization';
+import { FomodLoaderContext } from '@/app/loaders/index';
 import type licenseChecker from 'license-checker-rseidelsohn';
 
 export interface TabDisabledContext {
@@ -8,7 +8,7 @@ export interface TabDisabledContext {
 
 export interface Tab {
     name: Extract<keyof TranslationTableKeys, TabName>;
-    Page: React.FunctionComponent<{licenseInfo: React.ReactNode}>;
+    Page: React.FunctionComponent<{licenseInfo: React.ReactNode, rerenderTabContainer: () => unknown}>;
     icon: JSX.Element,
     disabled?: (context: TabDisabledContext) => boolean;
 
@@ -17,17 +17,21 @@ export interface Tab {
 }
 
 import tab_mission_control from './mission_control';
-import tab_install_editor from './install_editor';
+import tab_metadata from './metadata';
 import tab_step_builder from './builder';
+import tab_install_editor from './install_editor';
 import tab_xml_editor from './xml_editor';
+
 import tab_about from './about';
 import tab_settings from './settings';
 
 const tabs = {
     tab_mission_control,
+    tab_metadata,
     tab_step_builder,
     tab_install_editor,
     tab_xml_editor,
+
 
     tab_about,
     tab_settings,

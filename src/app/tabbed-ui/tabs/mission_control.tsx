@@ -2,9 +2,9 @@ import { Tab } from ".";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAtom } from "@fortawesome/free-solid-svg-icons";
-import FomodLoaderUI from '../../components/loaders/FomodLoaderUI';
-import LocaleSelector from '../../components/localization/LocaleSelector';
-import { T } from '../../components/localization/index';
+import FomodLoaderUI from '../../loaders/FomodLoaderUI';
+import LocaleSelector from '../../localization/LocaleSelector';
+import { T } from '../../localization/index';
 
 const tab: Tab = {
     name: 'tab_mission_control',

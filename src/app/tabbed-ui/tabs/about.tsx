@@ -2,7 +2,7 @@ import { Tab } from ".";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
-import { T } from '../../components/localization/index';
+import { T } from '../../localization/index';
 
 
 const tab: Tab = {

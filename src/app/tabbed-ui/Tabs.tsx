@@ -3,14 +3,14 @@
 import React from "react";
 import {default as tabs, Tab, TabName} from "./tabs/index";
 import styles from './Tabs.module.scss';
-import { T } from "../components/localization";
+import { T } from "@/app/localization";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretRight } from "@fortawesome/free-solid-svg-icons";
 import { useSettings } from '../components/SettingsContext';
 import { Keybind } from '../components/KeybindManager';
 import KeybindManager from '../components/KeybindManager';
-import { useFomod } from '../components/loaders/index';
+import { useFomod } from '../loaders/index';
 
 type TabEntry<T extends TabName> = [T, (typeof tabs)[T]];
 
@@ -20,6 +20,9 @@ const tabsForKeybinds = Object.entries(tabs) as TabEntry<TabName>[];
 
 export default function FomodBuilderTabbedUI({licenseInfo}: {licenseInfo: React.ReactNode}) {
     const settings = useSettings();
+
+    const [, rerender_] = React.useState({});
+    const rerender = React.useCallback(() => rerender_({}), [rerender_]);
 
     const [activeTab, setActiveTab] = React.useState<TabName>('tab_mission_control');
     const activeTabButtonRef = React.useRef<HTMLButtonElement|null>(null);
@@ -128,7 +131,7 @@ export default function FomodBuilderTabbedUI({licenseInfo}: {licenseInfo: React.
                     }}
                     tabIndex={active ? 0 : -1}
                 >
-            {transitioningFrom || active || tab.alwaysRendered ? <tab.Page licenseInfo={licenseInfo} /> : null}
+            {transitioningFrom || active || tab.alwaysRendered ? <tab.Page licenseInfo={licenseInfo} rerenderTabContainer={rerender} /> : null}
         </div> ;
     });
 

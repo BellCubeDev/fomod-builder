@@ -5,9 +5,9 @@ import React from 'react';
 import { Tab } from ".";
 
 import styles from './builder.module.scss';
-import FomodEditor from '@/app/components/fomod-parts/builder';
-import VortexFomodEditor from '@/app/components/fomod-parts/vortex';
-import MO2FomodEditor from '@/app/components/fomod-parts/mo2';
+import FomodEditor from '@/app/fomod-parts/builder';
+import VortexFomodEditor from '@/app/fomod-parts/vortex';
+import MO2FomodEditor from '@/app/fomod-parts/mo2';
 
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

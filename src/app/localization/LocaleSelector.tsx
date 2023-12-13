@@ -2,7 +2,7 @@
 
 import { Languages, useLocale } from ".";
 import React from "react";
-import Dropdown from '../dropdown/index';
+import Dropdown from '@/app/components/dropdown/index';
 
 const languageEntries = Object.entries(Languages) as [keyof typeof Languages, Languages][];
 

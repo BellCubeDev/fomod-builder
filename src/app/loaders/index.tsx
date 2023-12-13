@@ -1,7 +1,7 @@
 'use client';
 
 import React from "react";
-import { useSettings } from '../SettingsContext';
+import { useSettings } from '@/app/components/SettingsContext';
 import { FomodLoader } from './LoaderBase';
 
 import { enableMapSet } from 'immer';
@@ -39,6 +39,8 @@ export interface FomodLoaderContext {
     load(newLoader: FomodLoader, discard?: boolean): Promise<false|FomodLoadRejectReason>;
     autoSave(): Promise<false|FomodSaveRejectReason>;
     eventTarget: FomodEventTarget;
+    namesAreEntangled: boolean;
+    setNamesEntangled(value: boolean): void;
 }
 
 export const loaderContext = React.createContext<FomodLoaderContext>({
@@ -46,6 +48,8 @@ export const loaderContext = React.createContext<FomodLoaderContext>({
     load() { throw new Error('Cannot call load on the default context; add a FomodLoaderProvider to the tree first!'); },
     autoSave() { throw new Error('Cannot call autoSave on the default context; add a FomodLoaderProvider to the tree first!');},
     eventTarget: new EventTarget(),
+    namesAreEntangled: false,
+    setNamesEntangled() { throw new Error('Cannot call setNamesEntangled on the default context; add a FomodLoaderProvider to the tree first!');},
 });
 
 /** Provides the current Fomod state shared across the editor */
@@ -118,11 +122,17 @@ export function FomodLoaderProvider({ children }: { children: React.ReactNode })
         eventTarget.addEventListener('module-update', () => autoSave());
     }, [autoSave, eventTarget]);
 
-    React.useEffect(() => {
-        window.fomod = { loader, load, autoSave, eventTarget };
-    }, [loader, load, autoSave, eventTarget]);
+    const [namesAreEntangled, setNamesEntangled] = React.useState(false);
 
-    return <loaderContext.Provider value={{ loader, load, autoSave, eventTarget }}>
+    const value = React.useMemo(() => ({
+        loader, load, autoSave, eventTarget, namesAreEntangled, setNamesEntangled }
+    ), [loader, load, autoSave, eventTarget, namesAreEntangled, setNamesEntangled]);
+
+    React.useEffect(() => {
+        window.fomod = value;
+    }, [value]);
+
+    return <loaderContext.Provider value={value}>
         {children}
     </loaderContext.Provider>;
 }

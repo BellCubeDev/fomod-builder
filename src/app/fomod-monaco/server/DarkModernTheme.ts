@@ -1,3 +1,4 @@
+import 'server-only';
 import type {editor} from 'monaco-editor';
 
 async function getReleaseVersion() {
@@ -45,6 +46,10 @@ function parseTokenColors(tokenColors?: TokenColorDef[]): editor.ITokenThemeRule
     return tokens;
 }
 
+/** Merge two objects. Like `Object.assign()` but it's recursive.
+ *
+ * Non-object keys in obg2 will overwrite those in obj1.
+ */
 function mergeObjects(obj1: Record<string, any>, obj2: Record<string, any>): Record<string, any> {
     const obj: Record<string, any> = {};
 
@@ -78,21 +83,20 @@ export async function getDarkModernTheme() {
     const release = await getReleaseVersion();
 
     const [dark, darkPlusRaw, darkModernRaw] = await Promise.all<Promise<RawTheme>>([
-        fetch(`https://corsproxy.io/?https://main.vscode-cdn.net/stable/${release}/extensions/theme-defaults/themes/dark_vs.json`),
-        fetch(`https://corsproxy.io/?https://main.vscode-cdn.net/stable/${release}/extensions/theme-defaults/themes/dark_plus.json`),
-        fetch(`https://corsproxy.io/?https://main.vscode-cdn.net/stable/${release}/extensions/theme-defaults/themes/dark_modern.json`),
+        fetch(`https://main.vscode-cdn.net/stable/${release}/extensions/theme-defaults/themes/dark_vs.json`),
+        fetch(`https://main.vscode-cdn.net/stable/${release}/extensions/theme-defaults/themes/dark_plus.json`),
+        fetch(`https://main.vscode-cdn.net/stable/${release}/extensions/theme-defaults/themes/dark_modern.json`),
     ].map(p => p.then(res => res.json()))) as [RawTheme, RawTheme, RawTheme];
 
     const darkModern = mergeObjects(mergeObjects(dark, darkPlusRaw), darkModernRaw) as RawTheme;
 
-    return Object.assign(
+    const returnVal =  Object.assign(
         darkModern, {
             base: 'vs-dark',
             inherit: true,
             rules: parseTokenColors(darkModern.tokenColors),
         } satisfies Omit<editor.IStandaloneThemeData, keyof RawTheme>
     );
-}
 
-const DarkModernThemePromise = getDarkModernTheme();
-export default DarkModernThemePromise;
+    return returnVal;
+}

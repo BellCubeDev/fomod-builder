@@ -2,12 +2,12 @@
 
 import ToggleSwitch from '../../components/toggle-switch/index';
 import { useSettings } from '../../components/SettingsContext';
-import { T } from '../../components/localization/index';
+import { T } from '../../localization/index';
 import styles from './settings.module.scss';
-import SortingOrderDropdown from '../../components/fomod-parts/builder/SortingOrderDropdown';
+import SortingOrderDropdown from '../../fomod-parts/builder/SortingOrderDropdown';
 import { SortingOrder, GroupBehaviorType, OptionType } from 'fomod';
-import { GroupBehaviorDropdown, GroupBehaviorTypes } from '../../components/fomod-parts/builder/group';
-import { OptionBehaviorDropdown, OptionBehaviorTypes } from '../../components/fomod-parts/builder/option/index';
+import { GroupBehaviorDropdown, GroupBehaviorTypes } from '../../fomod-parts/builder/group';
+import { OptionBehaviorDropdown, OptionBehaviorTypes } from '../../fomod-parts/builder/option/index';
 
 export function SettingsPage() {
     const s = useSettings();

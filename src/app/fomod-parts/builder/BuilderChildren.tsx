@@ -4,10 +4,10 @@ import React from 'react';
 import { Draft, produce, freeze, current, isDraft } from 'immer';
 import { T } from '../../localization/index';
 import ScaleInButton from './ScaleInButton';
-import DeleteButton from '../../DeleteButton';
+import DeleteButton from '@/app/components/DeleteButton';
 import styles from './builder.module.scss';
 import { editSetByIndex } from '@/SetUtils';
-import { resolveRecursiveDrafts } from '../../../../SetUtils';
+import { resolveRecursiveDrafts } from '@/SetUtils';
 import { useFomod } from '../../loaders/index';
 import { XmlRepresentation } from 'fomod';
 

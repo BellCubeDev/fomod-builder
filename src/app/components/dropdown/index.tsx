@@ -3,7 +3,7 @@
 import Select, { GroupBase } from 'react-select';
 import styles from './Dropdown.module.scss';
 import React from 'react';
-import { useTranslate } from '../localization/index';
+import { useTranslate } from '@/app/localization/index';
 
 type ParamsBase = Parameters<typeof Select>[0];
 

@@ -1,5 +1,5 @@
 import RCTooltip from 'rc-tooltip';
-import { T } from '@/app/components/localization';
+import { T } from '@/app/localization';
 import React from 'react';
 
 import styles from './Tooltip.module.scss';

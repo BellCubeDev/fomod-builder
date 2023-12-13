@@ -4,11 +4,11 @@ import React from 'react';
 
 import { Immutable, Draft, castDraft } from 'immer';
 import { Step, Group, SortingOrder, TypeDescriptor, TypeNameDescriptor, OptionType, Option, GroupBehaviorType } from 'fomod';
-import { T } from '@/app/components/localization';
+import { T } from '@/app/localization';
 import SortingOrderDropdown from './SortingOrderDropdown';
-import { useSettings, defaultSettings, Settings } from '../../SettingsContext';
+import { useSettings, defaultSettings, Settings } from '@/app/components/SettingsContext';
 import styles from './builder.module.scss';
-import HeaderLikeInput from '../../header-like-input';
+import HeaderLikeInput from '@/app/components/header-like-input';
 import BuilderChildren from './BuilderChildren';
 import BuilderGroup from './group';
 import { createNewOption } from './group';
@@ -57,4 +57,3 @@ export function createNewGroup(settings: Settings | null): Draft<Group> {
 
     return group;
 }
-

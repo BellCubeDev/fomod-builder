@@ -40,6 +40,7 @@
     "noUncheckedIndexedAccess": true,
     "useUnknownInCatchVariables": true,
     "disableSizeLimit": true,
+    "pretty": true,
   },
   "include": [
     "next-env.d.ts",

@@ -1,8 +1,8 @@
 'use client';
 
-import Dropdown from '../../dropdown/index';
+import Dropdown from '@/app/components/dropdown';
 import { SortingOrder } from 'fomod';
-import { useTranslate } from '../../localization/index';
+import { useTranslate } from '@/app/localization';
 
 const orders = Object.values(SortingOrder) as SortingOrder[];
 

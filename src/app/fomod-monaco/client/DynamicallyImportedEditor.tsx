@@ -1,26 +1,24 @@
 'use client';
+import 'client-only';
 
 import React from 'react';
 import type {editor} from 'monaco-editor';
 import Monaco, {useMonaco} from '@monaco-editor/react';
 import styles from './FomodMonacoEditor.module.scss';
 
+import { useFomod } from '@/app/loaders';
 
-import { useFomod } from '@/app/components/loaders';
-import getXmlCompletionProvider, { SchemaPromise } from './XmlSchema';
-
-import applyXmlSchemasToMonaco from './XmlSchema';
-import DarkModernThemePromise from './DarkModernTheme';
 import { SourceCodePro } from '../../SourceCodePro';
-
-const darkModernTheme: Awaited<typeof DarkModernThemePromise> = await DarkModernThemePromise;
-const schemas: Awaited<typeof SchemaPromise> = await SchemaPromise;
-await new Promise(resolve => setTimeout(resolve, 1000));
-
+import { useMonacoData } from './MonacoDataContext';
+import { applyXmlSchemasToMonaco } from './XmlSchemaCompletionProvider';
 
 export default function FomodMonacoEditorForDynamicImportOnly() {
 
     const c = useFomod(true);
+    const {theme, infoSchema, moduleSchema} = useMonacoData();
+    if (!theme) throw new TypeError('You must define a theme for the Monaco editor!');
+    if (!infoSchema) throw new TypeError('You must define an infoSchema for the Monaco editor!');
+    if (!moduleSchema) throw new TypeError('You must define a moduleSchema for the Monaco editor!');
 
     const [isInfoMode, setInfoMode] = React.useState(true);
 
@@ -33,7 +31,7 @@ export default function FomodMonacoEditorForDynamicImportOnly() {
     const monaco = useMonaco();
     const editorRef = React.useRef<editor.IStandaloneCodeEditor | null>(null);
 
-    const [theme, setTheme] = React.useState<string>('vs-dark');
+    const [currentTheme, setCurrentTheme] = React.useState<string>('vs-dark');
 
     React.useEffect(() => {
         if ( !selectionIndicatorRef.current || !selectedElement ) return;
@@ -50,26 +48,24 @@ export default function FomodMonacoEditorForDynamicImportOnly() {
     }, [selectionIndicatorRef, selectedElement]);
 
     React.useEffect(() => {
-        if (!monaco) return;
-        monaco.editor.defineTheme('dark-modern', darkModernTheme);
+        if (!monaco || !theme) return;
+        monaco.editor.defineTheme('dark-modern', theme);
         monaco.editor.setTheme('dark-modern');
-        setTheme('dark-modern');
-    }, [monaco, theme] ); // `theme` is there as a sort of hack. Seems to fix the weird light theme before the next re-render
+        setCurrentTheme('dark-modern');
+    }, [monaco, currentTheme, theme] ); // `theme` is there as a sort of hack. Seems to fix the weird light theme before the next re-render
 
     if (!monaco) return <></>;
 
-    monaco?.editor.defineTheme('dark-modern', darkModernTheme);
-    monaco?.editor.setTheme('dark-modern');
+    if (theme) monaco?.editor.defineTheme('dark-modern', theme);
+    monaco?.editor.setTheme(currentTheme);
 
     function handleNewEditor(editor: editor.IStandaloneCodeEditor) {
         editorRef.current = editor;
         if (!monaco) return console.warn('No monaco or editor! Could not set XML schemas!');
-        applyXmlSchemasToMonaco(monaco, editor, schemas);
+        applyXmlSchemasToMonaco(monaco, editor, [infoSchema!, moduleSchema!]);
     }
 
     if (!c) return <>[[NO FOMOD LOADED]]</>;
-
-    //const fomod = c.fomod;
 
     return <div className={styles.editorContainer}>
         <div className={styles.editorHeader}>
@@ -97,7 +93,7 @@ export default function FomodMonacoEditorForDynamicImportOnly() {
                 fontSize: 13,
                 fontLigatures: true,
                 fontWeight: '400',
-                theme: theme,
+                theme: currentTheme,
                 minimap: {
                     enabled: true,
                     autohide: true,

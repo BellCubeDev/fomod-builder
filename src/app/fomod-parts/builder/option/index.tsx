@@ -2,15 +2,15 @@
 
 import React from 'react';
 
-import { Immutable, Draft, produce, castDraft } from 'immer';
+import { Immutable, Draft, castDraft } from 'immer';
 import { Option, FlagSetter, FlagInstance, OptionType } from 'fomod';
-import { T } from '@/app/components/localization';
-import { useSettings, Settings } from '../../../SettingsContext';
+import { T } from '@/app/localization';
+import { useSettings, Settings } from '@/app/components/SettingsContext';
 import styles from '../builder.module.scss';
 import { useTranslate } from '../../../localization/index';
 import DynamicImageDisplay from '../../DynamicImageDisplay';
-import HeaderLikeInput from '../../../header-like-input/index';
-import { editSetByIndex } from '../../../../../SetUtils';
+import HeaderLikeInput from '@/app/components/header-like-input/index';
+import { editSetByIndex } from '@/SetUtils';
 import BuilderChildren from '../BuilderChildren';
 
 export default function BuilderOption({option, edit}: {option: Immutable<Option<false>>, edit: (recipe: (draft: Draft<Option<false>>) => Draft<Option<false>> | undefined | void) => void}) {
@@ -85,7 +85,7 @@ export function BuilderFlag({flag, edit}: {flag: Immutable<FlagSetter>, edit: (r
     </div>;
 }
 
-import Dropdown from '../../../dropdown/index';
+import Dropdown from '@/app/components/dropdown/index';
 
 export const OptionBehaviorTypes = Object.values(OptionType).reverse() as OptionType[];
 

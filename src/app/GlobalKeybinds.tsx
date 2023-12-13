@@ -2,7 +2,7 @@
 
 import { Keybind } from './components/KeybindManager';
 import React from 'react';
-import { useFomod } from './components/loaders/index';
+import { useFomod } from './loaders';
 import KeybindManager from './components/KeybindManager';
 
 export default function GlobalKeybinds(props: Omit<React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>, 'ref'>) {
