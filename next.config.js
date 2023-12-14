@@ -24,9 +24,10 @@ const nextConfig = {
         turbo: {
             rules: { // load XSD files as strings
                 '*.xsd': {
+                    as: 'string',
                     loaders: ['raw-loader'],
                 }
-            }
+            },
         },
     },
 

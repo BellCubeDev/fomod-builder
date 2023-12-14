@@ -19,59 +19,44 @@ export default function HeaderLikeInput({ value, noValue, onChange, className, .
         onChange(e.target.value, e);
     }, [onChange]);
 
-    const [oldWidth, setOldWidth] = React.useState(0);
+    const oldWidthStore = React.useRef(0);
 
-    React.useEffect(() => {
-        const div = divRef.current;
-        if (!div) return;
+    function updateWidth(ref: React.RefObject<HTMLElement>) {
+        const el = ref.current;
+        if (!el) return;
 
-        div.style.width = '0';
-        div.parentElement!.style.width = `0`;
-        window.getComputedStyle(div);
+        el.style.width = '0';
+        el.parentElement!.style.width = '0';
+        el.style.transitionProperty = 'none';
+        el.parentElement!.style.transitionProperty = 'none';
+        window.getComputedStyle(el);
 
-        const newWidth = div.scrollWidth;
+        const newWidth = el.scrollWidth;
 
-        div.style.width = `${oldWidth}px`;
-        div.parentElement!.style.width = `${oldWidth}px`;
-        window.getComputedStyle(div);
-
-        let canceled = false;
-
-        requestAnimationFrame(() => requestAnimationFrame(() =>{
-            if (canceled) return;
-            div.style.width = `${newWidth}px`;
-            div.parentElement!.style.width = `${div.scrollWidth}px`;
-            setOldWidth(newWidth);
-        }));
-
-        return () => {canceled = true};
-    }, [value, divRef, editing, oldWidth]);
-
-    React.useEffect(() => {
-        const input = inputRef.current;
-        if (!input) return;
-
-        input.style.width = '0';
-        input.parentElement!.style.width = `0`;
-        window.getComputedStyle(input);
-
-        const newWidth = input.scrollWidth - 5;
-
-        input.style.width = `${oldWidth}px`;
-        input.parentElement!.style.width = `${oldWidth}px`;
-        window.getComputedStyle(input);
-
-        let canceled = false;
+        el.style.width = oldWidthStore.current ? `calc(${oldWidthStore.current}px + 1ch)` : '';
+        el.parentElement!.style.width = oldWidthStore.current ? `calc(${oldWidthStore.current}px + 1ch)` : '';
+        el.style.padding = '';
+        el.parentElement!.style.padding = '';
+        window.getComputedStyle(el);
+        oldWidthStore.current = newWidth;
 
         requestAnimationFrame(() => requestAnimationFrame(() =>{
-            if (canceled) return;
-            input.style.width = `${newWidth}px`;
-            input.parentElement!.style.width = `${input.scrollWidth}px`;
-            setOldWidth(newWidth);
+            el.style.transitionProperty = '';
+            el.parentElement!.style.transitionProperty = '';
+            requestAnimationFrame(() => requestAnimationFrame(() =>{
+                el.style.width = `calc(${newWidth}px + 1ch)`;
+                el.parentElement!.style.width = `calc(${newWidth}px + 1ch)`;
+            }));
         }));
+    };
 
-        return () => {canceled = true};
-    }, [value, inputRef, editing, oldWidth]);
+    React.useEffect(() => {
+        updateWidth(inputRef);
+    }, [value, inputRef, oldWidthStore, editing]);
+
+    React.useEffect(() => {
+        updateWidth(divRef);
+    }, [value, divRef, oldWidthStore, editing]);
 
     const handleKeyDown = React.useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
@@ -88,7 +73,7 @@ export default function HeaderLikeInput({ value, noValue, onChange, className, .
         <span data-editing={editing} className={styles.underlineProvider}><span>
             {editing
                 ? <input data-header-like-input-input type="text" value={value} className={styles.header} onChange={handleChange} onBlur={stopEditing} onKeyDown={handleKeyDown} ref={inputRef} />
-                : <div data-editing={editing} data-has-input-after data-header-like-input-div onClick={startEditing} className={styles.header} ref={divRef}>{value || <i style={{opacity: 0.75}}>{noValue}</i>}</div>
+                : <div data-editing={editing} data-has-input-after data-header-like-input-div onClick={startEditing} tabIndex={0} onFocus={startEditing} className={styles.header} ref={divRef}>{value || <i style={{opacity: 0.75}}>{noValue}</i>}</div>
             }
         </span></span>
     </div>;

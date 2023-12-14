@@ -32,7 +32,6 @@ export default function FomodEditor() {
 
     const edit = React.useCallback((recipe: (draft: Draft<Fomod<false>>) => Draft<Fomod<false>> | undefined | void) => {
         if (!loader) return console.error('Tried to edit with no loader! (this should not be possible)');
-        //console.log('editing...');
         loader.module = produce(loader.module, recipe) as Immutable<Fomod<false>>;
 
         // eslint-disable-next-line react-hooks/exhaustive-deps

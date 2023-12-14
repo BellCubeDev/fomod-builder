@@ -1,4 +1,7 @@
+@use '../../vars' as *;
+
 .header {
+    @extend %input-base;
     outline: none;
     background: none;
     border: none;
@@ -13,6 +16,9 @@
     margin-bottom: 0.5em;
     font-family: inherit;
     padding: 4px;
+
+    min-width: 128px;
+    width: unset;
 
     display: inline-block;
 

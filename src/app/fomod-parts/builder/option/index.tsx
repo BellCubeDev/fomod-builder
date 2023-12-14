@@ -28,9 +28,9 @@ export default function BuilderOption({option, edit}: {option: Immutable<Option<
         });
     }, [edit]);
 
-    const editImage = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const editImage = React.useCallback((v: string) => {
         edit(draft => {
-            draft.image = e.target.value || null;
+            draft.image = v || null;
         });
     }, [edit]);
 
@@ -41,7 +41,7 @@ export default function BuilderOption({option, edit}: {option: Immutable<Option<
         </div>
         <div>
             <DynamicImageDisplay path={option.image} alt={useTranslate('option_image_alt', option)} />
-            <input type='text' value={option.image || ''} onChange={editImage} placeholder={useTranslate('option_image_placeholder', option)} />
+            <DynamicWidthInput value={option.image || ''} onChange={editImage} placeholder={useTranslate('option_image_placeholder', option)} />
         </div>
         <div>
             <BuilderChildren
@@ -86,6 +86,7 @@ export function BuilderFlag({flag, edit}: {flag: Immutable<FlagSetter>, edit: (r
 }
 
 import Dropdown from '@/app/components/dropdown/index';
+import DynamicWidthInput from '@/app/components/dynamic-width-input';
 
 export const OptionBehaviorTypes = Object.values(OptionType).reverse() as OptionType[];
 

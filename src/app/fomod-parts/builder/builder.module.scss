@@ -1,4 +1,5 @@
 @use './vars' as *;
+@use '../../vars' as *;
 
 .builderBody {
     margin-top: 8px;
@@ -165,29 +166,17 @@
     }
 }
 
+.optionDescription {
+    @extend %input-base;
+    overflow: scroll;
+}
+
 .builderBody {
     @include bodyStyling($step-inactive, $step-background);
 
-    textarea {
-        width: calc(100% - 40px);
-
-        background: #222;
-        color: #e2e2e2;
-
-        resize: none;
-        overflow: scroll;
-
-        font-family: inherit;
-        font-size: 0.9em;
-
-        padding: 6px 9px;
-        border: 4px solid #333;
-        border-radius: 8px;
-    }
-
     div:not([class]) {
         width: 100%;
-        overflow: scroll;
+        overflow: hidden;
         display: inline-block;
     }
 

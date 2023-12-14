@@ -3,11 +3,12 @@
 import ToggleSwitch from '../../components/toggle-switch/index';
 import { useSettings } from '../../components/SettingsContext';
 import { T } from '../../localization/index';
-import styles from './settings.module.scss';
+import styles from './settingsGrid.module.scss';
 import SortingOrderDropdown from '../../fomod-parts/builder/SortingOrderDropdown';
 import { SortingOrder, GroupBehaviorType, OptionType } from 'fomod';
 import { GroupBehaviorDropdown, GroupBehaviorTypes } from '../../fomod-parts/builder/group';
 import { OptionBehaviorDropdown, OptionBehaviorTypes } from '../../fomod-parts/builder/option/index';
+import DynamicWidthInput from '@/app/components/dynamic-width-input';
 
 export function SettingsPage() {
     const s = useSettings();
@@ -19,7 +20,7 @@ export function SettingsPage() {
 
         <br /><br />
 
-        <table className={styles.settings}>
+        <table className={styles.grid}>
             <tr>
                 <td><T tkey='setting_reducedMotion' params={[s.reducedMotion]} /></td>
                 <td><ToggleSwitch value={s.reducedMotion} onChange={(v) => {s.update('reducedMotion', v);}} /></td>
@@ -33,7 +34,7 @@ export function SettingsPage() {
             </tr>
             <tr>
                 <td><T tkey='setting_autoSaveInterval' params={[s.autoSaveInterval]} /></td>
-                <td><input type='number' value={s.autoSaveInterval} onChange={(e) => {s.update('autoSaveInterval', parseInt(e.target.value));}} /></td>
+                <td><DynamicWidthInput type='number' value={s.autoSaveInterval} onChange={(v) => {  s.update('autoSaveInterval', parseFloat(v));  }} style={{maxWidth: 376}} /></td>
             </tr>
 
             <tr><td><br /></td></tr>

@@ -1,0 +1,16 @@
+@use '../../vars' as *;
+
+.input {
+    @extend %input-base;
+
+    min-width: 128px;
+
+    &:invalid {
+        &[data-validation-warn] {
+            border-color: orange;
+        }
+        &[data-validation-error] {
+            border-color: red;
+        }
+    }
+}

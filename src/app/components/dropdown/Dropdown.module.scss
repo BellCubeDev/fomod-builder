@@ -81,6 +81,10 @@
 .singleValue {
     color: #fff !important;
     padding: 10px 16px;
+
+    &:has(+.input > [aria-expanded="true"]) {
+        color: #888 !important;
+    }
 }
 
 .valueContainer {

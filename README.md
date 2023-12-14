@@ -30,13 +30,15 @@ npm run dev
 
 # FIXME
 
-* Text-Like Input Jiggles On Input
-* Text-Like Input Can't Be Tab Navigation'd
+* Header-Like Input layout doesn't perfectly match in the Y direction between editing and not editing
+* Entangled names aren't working properly yet
+* Entangled names on the Module side aren't working (perhaps only show name stuff on the Metadata tab anyway?)
 
 # TODO
 
 * [X] Loader APIs
 * [ ] Step/Group/Option Editing
+  * Styling, mostly
 * [ ] Dependency Editing
   * [X] Read ESP/L/M dependencies automatically
 * [ ] Install Editing

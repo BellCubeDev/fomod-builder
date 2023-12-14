@@ -1,28 +1,16 @@
-'use client';
-
-import React from 'react';
-
 import { Tab } from ".";
-
-import styles from './metadata.module.scss';
-
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
-
+import { faSignature } from "@fortawesome/free-solid-svg-icons";
+import { MetadataPage } from '../tab-pages/metadata';
 
 const tab: Tab = {
     name: 'tab_metadata',
 
-    Page() {
-        return <>
-            Pardon our dust! This page is still under construction.
-        </>;
-    },
+    Page: MetadataPage,
 
     disabled: ({fomod: loader}) => !loader.loader,
 
-    icon: <FontAwesomeIcon icon={faPenToSquare} />
+    icon: <FontAwesomeIcon icon={faSignature} />
 };
 
 export default tab;
