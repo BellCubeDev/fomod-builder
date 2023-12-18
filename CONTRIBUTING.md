@@ -8,7 +8,7 @@ I can't humanly test every scenario. Naturally, people (like you!) are going to 
 
 ### Translation
 
-I speak a grand total of one language. If you'd like to help translate the Fomod Builder into a language you know, take a look at [strings.ts](src/app/components/strings.ts) and see if you're able to help out!
+I speak a grand total of one language. If you'd like to help translate the Fomod Builder into a language you know, take a look at [strings.ts](src/app/localization/strings.tsx) and see if you're able to help out!
 
 The method of localization I've implemented assumes nothing about the languages it uses. I give you the raw values you need to come up with your own translation, regardless of how other languages handle it.
 

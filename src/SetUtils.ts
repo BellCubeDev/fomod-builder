@@ -9,11 +9,7 @@ export function editSetByIndex<T>(set: Set<T>, index: number, value: T) {
     const array = Array.from(set);
     array[index] = value;
 
-    set.clear();
-    array.forEach(item => {
-        while (isDraft(item)) item = current(item);
-        set.add(item);
-    });
+    resolveRecursiveDrafts (set, array);
 }
 
 /** Moves an item to a new index in a set. Edits the set in-place for compatibility with Immer.
@@ -29,21 +25,17 @@ export function moveSetItem<T>(set: Set<T>, fromIndex: number, toIndex: number) 
     const array = Array.from(set);
     array.splice(toIndex, 0, array.splice(fromIndex, 1)[0]!);
 
-    set.clear();
-    array.forEach(item => {
-        while (isDraft(item)) item = current(item);
-        set.add(item);
-    });
+    resolveRecursiveDrafts(set, array);
 }
 
 import { isDraft, current, Draft } from 'immer';
 
 /** Resolves accidental recursive drafts created by some witchcraft with immer. Edits the set in-place for compatibility with Immer. */
-export function resolveRecursiveDrafts<T extends Draft<any>>(set: Set<T>): void {
-    const array = Array.from(set);
+export function resolveRecursiveDrafts<T extends Draft<any>>(set: Set<T>, array?: Array<T>): void {
+    array ??= Array.from(set);
     array.forEach((item, index) => {
         while (isDraft(item)) item = current(item);
-        array[index] = item;
+        array![index] = item;
     });
 
     set.clear();

@@ -9,8 +9,8 @@ export default function Modal({open, ...props}: Omit<{open: boolean} & React.Det
     const dialogRef = React.useRef<HTMLDialogElement>(null);
     const settings = useSettings();
 
-    const prefersReducedMotion = settings?.reducedMotion || (typeof window !== "undefined" && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-
+    const prefersReducedMotionRef = React.useRef(false);
+    prefersReducedMotionRef.current = settings?.reducedMotion || (typeof window !== "undefined" && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
     React.useEffect(() => {
         if (!dialogRef.current) return;
@@ -21,7 +21,7 @@ export default function Modal({open, ...props}: Omit<{open: boolean} & React.Det
         else {
             if (!dialog.open) return;
 
-            if (prefersReducedMotion) return dialog.close();
+            if (prefersReducedMotionRef.current) return dialog.close();
 
             dialog.classList.add(styles.closing!);
 
@@ -30,7 +30,7 @@ export default function Modal({open, ...props}: Omit<{open: boolean} & React.Det
             dialog.addEventListener('transitionend', closeF, {once: true});
             return () => dialog.removeEventListener('transitionend', closeF);
         }
-    }, [dialogRef, open                                 ,prefersReducedMotion          ]); // TODO: Remove prefersReducedMotion from deps
+    }, [dialogRef, open, prefersReducedMotionRef]);
 
     return <dialog {...props} ref={dialogRef}></dialog>;
 }

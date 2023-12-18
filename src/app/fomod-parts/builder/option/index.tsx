@@ -10,7 +10,6 @@ import styles from '../builder.module.scss';
 import { useTranslate } from '../../../localization/index';
 import DynamicImageDisplay from '../../DynamicImageDisplay';
 import HeaderLikeInput from '@/app/components/header-like-input/index';
-import { editSetByIndex } from '@/SetUtils';
 import BuilderChildren from '../BuilderChildren';
 
 export default function BuilderOption({option, edit}: {option: Immutable<Option<false>>, edit: (recipe: (draft: Draft<Option<false>>) => Draft<Option<false>> | undefined | void) => void}) {

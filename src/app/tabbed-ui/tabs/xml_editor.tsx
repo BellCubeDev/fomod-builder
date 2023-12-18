@@ -9,7 +9,7 @@ const tab: Tab = {
     name: 'tab_xml_editor',
     icon: <FontAwesomeIcon icon={faCode} />,
     disabled: ({fomod: loader}) => !loader.loader,
-    alwaysRendered: true, // TODO: Render until the editor is ready so we can lazy-load the editor; use an event prop
+    alwaysRendered: true,
 
     Page({rerenderTabContainer}) {
         return <>

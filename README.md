@@ -33,6 +33,7 @@ npm run dev
 * Header-Like Input layout doesn't perfectly match in the Y direction between editing and not editing
 * Entangled names aren't working properly yet
 * Entangled names on the Module side aren't working (perhaps only show name stuff on the Metadata tab anyway?)
+* Options appear to be getting duplicated. Sounds like a job for the debugger!
 
 # TODO
 

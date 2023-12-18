@@ -10,6 +10,10 @@ export default function DynamicWidthInput({ value, onChange, className, ...props
 
     const oldWidthStore = React.useRef(0);
 
+    const [hasOffsetParent, setHasOffsetParent] = React.useState(false);
+    const hasOffsetParentThisRender = !!inputRef.current?.offsetParent;
+    if (hasOffsetParentThisRender !== hasOffsetParent) setHasOffsetParent(hasOffsetParentThisRender);
+
     React.useEffect(() => {
         const el = inputRef.current;
         if (!el) return;
@@ -24,7 +28,7 @@ export default function DynamicWidthInput({ value, onChange, className, ...props
 
     React.useEffect(() => {
         const input = inputRef.current;
-        if (!input) return;
+        if (!input || !hasOffsetParent) return;
 
         input.style.width = '0';
         input.style.transitionProperty = 'none';
@@ -43,7 +47,7 @@ export default function DynamicWidthInput({ value, onChange, className, ...props
                 input.style.width = `calc(${newWidth}px + 1ch)`;
             }));
         }));
-    }, [value, inputRef, oldWidthStore]);
+    }, [value, inputRef, oldWidthStore, hasOffsetParent]);
 
     return <input type="text" {...props} value={value} className={`${className} ${styles.input}`} onInput={handleChange} onChange={handleChange} ref={inputRef} />;
 }

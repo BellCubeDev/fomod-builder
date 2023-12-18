@@ -14,8 +14,6 @@ export default function ToggleSwitch({ value, onChange, disabled, className, sty
 }) {
     const [focused, setFocused] = React.useState(false);
 
-    // TODO: useEffect to add and remove the classes for the values
-
     return <KeybindManager keybinds={React.useMemo(()=> [{
         action(e) {
             onChange(!value);
