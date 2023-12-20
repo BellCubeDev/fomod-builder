@@ -38,3 +38,12 @@ $mo2-blue: #3ebcee;
         display: none;
     }
 }
+
+%label-style {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 8px;
+}

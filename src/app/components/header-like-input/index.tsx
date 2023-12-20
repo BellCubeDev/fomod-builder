@@ -8,10 +8,14 @@ export default function HeaderLikeInput({ value, noValue, onChange, className, .
     const divRef = React.useRef<HTMLDivElement>(null);
 
     const startEditing = React.useCallback(() => {
+        if (inputRef.current?.parentElement?.hasAttribute('debug')) return;
+        if (divRef.current?.parentElement?.hasAttribute('debug')) return;
         setEditing(true);
     }, []);
 
     const stopEditing = React.useCallback(() => {
+        if (inputRef.current?.parentElement?.hasAttribute('debug')) return;
+        if (divRef.current?.parentElement?.hasAttribute('debug')) return;
         setEditing(false);
     }, []);
 
@@ -19,35 +23,66 @@ export default function HeaderLikeInput({ value, noValue, onChange, className, .
         onChange(e.target.value, e);
     }, [onChange]);
 
-    const oldWidthStore = React.useRef(0);
+    const oldWidthStore = React.useRef([0, false] as [width: number, wasInput: boolean]);
+
+    const hadOffsetParentLastRenderRef = React.useRef(false);
+    const [hasOffsetParent, setHasOffsetParent] = React.useState(false);
 
     function updateWidth(ref: React.RefObject<HTMLElement>) {
         const el = ref.current;
-        if (!el) return;
+        if (el) {
+            requestAnimationFrame(() => requestAnimationFrame(() =>{
+                if (oldWidthStore.current[0] !== 0) return;
+                oldWidthStore.current[0] = el.scrollWidth;
+                oldWidthStore.current[1] = el === inputRef.current;
+            }));
+        }
+
+        if (!el || !hasOffsetParent) {
+            if (!inputRef.current?.offsetParent && !divRef.current?.parentElement?.offsetParent)
+                hadOffsetParentLastRenderRef.current = false;
+
+            return;
+        }
 
         el.style.width = '0';
-        el.parentElement!.style.width = '0';
         el.style.transitionProperty = 'none';
-        el.parentElement!.style.transitionProperty = 'none';
+        el.setAttribute('data-is-recalcing-width', 'true');
         window.getComputedStyle(el);
 
         const newWidth = el.scrollWidth;
+        const newWidthString = el === inputRef.current ? `calc(${newWidth}px + 1ch)` : `${newWidth}px`;
 
-        el.style.width = oldWidthStore.current ? `calc(${oldWidthStore.current}px + 1ch)` : '';
-        el.parentElement!.style.width = oldWidthStore.current ? `calc(${oldWidthStore.current}px + 1ch)` : '';
-        el.style.padding = '';
-        el.parentElement!.style.padding = '';
-        window.getComputedStyle(el);
-        oldWidthStore.current = newWidth;
+        const hadOffsetParent = hadOffsetParentLastRenderRef.current;
+        hadOffsetParentLastRenderRef.current = true;
 
-        requestAnimationFrame(() => requestAnimationFrame(() =>{
+        const [oldWidth, oldWidthWasInput] = oldWidthStore.current;
+
+        if (!hadOffsetParent) {
+            el.style.width =  newWidthString;
+            el.style.padding = '';
             el.style.transitionProperty = '';
-            el.parentElement!.style.transitionProperty = '';
+            el.removeAttribute('data-is-recalcing-width');
+            window.getComputedStyle(el);
+            oldWidthStore.current[0] = newWidth;
+            oldWidthStore.current[1] = el === inputRef.current;
+        } else {
+            el.style.width = oldWidth ?
+                oldWidthWasInput ? `calc(${oldWidth}px + 1ch)` : `${oldWidth}px`
+            : '';
+            el.style.padding = '';
+            window.getComputedStyle(el);
+            oldWidthStore.current[0] = newWidth;
+            oldWidthStore.current[1] = el === inputRef.current;
             requestAnimationFrame(() => requestAnimationFrame(() =>{
-                el.style.width = `calc(${newWidth}px + 1ch)`;
-                el.parentElement!.style.width = `calc(${newWidth}px + 1ch)`;
+                el.style.transitionProperty = '';
+                el.removeAttribute('data-is-recalcing-width');
+                requestAnimationFrame(() => requestAnimationFrame(() =>{
+                    el.style.width = newWidthString;
+                    el.style.transitionProperty = '';
+                }));
             }));
-        }));
+        }
     };
 
     React.useEffect(() => {
@@ -68,6 +103,9 @@ export default function HeaderLikeInput({ value, noValue, onChange, className, .
         if (editing) inputRef.current?.focus();
         else inputRef.current?.blur();
     }, [editing]);
+
+    const hasOffsetParentThisRender = !!inputRef.current?.offsetParent || !!divRef.current?.parentElement?.offsetParent;
+    if (hasOffsetParentThisRender !== hasOffsetParent) setHasOffsetParent(hasOffsetParentThisRender);
 
     return <div data-header-like-input-wrapper className={className} {...props}>
         <span data-editing={editing} className={styles.underlineProvider}><span>

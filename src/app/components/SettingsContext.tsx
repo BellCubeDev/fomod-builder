@@ -16,8 +16,14 @@ export interface Settings {
     /** The user requests reduced motion. This is offered both for accessibility and for editing speed (though, for accessibility, it's often better to go through the browser) */
     reducedMotion: boolean,
 
-    update<TKey extends keyof Settings>(key: TKey, value: Settings[TKey]): void,
-    update(settings: Partial<Settings>): void,
+    /** Whether to keep the ModuleConfig.xml and Info.xml names in sync
+     *
+     * Editors will show both names if this setting is false OR there is a conflict between the two.
+    */
+    namesAreEntangled: boolean,
+
+    update<TKey extends keyof undefined>(this: Settings, settings: Partial<SettingsValues>): void;
+    update<TKey extends keyof SettingsValues>(this: Settings, key: TKey, value: Settings[TKey]): void;
 }
 
 type SettingsValues = Omit<Settings, 'update'>;
@@ -47,7 +53,7 @@ function defaultUpdate<TKey extends keyof SettingsValues | undefined = undefined
 }
 
 export const defaultSettings = {
-    update: defaultUpdate,
+    update: (...args: any[])=>{throw new Error('Cannot call update() on default settings!');},
 
     defaultOptionType: OptionType.Optional,
     defaultGroupBehavior: GroupBehaviorType.SelectAny,
@@ -60,6 +66,7 @@ export const defaultSettings = {
 
     reducedMotion: false,
 
+    namesAreEntangled: true,
 } as const satisfies Readonly<Settings>;
 
 if (typeof window !== 'undefined') window.defaultSettings = defaultSettings;

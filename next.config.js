@@ -11,8 +11,7 @@ const nextConfig = {
     poweredByHeader: true,
     reactStrictMode: true,
 
-
-
+    productionBrowserSourceMaps: true,
 
     /** @type {import('sass').Options} */
     sassOptions: {

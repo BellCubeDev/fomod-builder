@@ -1,3 +1,5 @@
+@use './vars' as *;
+
 html, body {
     overflow: hidden;
     background: #141414;
@@ -40,10 +42,5 @@ code {
 }
 
 label {
-    display: flex;
-    align-items: center;
-    flex-wrap: nowrap;
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: 8px;
+    @extend %label-style
 }

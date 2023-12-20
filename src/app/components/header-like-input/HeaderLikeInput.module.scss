@@ -25,6 +25,8 @@
     &[data-header-like-input-div] { width: max-content; }
     &[data-header-like-input-input] { width: calc(100% - 4px); }
 
+    height: .95em;
+
     white-space: nowrap;
 }
 
@@ -70,10 +72,10 @@
         transform: scaleX(0) scaleY(0.5);
         transform-origin: center;
 
-        transition-timing-function: cubic-bezier(0, 1, 1, 1);
+        transition-timing-function: cubic-bezier(.33, .15, .5, .7);
         transition-property: transform, background-color;
 
-        animation: animateToHover 0.3s cubic-bezier(0, 1, 1, 1) reverse;
+        animation: animateToHover 0.3s cubic-bezier(.33, .15, .5, .7) reverse;
         transition-duration: 0.3s;
 
         bottom: -3px;
@@ -81,20 +83,24 @@
     }
 
     &:hover::after {
-        background-color: hsla(0, 0%, 78%, 100%);
+        background-color: hsla(0, 0%, 62%, 100%);
         transform: scaleX(.75) scaleY(0.75);
 
-        transition-timing-function: cubic-bezier(1, 0, 1, 1);
-        transition-duration: 0.15s;
-        animation: animateToHover 0.15s cubic-bezier(1, 0, 1, 1);
+        transition-timing-function: cubic-bezier(.33, .15, .5, .7);
+        transition-duration: 0.2s;
+        animation: animateToHover 0.4s cubic-bezier(.33, .15, .5, .7);
     }
 
     &[data-editing="true"]::after {
         background-color: hsla(0, 0%, 82%, 100%);
         transform: scaleX(1) scaleY(0.75);
 
-        transition-timing-function: cubic-bezier(1, 0, 1, 1);
+        transition-timing-function: cubic-bezier(.33, .15, .5, .7);
         transition-duration: 0.2s;
-        animation: animateToHover 0.2s cubic-bezier(1, 0, 1, 1);
+        animation: animateToHover 0.2s cubic-bezier(.33, .15, .5, .7);
+    }
+
+    &:has([data-is-recalcing-width]):is(::before, ::after) {
+        transition-property: none !important;
     }
 }

@@ -453,32 +453,32 @@ export const translationTable: RecursiveReadonly<TranslationTable> = {
     },
 
     builder_module_name: {
-        en: ()=> <>Installer Name (Module.xml):</>
+        en: ()=> <>Installer Name (Module.xml)</>
     },
 
     metadata_author: {
-        en: ()=> <>Author:</>
+        en: ()=> <>Author</>
     },
 
     metadata_id: {
-        en: ()=> <>(Nexus Mods) ID:</>
+        en: ()=> <>(Nexus Mods) ID</>
     },
 
     metadata_version: {
-        en: ()=> <>Version:</>
+        en: ()=> <>Version</>
     },
 
     metadata_website: {
-        en: ()=> <>Website:</>
+        en: ()=> <>Website</>
     },
 
 
     builder_info_name: {
-        en: ()=> <>Mod Name (Info.xml):</>
+        en: ()=> <>Mod Name (Info.xml)</>
     },
 
     builder_module_name_conflict_warning: {
-        en: ()=> <>The names in Module.xml and Info.xml conflict. As soon as they align, they will no longer be entangled.</>
+        en: ()=> <>The names in Module.xml and Info.xml conflict. As soon as they align, they will be entangled again.</>
     },
 
     // Steps

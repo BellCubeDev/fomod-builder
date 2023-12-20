@@ -41,6 +41,7 @@
     "useUnknownInCatchVariables": true,
     "disableSizeLimit": true,
     "pretty": true,
+    "sourceMap": true,
   },
   "include": [
     "next-env.d.ts",

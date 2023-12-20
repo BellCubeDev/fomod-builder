@@ -1,0 +1,18 @@
+@use '../../vars' as *;
+@use './settingsGrid.module' as settingsGrid;
+
+.flex {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+
+    table {
+        @extend .grid;
+    }
+
+    > label {
+        flex-direction: column;
+    }
+}
