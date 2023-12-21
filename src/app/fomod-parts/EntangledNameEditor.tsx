@@ -32,7 +32,7 @@ export default function EntangledNameEditor({InputComponent}: {InputComponent: R
     const editName = React.useCallback((value: string, isModule = true) => {
         if (!loader) return console.error('Tried to change name with no loader! (this should not be possible)');
 
-        const treatAsEntangled = settings.namesAreEntangled && (loader.info.data.Name && loader.module.moduleName === loader.info.data.Name);
+        const treatAsEntangled = settings.namesAreEntangled && (loader.module.moduleName === (loader.info.data.Name || ''));
 
         if (isModule || treatAsEntangled) loader.module = produce(loader.module, draft => {
             draft.moduleName = value;
@@ -53,7 +53,7 @@ export default function EntangledNameEditor({InputComponent}: {InputComponent: R
     if (!loader) return null;
 
 
-    const treatAsEntangled = settings.namesAreEntangled && (loader.module.moduleName === (loader.info.data.Name ?? ''));
+    const treatAsEntangled = settings.namesAreEntangled && (loader.module.moduleName === (loader.info.data.Name || ''));
 
     return <DynamicWidthInputWidthSharer><table style={{position: 'relative'}}>
     {!treatAsEntangled && <tr>
