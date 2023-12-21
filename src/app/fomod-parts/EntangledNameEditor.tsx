@@ -55,7 +55,7 @@ export default function EntangledNameEditor({InputComponent}: {InputComponent: R
 
     const treatAsEntangled = settings.namesAreEntangled && (loader.module.moduleName === (loader.info.data.Name ?? ''));
 
-    return <DynamicWidthInputWidthSharer><table>
+    return <DynamicWidthInputWidthSharer><table style={{position: 'relative'}}>
     {!treatAsEntangled && <tr>
         <td><label htmlFor={bottomInputID}>
             <T tkey='builder_info_name' params={[loader.info.data.Name]} />
@@ -82,7 +82,7 @@ export default function EntangledNameEditor({InputComponent}: {InputComponent: R
     </table>
 
     {settings.namesAreEntangled && !treatAsEntangled &&
-        <span>
+        <span  style={{position: 'absolute', marginTop: '1px', fontSize: '0.75em', color: 'orange'}}>
             <T tkey='builder_module_name_conflict_warning' />
         </span>
     }

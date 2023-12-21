@@ -6,10 +6,16 @@
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    gap: 8px;
+    gap: 24px;
+    row-gap: 40px; // 45678
 
     table {
         @extend .grid;
+
+        td:nth-child(3) {
+            padding-left: 16px;
+            padding-right: 32px;
+        }
     }
 
     > label {

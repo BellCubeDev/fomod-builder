@@ -35,6 +35,8 @@ export abstract class FomodLoader {
     abstract getFileByPath(path: string): Promise<File|null>;
 
     static CanUse: boolean;
+    static FileSystemCapability: boolean;
+
     static Name: keyof TranslationTableKeys & `loader_${string}`;
     static LoaderUI: React.FunctionComponent<{}>;
     static LoaderUIClickEvent: (eventTarget: FomodEventTarget, ...params: Parameters<React.MouseEventHandler<HTMLButtonElement>>) => Promise<[false, FomodLoader] | [Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges>]>;

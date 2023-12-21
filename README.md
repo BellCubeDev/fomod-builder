@@ -30,33 +30,32 @@ npm run dev
 
 # FIXME
 
-* Options appear to be getting duplicated. Sounds like a job for the debugger!
 * Dynamic Length Inputs can stretch so far they push everything off of the screen
 
 # TODO
 
+### Needs Styling
+* Option Editor
+
+### Roadmap
 * [X] Loader APIs
-* [ ] Step/Group/Option Editing
-  * Styling, mostly
+* [X] Step/Group/Option Editing
+* [ ] Install Editing
 * [ ] Dependency Editing
   * [X] Read ESP/L/M dependencies automatically
-* [ ] Install Editing
-
-### Important Tooltips
-
-Listed here so I don't forget to add these later
-
-* [ ] Differences Between Mod Manager Implementations
-  * [ ] `SelectAtLeastOne` Groups
-  * [ ] (MO2) Name from Info.xml `<Name>` vs (Vortex) ModuleConfig.xml's `<ModuleName>`
-  * [ ] MO2's `CouldBeUsable` extra space at start (needs further investigation)
-* [ ] Pseudo-Deprecated Features
-  * [ ] `CouldBeUsable` Options
-* [ ] Problematic Features
-  * [ ] `NotUsable` and `Required` Options
-  * [ ] `fommDependency`
-* [ ] Intuition Breakers
-  * [ ] First matching `pattern` determines Option behavior type
+* [ ] TOOLTIPS FOR EVERYONE!!! <br />
+  Here's some tooltips we need:
+  * [ ] Differences Between Mod Manager Implementations
+    * [ ] `SelectAtLeastOne` Groups
+    * [ ] (MO2) Name from Info.xml `<Name>` vs (Vortex) ModuleConfig.xml's `<ModuleName>`
+    * [ ] MO2's `CouldBeUsable` extra space at start (needs further investigation)
+  * [ ] Pseudo-Deprecated Features
+    * [ ] `CouldBeUsable` Options
+  * [ ] Problematic Features
+    * [ ] `NotUsable` and `Required` Options
+    * [ ] `fommDependency`
+  * [ ] Intuition Breakers
+    * [ ] First matching `pattern` determines Option behavior type
 
 ### Potential Warnings
 * Using an ESP module at all. ESM/L modules are preferred as they are handled more gracefully by the game engine.

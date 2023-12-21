@@ -151,6 +151,7 @@ export default class FileSystemFolderLoader extends FomodLoader {
     }
 
     static override CanUse = typeof FileSystemDirectoryHandle !== 'undefined' && !!window.showDirectoryPicker; // Firefox and Safari sadly don't not support this...
+    static override FileSystemCapability = this.CanUse;
     static override readonly Name = 'loader_filesystem' satisfies keyof TranslationTableKeys;
     static override async LoaderUIClickEvent(eventTarget: FomodEventTarget, e: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<[false, FileSystemFolderLoader] | [Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges>]> {
         let folder = await window.showDirectoryPicker().catch((e) => e instanceof DOMException && e.name === 'AbortError' ? null : Promise.reject(e));
