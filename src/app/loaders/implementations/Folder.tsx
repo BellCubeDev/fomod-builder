@@ -4,7 +4,7 @@ import styles from './FolderLoader.module.scss';
 import { TranslationTableKeys } from '@/app/localization/strings';
 import { T } from '@/app/localization';
 
-import { FomodLoader, FomodSaveRejectReason, FomodLoadRejectReason, FomodEventTarget } from '..';
+import { FomodLoader, FomodSaveRejectReason, FomodLoadRejectReason, FomodEventTarget, reorganizeInstalls } from '..';
 import { parseInfoDoc, parseModuleDoc, Fomod, BlankModuleConfig, FomodInfo, BlankInfoDoc, getOrCreateElementByTagName } from 'fomod';
 
 export default class FileSystemFolderLoader extends FomodLoader {
@@ -125,6 +125,8 @@ export default class FileSystemFolderLoader extends FomodLoader {
             result = new Fomod();
             result.assignElement(getOrCreateElementByTagName(doc.documentElement, Fomod.tagName));
         }
+
+        reorganizeInstalls(result);
 
         const asElement = result.asElement(doc);
 

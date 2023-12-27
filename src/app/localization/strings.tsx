@@ -115,10 +115,10 @@ export interface TranslationTableKeys {
 
     // Builder-Specific Labels
     builder_step_sorting_order: () => React.ReactNode;
-    builder_module_name: (value: Fomod['moduleName']) => React.ReactNode;
-    builder_module_name_entangled: (moduleName: Fomod['moduleName'], infoName: FomodInfo['data']['Name']) => React.ReactNode;
+    builder_module_name: (value: Fomod<boolean>['moduleName']) => React.ReactNode;
+    builder_module_name_entangled: (moduleName: Fomod<boolean>['moduleName'], infoName: FomodInfo['data']['Name']) => React.ReactNode;
     builder_info_name: (value: FomodInfo['data']['Name']) => React.ReactNode;
-    builder_module_name_conflict_warning: (moduleName: Fomod['moduleName'], infoName: FomodInfo['data']['Name']) => React.ReactNode;
+    builder_module_name_conflict_warning: (moduleName: Fomod<boolean>['moduleName'], infoName: FomodInfo['data']['Name']) => React.ReactNode;
 
     // Steps
     steps_no_steps: () => React.ReactNode;

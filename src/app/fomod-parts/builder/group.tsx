@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { Immutable, Draft, castDraft } from 'immer';
-import { Group, Option, OptionType, TypeDescriptor, TypeNameDescriptor, GroupBehaviorType } from 'fomod';
+import { Group, Option, OptionType, TypeDescriptor, TypeNameDescriptor, GroupBehaviorType, TagName } from 'fomod';
 import { T } from '@/app/localization';
 import SortingOrderDropdown from './SortingOrderDropdown';
 import { useSettings, defaultSettings, Settings } from '@/app/components/SettingsContext';
@@ -63,7 +63,7 @@ export default function BuilderGroup({group, edit}: {group: Immutable<Group<fals
 }
 
 export function createNewOption(settings: Settings | null) {
-    const typeDescriptor = new TypeDescriptor(new TypeNameDescriptor('type', settings?.defaultOptionType ?? OptionType.Optional, false));
+    const typeDescriptor = new TypeDescriptor(new TypeNameDescriptor(TagName.Type, settings?.defaultOptionType ?? OptionType.Optional, false));
     return castDraft(new Option('', '', '', typeDescriptor));
 }
 

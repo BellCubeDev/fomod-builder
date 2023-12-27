@@ -33,6 +33,8 @@ npm run dev
 * Dynamic Length Inputs can stretch so far they push everything off of the screen
 
 # TODO
+* Drag-n-drop reordering
+* Some kind of button-based reordering too
 
 ### Needs Styling
 * Option Editor

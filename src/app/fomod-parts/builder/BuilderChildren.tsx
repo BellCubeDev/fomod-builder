@@ -32,7 +32,7 @@ function tryCallingEdit(f: () => unknown) {
 export default function BuilderChildren<
     TTypeString extends ValidTypeString,
     TParentInstance extends {},
-    TChildInstance extends XmlRepresentation & {name: string},
+    TChildInstance extends XmlRepresentation<boolean> & {name: string},
 > ({ children, className, type, edit, childKey, createChildClass, ChildComponent, showAll }: {
     children: TrueImmutable<Set<TChildInstance>>,
     className?: string,

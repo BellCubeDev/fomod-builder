@@ -2,14 +2,14 @@
 
 import React from "react";
 import xmlFormat from 'xml-formatter';
-import { Fomod, FomodInfo } from 'fomod';
 import { useImmer } from 'use-immer';
-import { Immutable, immerable, createDraft } from 'immer';
+import { Immutable, immerable, createDraft, produce, current, castDraft } from 'immer';
 
 import { TranslationTableKeys } from '../localization/strings';
 import { FomodLoadRejectReason, FomodSaveRejectReason } from '.';
 
 import * as fomodLib from 'fomod';
+import { Fomod, FomodInfo, InstallPattern } from 'fomod';
 import { FomodEventTarget } from './index';
 
 for (const item of Object.values(fomodLib)) {
@@ -31,6 +31,17 @@ export class FomodSavingError extends Error {
     }
 }
 
+export function reorganizeInstalls(module: Fomod<false>) {
+    module.steps.forEach(step => {
+        step.groups.forEach(group => {
+            group.options.forEach(option => {
+                module.installs.add(option.installsToSet);
+                option.installsToSet = new InstallPattern(option.installsToSet.dependencies);
+            });
+        });
+    });
+}
+
 export abstract class FomodLoader {
     abstract getFileByPath(path: string): Promise<File|null>;
 
@@ -50,9 +61,8 @@ export abstract class FomodLoader {
     abstract reloadFromText(text: string, info?: boolean): false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges>;
 
 
-    protected eventTarget: FomodEventTarget;
-    constructor(eventTarget: FomodEventTarget) {
-        this.eventTarget = eventTarget;
+    constructor(protected eventTarget: FomodEventTarget) {
+
     }
 
 

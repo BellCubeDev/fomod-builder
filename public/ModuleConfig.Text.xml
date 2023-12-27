@@ -1,24 +1,50 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://qconsulting.ca/fo3/ModConfig5.0.xsd">
-
-    <moduleName>Example Mod</moduleName>
-
+    <moduleName colour="000000" position="Left"></moduleName>
+    <moduleImage height="-1" path="" showFade="true" showImage="true"/>
+    <moduleDependencies operator="And"></moduleDependencies>
+    <requiredInstallFiles>
+        <file source="" alwaysInstall="true" destination="" installIfUsable="true" priority="0" />
+    </requiredInstallFiles>
     <installSteps order="Ascending">
-        <installStep name="1">
-            <optionalFileGroups>
-                <group name="123" type="SelectAtLeastOne">
-                    <plugins>
-                        <plugin name="Select Me First!">
-                            <description></description>
-                            <image path="128787234534" />
-                            <files />
+        <installStep name="" >
+            <visible></visible>
+            <optionalFileGroups order="Ascending">
+                <group name="" type="SelectAtLeastOne">
+                    <plugins order="Ascending">
+                        <plugin name="" >
+                            <description ></description>
+                            <image path="" />
+                            <conditionFlags>
+                                <flag name=""></flag>
+                            </conditionFlags>
+                            <files>
+                                <file source="" />
+                                <folder source="" />
+                            </files>
                             <typeDescriptor>
-                                <type name="Optional" />
+                                <type name="Required" />
                             </typeDescriptor>
                         </plugin>
                     </plugins>
                 </group>
             </optionalFileGroups>
+
         </installStep>
     </installSteps>
+    <conditionalFileInstalls>
+        <patterns>
+            <pattern>
+                <dependencies>
+                    <fileDependency file="" state="Active" />
+                    <flagDependency flag="" value="" />
+                    <fommDependency version="" />
+                    <foseDependency version="" />
+                    <gameDependency version="" />
+                </dependencies>
+                <files>
 
+                </files>
+            </pattern>
+        </patterns>
+    </conditionalFileInstalls>
 </config>

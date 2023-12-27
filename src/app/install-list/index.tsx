@@ -2,6 +2,8 @@
 
 import { useFomod } from '../loaders';
 import React from 'react';
+import { InstallInstancesByDocument, InstallPattern } from 'fomod';
+import { castDraft, current, produce } from 'immer';
 
 export default function InstallList() {
     const {loader, eventTarget} = useFomod();
@@ -18,5 +20,11 @@ export default function InstallList() {
 
     }, [eventTarget]);
 
+    React.useEffect(() => {
+        if (!loader) return;
 
+        
+    });
+
+    if (!loader) return null;
 }
