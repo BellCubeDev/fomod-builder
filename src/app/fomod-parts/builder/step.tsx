@@ -51,7 +51,7 @@ export default function BuilderStep({step, edit}: {step: Immutable<Step<false>>,
     </>;
 }
 
-export function createNewGroup(settings: Settings | null): Draft<Group> {
+export function createNewGroup(settings: Settings | null) {
     const group = castDraft(new Group('', settings?.defaultGroupBehavior ?? GroupBehaviorType.SelectAny, settings?.defaultOptionSortingOrder ?? SortingOrder.Explicit));
     group.options.add(createNewOption(settings));
 

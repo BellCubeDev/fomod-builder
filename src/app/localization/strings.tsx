@@ -62,6 +62,7 @@ export interface TranslationTableKeys {
     loader_filesystem: (inPopup: boolean) => React.ReactNode;
     loader_filesystem_description: () => React.ReactNode;
     loader_filesystem_select_folder: () => React.ReactNode;
+    loader_filesystem_no_support: () => React.ReactNode;
 
 
     loader_file_input: (inPopup: boolean) => React.ReactNode;
@@ -339,6 +340,10 @@ export const translationTable: RecursiveReadonly<TranslationTable> = {
 
     loader_filesystem_select_folder: {
         en: ()=> 'Select Folder',
+    },
+
+    loader_filesystem_no_support: {
+        en: ()=> 'Your browser does not support the File System Access API in full. Please try a different method.',
     },
 
     loader_file_input: {

@@ -164,6 +164,11 @@ export default class FileSystemFolderLoader extends FomodLoader {
         return [false, loader];
     }
     static override LoaderUI() {
+        if (!FileSystemFolderLoader.CanUse) return <div className={styles.fsLoaderError}>
+            <h3><T tkey='loader_filesystem' params={[true]} /></h3>
+            <p><T tkey='loader_filesystem_no_support' /></p>
+        </div>;
+        
         return <div className={styles.fsLoader}>
             <h3><T tkey='loader_filesystem' params={[true]} /></h3>
             <p><T tkey='loader_filesystem_description' /></p>

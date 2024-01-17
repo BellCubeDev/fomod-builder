@@ -28,7 +28,7 @@ export default function FomodLoaderUI() {
 
         <div className={styles.loader}>
             <FileSystemFolderLoader.LoaderUI />
-            <button type='button' onClick={(e) => clickEvent(FileSystemFolderLoader, e)}>Select Folder</button>
+            {FileSystemFolderLoader.CanUse && <button type='button' onClick={(e) => clickEvent(FileSystemFolderLoader, e)}>Select Folder</button>}
         </div>
     </div>;
 }
