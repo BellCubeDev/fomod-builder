@@ -28,7 +28,7 @@ export function moveSetItem<T>(set: Set<T>, fromIndex: number, toIndex: number) 
     resolveRecursiveDrafts(set, array);
 }
 
-import { isDraft, current, Draft } from 'immer';
+import { isDraft, current, Draft } from '@/immer';
 
 /** Resolves accidental recursive drafts created by some witchcraft with immer. Edits the set in-place for compatibility with Immer. */
 export function resolveRecursiveDrafts<T extends Draft<any>>(set: Set<T>, array?: Array<T>): void {

@@ -2,15 +2,15 @@
 
 import React from "react";
 import xmlFormat from 'xml-formatter';
-import { useImmer } from 'use-immer';
-import { Immutable, immerable, createDraft, produce, current, castDraft } from 'immer';
+import { Immutable, immerable, createDraft, Immer, current } from '@/immer';
 
 import { TranslationTableKeys } from '../localization/strings';
 import { FomodLoadRejectReason, FomodSaveRejectReason } from '.';
 
 import * as fomodLib from 'fomod';
-import { Fomod, FomodInfo, InstallPattern } from 'fomod';
+import { Fomod, FomodInfo, InstallPattern, BlankModuleConfig, BlankInfoDoc } from 'fomod';
 import { FomodEventTarget } from './index';
+import type { FomodDocumentConfig } from "fomod/dist/definitions/lib/FomodDocumentConfig";
 
 for (const item of Object.values(fomodLib)) {
     if ((typeof item === 'function' || typeof item === 'object') && 'prototype' in item) {
@@ -35,12 +35,23 @@ export function reorganizeInstalls(module: Fomod<false>) {
     module.steps.forEach(step => {
         step.groups.forEach(group => {
             group.options.forEach(option => {
+                if (option.installsToSet.filesWrapper.installs.size === 0) return;
                 module.installs.add(option.installsToSet);
                 option.installsToSet = new InstallPattern(option.installsToSet.dependencies);
             });
         });
     });
 }
+
+export const fomodParseConfig: Required<FomodDocumentConfig> = {
+    flattenConditionalInstalls: false,
+    flattenConditionalInstallsNoDependencies: false,
+    generateNewOptionFlagNames: false,
+    includeInfoSchema: true,
+    optionSelectedValue: 'OPTION_SELECTED',
+    parseOptionFlags: 'loose',
+    removeEmptyConditionalInstalls: true,
+};
 
 export abstract class FomodLoader {
     abstract getFileByPath(path: string): Promise<File|null>;
@@ -99,7 +110,7 @@ export abstract class FomodLoader {
             return this.reloadFromText(this._moduleText, false);
         } else {
             if (!this._moduleDoc || !this._module) return false;
-            this._moduleText = this.formatXMLForEditing(createDraft(this._module).asElement(new DOMParser().parseFromString('', 'application/xml')).outerHTML);
+            this._moduleText = this.formatXMLForEditing(current(createDraft(this._module)).asElement(this._moduleDoc, fomodParseConfig).outerHTML);
             return false;
         }
     }
@@ -115,7 +126,7 @@ export abstract class FomodLoader {
             return this.reloadFromText(this._infoText, true);
         } else {
             if (!this._infoDoc || !this._info) return false;
-            this._infoText = this.formatXMLForEditing(createDraft(this._info).asElement(new DOMParser().parseFromString('', 'application/xml')).outerHTML);
+            this._infoText = this.formatXMLForEditing(current(createDraft(this._info)).asElement(this._infoDoc, fomodParseConfig).outerHTML);
             return false;
         }
     }
@@ -205,7 +216,7 @@ export abstract class FomodLoader {
         const reloadRejection = this.reloadModuleIfNeeded('text');
         if (reloadRejection) throw new FomodLoadingError('Failed to reload ModuleConfig.xml from text', reloadRejection);
 
-        return this.formatXMLForEditing(createDraft(this.module).asElement(this.moduleDoc!).outerHTML);
+        return this.formatXMLForEditing(createDraft(this.module).asElement(this.moduleDoc!, fomodParseConfig).outerHTML);
     }
 
     set moduleText(text: string) {
@@ -214,8 +225,7 @@ export abstract class FomodLoader {
     }
 
     get moduleDocForSaving(): string {
-
-        return this.formatXMLForSaving(createDraft(this.module).asElement(this.moduleDoc!).outerHTML);
+        return this.formatXMLForSaving(createDraft(this.module).asElement(this.moduleDoc!, fomodParseConfig).outerHTML);
     }
 
 
@@ -313,14 +323,4 @@ export function addBase<T>(this: HistoryStates<T>, newState: TupleOfImmutable<T>
     if (this.current) this.backward = [...this.backward, this.current];
     this.current = newState;
     this.forward = [];
-}
-
-export function useProducer<T>(initialState: TupleOfImmutable<T>, history: HistoryStates<T>) {
-    const [val, setter] = useImmer(initialState);
-
-    React.useEffect(() => {
-        history.add(val);
-    }, [val, history]);
-
-    return [val, setter] as const;
 }

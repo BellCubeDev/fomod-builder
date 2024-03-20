@@ -9,10 +9,10 @@
     background-color: #222;
     color: white;
 
-    padding: 6px 10px;
-    margin-left: 4px;
-    border-radius: 32px;
-    height: 32px;
+    margin-left: 8px;
+    padding: .25em .5em;
+    border-radius: 28px;
+    height: 28px;
 
     font-weight: bold;
     outline: none;
@@ -24,8 +24,7 @@
 
     outline: none;
 
-    transition: all 0.15s ease-in-out;
-    transition-property: background-color, border-color;
+    transition: background-color 0.15s ease-in-out, border-color 0.10s ease-in-out;
 
     &:hover { background-color: #333; }
     &:focus {
@@ -33,7 +32,7 @@
         border-color: #777;
     }
 
-    &.active { background-color: #999; }
+    &.active:is(:hover, :focus) { background-color: #999; }
 }
 
 .deleteButton {
@@ -90,15 +89,33 @@
     transform-origin: left center;
 }
 
+//@keyframes scrollSideMaskLeft {
+//    0% {
+//        mask-position: -3em 0;
+//    }
+//
+//    100% {
+//        mask-position: 0 0;
+//    }
+//}
+//
+//@keyframes scrollSideMaskRight {
+//    0% {
+//        mask-position: calc(100% + 3em) 0;
+//    }
+//
+//    100% {
+//        mask-position: 100% 0;
+//    }
+//}
+
 @mixin bodyStyling($color-bg-inactive, $color-bg-active) {
     width: 100%;
 
     > .childSelector {
         width: 100%;
-        height: 43px;
 
-        overflow-y: hidden;
-        overflow-x: auto;
+
         white-space: nowrap;
         display: flex;
         flex-direction: row;
@@ -111,41 +128,122 @@
             padding: 12px 0;
         }
 
-        button:not(.addButton, .deleteButton) {
-            background-color: $color-bg-inactive;
 
-            padding: 8px 16px;
+        > .childSelectorButtonsBG {
+            overflow-x: auto;
 
-            font-size: 1em;
-            color: white;
-            i { color: #aaa; }
+            background: $color-bg-active;
+            &:not(:has(> *)) { background: none; }
+        }
 
-            border: 1px solid #888;
-            border-top-width: 4px;
-            border-bottom-width: 4px;
-            &:first-child { border-left-width: 2px; }
-            &:has(+ :last-child) { border-right-width: 2px; }
+        //> .childSelectorButtonsBG > .rightFade {
+        //    mask: linear-gradient(90deg,#000 calc(100% - 3em),#0002);
+        //    animation-name: scrollSideMaskRight;
+        //    animation-timeline: scroll(x 0 3em);
+        //
+        //    overflow-x: auto;
+        //}
+        //
+        //> .childSelectorButtonsBG > .rightFade > .leftFade {
+        //    mask: linear-gradient(90deg,#0002,#000 3em);
+        //    animation-name: scrollSideMaskLeft;
+        //    animation-timeline: scroll(x calc(100% - 3em) 100%);
+        //
+        //    overflow-x: auto;
+        //}
+        //
+        // TODO: Add this but through JS
 
-            outline: none;
+        > .childSelectorButtonsBG .buttons {
+            background: $color-bg-active;
 
-            transition: all 0.15s ease-in-out;
-            transition-property: background-color, border-color;
+            overflow-x: auto;
+            overflow-y: hidden;
 
-            cursor: pointer;
-
-            &:hover { background-color: mix($color-bg-inactive, $color-bg-active, 50%); }
-            &:focus {
-                background-color: $color-bg-active;
-                border-color: white;
+            &::-webkit-scrollbar {
+                height: 8px;
+                background: $color-bg-active;
             }
 
-            &.active { background-color: $color-bg-active; }
-
-            &[aria-selected="true"] {
-                background-color: $color-bg-active !important;
-                border-color: white;
-                border-bottom-color: $color-bg-active;
+            &::-webkit-scrollbar-thumb {
+                background: $color-bg-inactive;
+                border-radius: 4px;
             }
+
+            &::-webkit-scrollbar-corner {
+                background: $color-bg-active;
+            }
+
+            &::-webkit-scrollbar, &::-webkit-scrollbar-thumb, &::-webkit-scrollbar-corner {
+                transition: filter 0.1s ease-in-out;
+                filter: opacity(0);
+                &:hover { filter: opacity(1); }
+            }
+
+            .childButtonWrapper {
+                background-color: $color-bg-inactive;
+                display: inline;
+                position: relative;
+
+
+                > .childButton {
+                    padding: 8px 16px;
+                    padding-right: 40px;
+                    font-size: 1em;
+                    color: white;
+                    i { color: #aaa; }
+
+                    background: $color-bg-inactive;
+
+                    border: 1px solid mix(#fff, $color-bg-active, 5%);
+                    border-bottom-color: $color-bg-active;
+                    border-top-width: 2px;
+                    border-bottom-width: 2px;
+                    &:first-child { border-left-width: 2px; }
+                    &:last-child { border-right-width: 2px; }
+
+                    outline: none;
+
+                    transition: background-color 0.15s ease-in-out, border-color 0.10s ease-in-out;
+
+                    cursor: pointer;
+
+                    &:hover, &:focus {
+                        background-color: mix($color-bg-inactive, $color-bg-active, 50%);
+                        border-color: mix(#fff, $color-bg-active, 10%);
+
+                        &.active {
+                            background-color: $color-bg-active;
+                            border-bottom-color: $color-bg-active;
+                        }
+                    }
+
+
+                    &[aria-selected="true"] {
+                        background-color: $color-bg-active !important;
+                        border-color: white;
+                        border-bottom-color: $color-bg-active;
+                    }
+                }
+
+                .deleteButton {
+                    position: absolute;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    padding: 4px;
+                    right: 6px;
+                    margin: 0;
+                    font-size: 16px;
+                    margin-top: 2px;
+
+                    transition: color 0.15s ease-in-out;
+
+                    color: #aaa;
+                }
+
+
+            }
+
         }
     }
 

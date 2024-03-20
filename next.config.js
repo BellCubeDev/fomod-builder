@@ -28,9 +28,12 @@ const nextConfig = {
                 }
             },
         },
+        esmExternals: 'loose',
     },
 
     staticPageGenerationTimeout: 600,
+
+    transpilePackages: ['fomod'],
 
     trailingSlash: true,
 

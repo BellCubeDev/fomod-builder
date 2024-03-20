@@ -29,14 +29,14 @@ export function useScaleInX(ref: React.RefObject<HTMLElement>) {
 
 }
 
-export const ScaleInButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
-    function ScaleInButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>, inputRef: React.ForwardedRef<HTMLButtonElement>|null) {
-        const ref = React.useRef<HTMLButtonElement>(null);
+export const ScaleInDiv = React.forwardRef(
+    function ScaleInDiv(props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>, inputRef: React.Ref<HTMLDivElement>) {
+        const ref = React.useRef<HTMLDivElement>(null);
         React.useImperativeHandle(inputRef, () => ref.current!);
 
         useScaleInX(ref);
 
-        return <button {...props} ref={ref} />;
+        return <div {...props} ref={ref} />;
     }
 );
-export default ScaleInButton;
+export default ScaleInDiv;

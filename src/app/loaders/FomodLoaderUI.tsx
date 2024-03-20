@@ -1,5 +1,7 @@
 'use client';
 
+// LOAD THIS WITH NO SSR
+
 import { useFomod, FomodLoader as FomodLoaderClass } from '.';
 import { T } from '../localization/index';
 import styles from './FolderLoader.module.scss';

@@ -4,8 +4,9 @@ import styles from './FolderLoader.module.scss';
 import { TranslationTableKeys } from '@/app/localization/strings';
 import { T } from '@/app/localization';
 
-import { FomodLoader, FomodSaveRejectReason, FomodLoadRejectReason, FomodEventTarget, reorganizeInstalls } from '..';
+import { FomodLoader, FomodSaveRejectReason, FomodLoadRejectReason, FomodEventTarget, reorganizeInstalls, fomodParseConfig } from '..';
 import { parseInfoDoc, parseModuleDoc, Fomod, BlankModuleConfig, FomodInfo, BlankInfoDoc, getOrCreateElementByTagName } from 'fomod';
+import { produce } from '@/immer';
 
 export default class FileSystemFolderLoader extends FomodLoader {
     protected override _info: FomodInfo | null = null;
@@ -88,16 +89,20 @@ export default class FileSystemFolderLoader extends FomodLoader {
             else throw e;
         }
 
-        let result = parseInfoDoc(doc);
+        let result = parseInfoDoc(doc, fomodParseConfig);
         if (!result) {
             if (doc.documentElement.getElementsByTagName(FomodInfo.tagName).length) return FomodLoadRejectReason.UnsalvageableInfoDoc;
             result = new FomodInfo();
             result.assignElement(getOrCreateElementByTagName(doc.documentElement, FomodInfo.tagName));
         }
 
-        const asElement = result.asElement(doc);
+        let asElement!: Element;
+        const immutableResult = produce(result, d => {
+            asElement = d.asElement(doc, fomodParseConfig);
+            return d;
+        });
 
-        this._info = result;
+        this._info = immutableResult;
         this._infoDoc = asElement.ownerDocument!;
         this._infoText = asElement.outerHTML;
 
@@ -119,7 +124,7 @@ export default class FileSystemFolderLoader extends FomodLoader {
         }
 
 
-        let result = parseModuleDoc(doc);
+        let result = parseModuleDoc(doc, fomodParseConfig);
         if (!result) {
             if (doc.documentElement.getElementsByTagName(Fomod.tagName).length) return FomodLoadRejectReason.UnsalvageableModuleDoc;
             result = new Fomod();
@@ -128,9 +133,13 @@ export default class FileSystemFolderLoader extends FomodLoader {
 
         reorganizeInstalls(result);
 
-        const asElement = result.asElement(doc);
+        let asElement!: Element;
+        const immutableResult = produce(result, d => {
+            asElement = d.asElement(doc, fomodParseConfig);
+            return d;
+        });
 
-        this._module = result;
+        this._module = immutableResult;
         this._moduleDoc = asElement.ownerDocument!;
         this._moduleText = this.formatXMLForEditing(asElement.outerHTML);
 
@@ -155,6 +164,7 @@ export default class FileSystemFolderLoader extends FomodLoader {
     static override CanUse = typeof FileSystemDirectoryHandle !== 'undefined' && !!window.showDirectoryPicker; // Firefox and Safari sadly don't not support this...
     static override FileSystemCapability = this.CanUse;
     static override readonly Name = 'loader_filesystem' satisfies keyof TranslationTableKeys;
+
     static override async LoaderUIClickEvent(eventTarget: FomodEventTarget, e: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<[false, FileSystemFolderLoader] | [Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges>]> {
         let folder = await window.showDirectoryPicker().catch((e) => e instanceof DOMException && e.name === 'AbortError' ? null : Promise.reject(e));
         if (!folder) return [FomodLoadRejectReason.NoFolderSelected];
@@ -165,15 +175,13 @@ export default class FileSystemFolderLoader extends FomodLoader {
 
         return [false, loader];
     }
+
     static override LoaderUI() {
-        if (!FileSystemFolderLoader.CanUse) return <div className={styles.fsLoaderError}>
+        return <div className={styles.fsLoaderError}>
             <h3><T tkey='loader_filesystem' params={[true]} /></h3>
-            <p><T tkey='loader_filesystem_no_support' /></p>
-        </div>;
-        
-        return <div className={styles.fsLoader}>
-            <h3><T tkey='loader_filesystem' params={[true]} /></h3>
-            <p><T tkey='loader_filesystem_description' /></p>
+            <div suppressHydrationWarning>
+                <T tkey={FileSystemFolderLoader.CanUse ? 'loader_filesystem_description' : 'loader_filesystem_no_support'} />
+            </div>
         </div>;
     }
 
@@ -203,6 +211,16 @@ abstract class BCDFileSystemObjectBase {
         return permissionRequestResult ;
     }
 }
+
+export class ExpectedFolderInMiddleOfPathError extends Error {
+    constructor(parsedPath: path.ParsedPath, item: string, index: number) {
+        super('Expected folder in middle of path; got a file instead!' +
+              '\n   with path: ' + parsedPath.dir + path.sep + parsedPath.base +
+              '\n   with item #' + (index + 1) + ': ' + item
+            );
+    }
+}
+
 
 export class BCDFolder extends BCDFileSystemObjectBase {
     handle: FileSystemDirectoryHandle;
@@ -258,7 +276,7 @@ export class BCDFolder extends BCDFileSystemObjectBase {
             if (next === null) return null;
 
             if (next instanceof BCDFile) {
-                if (i !== items.length - 1) throw new Error('Expected folder while in middle of path; got file');
+                if (i !== items.length - 1) throw new ExpectedFolderInMiddleOfPathError(parsed, item, i);
                 return next;
             }
 
@@ -267,12 +285,23 @@ export class BCDFolder extends BCDFileSystemObjectBase {
 
         return current;
     }
+
+    async getChildren(): Promise<BCDFileSystemObject[]> {
+        if ( !('getEntries' in this.handle) ) return [];
+
+        const children: BCDFileSystemObject[] = [];
+
+        for await (const [fileName, entry] of this.handle) {
+            if (entry instanceof FileSystemFileHandle) children.push(new BCDFile(entry, this));
+            else if (entry instanceof FileSystemDirectoryHandle) children.push(new BCDFolder(entry, this));
+            else throw new TypeError(`BCDFolder.getChildren() encountered an unknown File System Access API class! Rather than break in a weird way, we'll just not continue with this broken code path.`);
+        }
+
+        return children;
+    }
 }
 
 export class BCDFile extends BCDFileSystemObjectBase {
-    handle: FileSystemFileHandle;
-    parent: BCDFolder | null;
-
     protected _writeCloseTimeout: NodeJS.Timeout | null = null;
     protected _writeStream: FileSystemWritableFileStream | null = null;
     protected set newWriteStream(value: FileSystemWritableFileStream | null) {
@@ -325,9 +354,7 @@ export class BCDFile extends BCDFileSystemObjectBase {
         return false;
     }
 
-    constructor(handle: FileSystemFileHandle, parent: BCDFolder | null = null) {
+    constructor(public handle: FileSystemFileHandle, public parent: BCDFolder | null = null) {
         super();
-        this.handle = handle;
-        this.parent = parent;
     }
 }

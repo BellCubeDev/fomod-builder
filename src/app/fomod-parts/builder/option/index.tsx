@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { Immutable, Draft, castDraft } from 'immer';
+import { Immutable, Draft, castDraft } from '@/immer';
 import { Option, FlagSetter, FlagInstance, OptionType } from 'fomod';
 import { T } from '@/app/localization';
 import { useSettings, Settings } from '@/app/components/SettingsContext';
@@ -14,6 +14,8 @@ import BuilderChildren from '../BuilderChildren';
 
 export default function BuilderOption({option, edit}: {option: Immutable<Option<false>>, edit: (recipe: (draft: Draft<Option<false>>) => Draft<Option<false>> | undefined | void) => void}) {
     const settings = useSettings();
+
+    const {loader} = useFomod();
 
     const editName = React.useCallback((value: string) => {
         edit(draft => {
@@ -33,6 +35,8 @@ export default function BuilderOption({option, edit}: {option: Immutable<Option<
         });
     }, [edit]);
 
+    const optionFlagName = loader?.moduleDoc ? option.existingOptionFlagSetterByDocument.get(loader.moduleDoc)?.name : undefined;
+
     return <div>
         <div>
             <HeaderLikeInput value={option.name} noValue={<T tkey='option_header' params={[option.name]} />} onChange={editName} className={styles.stepName} />
@@ -51,9 +55,13 @@ export default function BuilderOption({option, edit}: {option: Immutable<Option<
                 createChildClass={createNewFlag.bind(null, settings)}
                 className={styles.flagWrapper}
                 showAll={true}
+
             >
                 {option.flagsToSet}
             </BuilderChildren>
+        </div>
+        <div>
+            Name of option flag: {optionFlagName}
         </div>
     </div>;
 }
@@ -86,6 +94,7 @@ export function BuilderFlag({flag, edit}: {flag: Immutable<FlagSetter>, edit: (r
 
 import Dropdown from '@/app/components/dropdown/index';
 import DynamicWidthInput from '@/app/components/dynamic-width-input';
+import { useFomod } from '@/app/loaders';
 
 export const OptionBehaviorTypes = Object.values(OptionType).reverse() as OptionType[];
 

@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { Immutable, Draft, castDraft } from 'immer';
+import { Immutable, Draft, castDraft } from '@/immer';
 import { Group, Option, OptionType, TypeDescriptor, TypeNameDescriptor, GroupBehaviorType, TagName } from 'fomod';
 import { T } from '@/app/localization';
 import SortingOrderDropdown from './SortingOrderDropdown';

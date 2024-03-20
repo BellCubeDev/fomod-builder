@@ -1,15 +1,15 @@
 'use client';
 
 import React from 'react';
-import { Draft, produce, freeze, current, isDraft } from 'immer';
+import { Draft, produce, freeze, current, isDraft } from '@/immer';
 import { T } from '../../localization/index';
-import ScaleInButton from './ScaleInButton';
+import ScaleInDiv from './ScaleInDiv';
 import DeleteButton from '@/app/components/DeleteButton';
 import styles from './builder.module.scss';
 import { editSetByIndex } from '@/SetUtils';
 import { resolveRecursiveDrafts } from '@/SetUtils';
 import { useFomod } from '../../loaders/index';
-import { XmlRepresentation } from 'fomod';
+import { XmlRepresentation } from 'fomod/dist/definitions/lib/XmlRepresentation';
 
 function tryMutation(f: () => unknown) {
     try {
@@ -124,12 +124,18 @@ export default function BuilderChildren<
 
     return <div className={className}>
         <div className={styles.childSelector} role='tablist'>
-            {childArr.length ? childArr.map(
-                (child, i) => <ScaleInButton key={i} onClick={(e) => setSelectedChildNum(i) } role='tab' aria-selected={i === selectedChildNum} aria-controls={`builder-step-${i+1}`}>
-                    <T tkey={`${type as ValidTypeString}_button`} params={[child.name]} />
-                    <DeleteButton onActivation={deleteToBeBound.bind(undefined, i)} className={styles.deleteButton} disabled={type !== 'step' && childArr.length < 2} />
-                </ScaleInButton>
-            ) : <T tkey={`${type}s_no_${type}s` as TypesNoTypesStrings} />}
+            <div className={styles.childSelectorButtonsBG}>
+                <div className={styles.buttons} >
+                    {childArr.length ? childArr.map(
+                        (child, i) => <ScaleInDiv key={i} className={styles.childButtonWrapper}>
+                            <button onClick={(e) => setSelectedChildNum(i) } role='tab' aria-selected={i === selectedChildNum} aria-controls={`builder-step-${i+1}`} className={styles.childButton} >
+                                <T tkey={`${type as ValidTypeString}_button`} params={[child.name]} />
+                            </button>
+                            <DeleteButton onActivation={deleteToBeBound.bind(undefined, i)} className={styles.deleteButton} disabled={type !== 'step' && childArr.length < 2} />
+                        </ScaleInDiv>
+                    ) : <T tkey={`${type}s_no_${type}s` as TypesNoTypesStrings} />}
+                </div>
+            </div>
             <button key={childArr?.length} onClick={addChild} className={styles.addButton}>
                 <T tkey={`${type as ValidTypeString}_add_button`} />
             </button>

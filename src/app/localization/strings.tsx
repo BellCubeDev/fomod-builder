@@ -1,6 +1,6 @@
 import {TranslationTable} from '.';
 import { GroupBehaviorType, Option, FlagSetter, FomodInfo, Fomod } from 'fomod';
-import { Immutable } from 'immer';
+import { Immutable } from '@/immer';
 import tab from '@/app/tabbed-ui/tabs/about';
 import { Settings } from '@/app/components/SettingsContext';
 
@@ -330,11 +330,15 @@ export const translationTable: RecursiveReadonly<TranslationTable> = {
 
     loader_filesystem_description: {
         en: ()=> <>
-            Select the root folder of your project. If it&rsquo;s not already set up for a Fomod, we&rsquo;ll handle that for you.
-            <br/>
-            If it is already set up for a Fomod, there should be a <code>fomod</code> folder.
-            <br />
-            Note that this is a very new and shiny technique. If you run into issues, you may either need to update your browser or try a different method.
+            <p>
+                Select the root folder of your project. If it&rsquo;s not already set up for a Fomod, we&rsquo;ll handle that for you.
+            </p>
+            <p>
+                If it is already set up for a Fomod, there should be a <code>fomod</code> folder.
+            </p>
+            <p>
+                Note that this is a very new and shiny technique. If you run into issues, you may either need to update your browser or try a different method.
+            </p>
         </>,
     },
 

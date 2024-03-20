@@ -5,7 +5,7 @@ import styles from './MetadataFlex.module.scss';
 import DynamicWidthInput from '@/app/components/dynamic-width-input';
 import React from 'react';
 import { useFomod } from '@/app/loaders';
-import { produce } from 'immer';
+import { produce } from '@/immer';
 import { FomodInfo } from 'fomod';
 import EntangledNameEditor from '../../fomod-parts/EntangledNameEditor';
 

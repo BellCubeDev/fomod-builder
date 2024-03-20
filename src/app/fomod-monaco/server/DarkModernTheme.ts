@@ -4,13 +4,17 @@ import type {editor} from 'monaco-editor';
 async function getReleaseVersion() {
     // get redirect URL
 
-    const releaseData = await fetch('https://api.github.com/repos/microsoft/vscode/releases/latest').then(res => res.json()).catch(() => null);
+    const releaseData = await fetch('https://api.github.com/repos/microsoft/vscode/releases/latest').then(res => res.json()).catch(() => {});
+    if (process.env.mock_releases_latest_tag_name) Object.assign(releaseData, {tag_name: process.env.mock_releases_latest_tag_name});
     //console.log('releaseData', releaseData);
-    if (!releaseData || !('tag_name' in releaseData) ) throw new Error('Failed to get latest VS Code release from GitHub');
+    if (!('tag_name' in releaseData) )
+        throw new Error('Failed to get latest VS Code release from GitHub');
 
-    const tagData = await fetch (`https://api.github.com/repos/microsoft/vscode/git/ref/tags/${encodeURI(releaseData.tag_name)}`).then(res => res.json()).catch(() => null);
+    const tagData = await fetch (`https://api.github.com/repos/microsoft/vscode/git/ref/tags/${encodeURI(releaseData.tag_name)}`).then(res => res.json()).catch(() => {});
+    if (process.env.mock_git_ref_tags_sha) Object.assign(tagData, {object: {sha: process.env.mock_git_ref_tags_sha}});
     //console.log('tagData', tagData);
-    if (!tagData || !('object' in tagData) || typeof tagData.object !== 'object' || !('sha' in tagData.object) ) throw new Error('Failed to get release version');
+    if (!tagData || !('object' in tagData) || typeof tagData.object !== 'object' || !('sha' in tagData.object) )
+        throw new Error('Failed to get release version');
 
     return tagData.object.sha;
 }
@@ -86,7 +90,15 @@ export async function getDarkModernTheme() {
         fetch(`https://main.vscode-cdn.net/stable/${release}/extensions/theme-defaults/themes/dark_vs.json`),
         fetch(`https://main.vscode-cdn.net/stable/${release}/extensions/theme-defaults/themes/dark_plus.json`),
         fetch(`https://main.vscode-cdn.net/stable/${release}/extensions/theme-defaults/themes/dark_modern.json`),
-    ].map(p => p.then(res => res.json()))) as [RawTheme, RawTheme, RawTheme];
+    ].map(async p => p.then(res => res.text()).then(text => {
+        try {
+            return JSON.parse(text) as RawTheme;
+        } catch (err) {
+            console.error('Failed to parse theme', {err, text, release});
+            throw err;
+        }
+    }
+    ))) as [RawTheme, RawTheme, RawTheme];
 
     const darkModern = mergeObjects(mergeObjects(dark, darkPlusRaw), darkModernRaw) as RawTheme;
 

@@ -2,7 +2,7 @@
 
 import { useFomod } from '@/app/loaders';
 import BuilderStep from './step';
-import { Immutable, produce, Draft, castDraft } from 'immer';
+import { Immutable, produce, Draft, castDraft } from '@/immer';
 import { Fomod, Step, SortingOrder } from 'fomod';
 import React from 'react';
 import { useSettings, Settings, defaultSettings } from '@/app/components/SettingsContext';

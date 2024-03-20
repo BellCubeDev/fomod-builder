@@ -4,7 +4,7 @@ import React from "react";
 import { useSettings } from '@/app/components/SettingsContext';
 import { FomodLoader } from './LoaderBase';
 
-import { enableMapSet } from 'immer';
+import { enableMapSet, immer } from '@/immer';
 
 export * from './LoaderBase';
 
@@ -77,6 +77,7 @@ export function FomodLoaderProvider({ children }: { children: React.ReactNode })
     const [loader, setLoader] = React.useState<FomodLoader|null>(null);
 
     React.useEffect(() => {
+        immer.setAllowMultiRefs(true);
         enableMapSet();
     }, []);
 

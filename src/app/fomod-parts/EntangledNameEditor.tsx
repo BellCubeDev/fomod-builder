@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useFomod } from '@/app/loaders';
-import { produce } from 'immer';
+import { produce } from '@/immer';
 import { defaultSettings, useSettings } from '../components/SettingsContext';
 import ToggleSwitch from '../components/toggle-switch';
 import { T } from '../localization';
