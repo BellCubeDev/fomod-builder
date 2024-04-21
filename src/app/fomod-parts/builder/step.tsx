@@ -2,8 +2,8 @@
 
 import React from 'react';
 
-import { Immutable, Draft, castDraft } from '@/immer';
-import { Step, Group, SortingOrder, TypeDescriptor, TypeNameDescriptor, OptionType, Option, GroupBehaviorType } from 'fomod';
+import { Immutable, Draft, createDraft } from '@/immer';
+import { Step, Group, SortingOrder, GroupBehaviorType } from 'fomod';
 import { T } from '@/app/localization';
 import SortingOrderDropdown from './SortingOrderDropdown';
 import { useSettings, defaultSettings, Settings } from '@/app/components/SettingsContext';
@@ -52,7 +52,8 @@ export default function BuilderStep({step, edit}: {step: Immutable<Step<false>>,
 }
 
 export function createNewGroup(settings: Settings | null) {
-    const group = castDraft(new Group('', settings?.defaultGroupBehavior ?? GroupBehaviorType.SelectAny, settings?.defaultOptionSortingOrder ?? SortingOrder.Explicit));
+    const group = createDraft(new Group('', settings?.defaultGroupBehavior ?? GroupBehaviorType.SelectAny, settings?.defaultOptionSortingOrder ?? SortingOrder.Explicit));
+
     group.options.add(createNewOption(settings));
 
     return group;

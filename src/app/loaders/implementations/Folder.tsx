@@ -77,73 +77,83 @@ export default class FileSystemFolderLoader extends FomodLoader {
     // TODO: Come up with some clever way to notify the user when their Monaco-edited XML is invalid
 
     reloadInfoFromText(text: string): false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges> {
-        text ||= BlankInfoDoc;
-
-        let doc: Document;
-
         try {
-            doc = new DOMParser().parseFromString(text, 'application/xml');
-            if (doc.body?.firstElementChild?.tagName === 'parsererror' || doc.documentElement?.firstElementChild?.tagName === 'parsererror') return FomodLoadRejectReason.InvalidXML;
+                text ||= BlankInfoDoc;
+
+            let doc: Document;
+
+            try {
+                doc = new DOMParser().parseFromString(text, 'application/xml');
+                if (doc.body?.firstElementChild?.tagName === 'parsererror' || doc.documentElement?.firstElementChild?.tagName === 'parsererror') return FomodLoadRejectReason.InvalidXML;
+            } catch (e) {
+                if (e instanceof Error && e.name === 'SyntaxError') return FomodLoadRejectReason.InvalidXML;
+                else throw e;
+            }
+
+            let result = parseInfoDoc(doc, fomodParseConfig);
+            if (!result) {
+                if (doc.documentElement.getElementsByTagName(FomodInfo.tagName).length) return FomodLoadRejectReason.UnsalvageableInfoDoc;
+                result = new FomodInfo();
+                result.assignElement(getOrCreateElementByTagName(doc.documentElement, FomodInfo.tagName));
+            }
+
+            let asElement!: Element;
+            const immutableResult = produce(result, d => {
+                asElement = d.asElement(doc, fomodParseConfig);
+                return d;
+            });
+
+            this._info = immutableResult;
+            this._infoDoc = asElement.ownerDocument!;
+            this._infoText = asElement.outerHTML;
+
+            return false;
         } catch (e) {
-            if (e instanceof Error && e.name === 'SyntaxError') return FomodLoadRejectReason.InvalidXML;
-            else throw e;
+            console.error(e); // TODO: Show a notification to the user
+            return FomodLoadRejectReason.UnsalvageableInfoDoc;
         }
-
-        let result = parseInfoDoc(doc, fomodParseConfig);
-        if (!result) {
-            if (doc.documentElement.getElementsByTagName(FomodInfo.tagName).length) return FomodLoadRejectReason.UnsalvageableInfoDoc;
-            result = new FomodInfo();
-            result.assignElement(getOrCreateElementByTagName(doc.documentElement, FomodInfo.tagName));
-        }
-
-        let asElement!: Element;
-        const immutableResult = produce(result, d => {
-            asElement = d.asElement(doc, fomodParseConfig);
-            return d;
-        });
-
-        this._info = immutableResult;
-        this._infoDoc = asElement.ownerDocument!;
-        this._infoText = asElement.outerHTML;
-
-        return false;
     }
 
     reloadModuleFromText(text: string): false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges> {
-        text ||=  BlankModuleConfig;
-
-        let doc: Document;
-
         try {
-            doc = new DOMParser().parseFromString(text, 'application/xml');
-            if (doc.body?.firstElementChild?.tagName === 'parsererror' || doc.documentElement?.firstElementChild?.tagName === 'parsererror')
-                return FomodLoadRejectReason.InvalidXML;
+            text ||=  BlankModuleConfig;
+
+            let doc: Document;
+
+            try {
+                doc = new DOMParser().parseFromString(text, 'application/xml');
+                if (doc.body?.firstElementChild?.tagName === 'parsererror' || doc.documentElement?.firstElementChild?.tagName === 'parsererror')
+                    return FomodLoadRejectReason.InvalidXML;
+            } catch (e) {
+                if (e instanceof Error && e.name === 'SyntaxError') return FomodLoadRejectReason.InvalidXML;
+                else throw e;
+            }
+
+
+            let result = parseModuleDoc(doc, fomodParseConfig);
+            if (!result) {
+                if (doc.documentElement.getElementsByTagName(Fomod.tagName).length) return FomodLoadRejectReason.UnsalvageableModuleDoc;
+                result = new Fomod();
+                result.assignElement(getOrCreateElementByTagName(doc.documentElement, Fomod.tagName));
+            }
+
+            reorganizeInstalls(result);
+
+            let asElement!: Element;
+            const immutableResult = produce(result, d => {
+                asElement = d.asElement(doc, fomodParseConfig);
+                return d;
+            });
+
+            this._module = immutableResult;
+            this._moduleDoc = asElement.ownerDocument!;
+            this._moduleText = this.formatXMLForEditing(asElement.outerHTML);
+
+            return false;
         } catch (e) {
-            if (e instanceof Error && e.name === 'SyntaxError') return FomodLoadRejectReason.InvalidXML;
-            else throw e;
+            console.error(e); // TODO: Show a notification to the user
+            return FomodLoadRejectReason.UnsalvageableModuleDoc;
         }
-
-
-        let result = parseModuleDoc(doc, fomodParseConfig);
-        if (!result) {
-            if (doc.documentElement.getElementsByTagName(Fomod.tagName).length) return FomodLoadRejectReason.UnsalvageableModuleDoc;
-            result = new Fomod();
-            result.assignElement(getOrCreateElementByTagName(doc.documentElement, Fomod.tagName));
-        }
-
-        reorganizeInstalls(result);
-
-        let asElement!: Element;
-        const immutableResult = produce(result, d => {
-            asElement = d.asElement(doc, fomodParseConfig);
-            return d;
-        });
-
-        this._module = immutableResult;
-        this._moduleDoc = asElement.ownerDocument!;
-        this._moduleText = this.formatXMLForEditing(asElement.outerHTML);
-
-        return false;
     }
 
     async save(): Promise<false | Exclude<FomodSaveRejectReason, FomodSaveRejectReason.NoLoader> > {

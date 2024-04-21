@@ -33,6 +33,7 @@ npm run dev
 
 # TODO
 * Migrate `edit` functions to simply transform; do not use Immer's `produce()` function so we can benefit from multi-ref editing
+* Add duplication options to all places with `n` children
 
 ### Needs Styling
 * Option Editor

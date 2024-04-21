@@ -5,7 +5,9 @@ import { Immer, Draft, Immutable, enableMapSet } from "immer";
 export { Immer, original, current, isDraft, isDraftable, nothing, immerable, freeze, enableMapSet } from "immer";
 export type { Draft, Immutable } from "immer";
 
-export const immer = new Immer();
+export const immer = new Immer({
+	allowMultiRefs: true,
+});
 
 immer.setAllowMultiRefs(true);
 enableMapSet();
@@ -29,7 +31,10 @@ enableMapSet();
  * @param {Function} patchListener - optional function that will be called with all the patches produced here
  * @returns {any} a new state, or the initial state if nothing was modified
  */
-export const produce: typeof immer.produce = immer.produce;
+export const produce: typeof immer.produce = ((...args: Parameters<typeof immer.produce>) => {
+	console.log('produce() called with', args);
+	return immer.produce(...args);
+}) as any;
 
 /**
  * Pass true to automatically freeze all copies created by Immer.

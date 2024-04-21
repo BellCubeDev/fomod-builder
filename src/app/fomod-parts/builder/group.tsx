@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { Immutable, Draft, castDraft } from '@/immer';
+import { Immutable, Draft, createDraft } from '@/immer';
 import { Group, Option, OptionType, TypeDescriptor, TypeNameDescriptor, GroupBehaviorType, TagName } from 'fomod';
 import { T } from '@/app/localization';
 import SortingOrderDropdown from './SortingOrderDropdown';
@@ -35,6 +35,8 @@ export default function BuilderGroup({group, edit}: {group: Immutable<Group<fals
         edit(draft => { draft.behaviorType = resolvedBehaviorType; });
     }, [edit, group.behaviorType, settings?.defaultGroupBehavior]);
 
+    console.log(group);
+
     return <>
         <HeaderLikeInput value={group.name} noValue={<T tkey='group_header' params={[group.name]} />} onChange={editName} className={styles.stepName} />
 
@@ -64,7 +66,7 @@ export default function BuilderGroup({group, edit}: {group: Immutable<Group<fals
 
 export function createNewOption(settings: Settings | null) {
     const typeDescriptor = new TypeDescriptor(new TypeNameDescriptor(TagName.Type, settings?.defaultOptionType ?? OptionType.Optional, false));
-    return castDraft(new Option('', '', '', typeDescriptor));
+    return createDraft(new Option('', '', '', typeDescriptor));
 }
 
 import Dropdown from '@/app/components/dropdown';

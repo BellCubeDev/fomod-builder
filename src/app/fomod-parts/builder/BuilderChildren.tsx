@@ -1,13 +1,12 @@
 'use client';
 
 import React from 'react';
-import { Draft, produce, freeze, current, isDraft } from '@/immer';
+import { Draft } from '@/immer';
 import { T } from '../../localization/index';
 import ScaleInDiv from './ScaleInDiv';
 import DeleteButton from '@/app/components/DeleteButton';
 import styles from './builder.module.scss';
 import { editSetByIndex } from '@/SetUtils';
-import { resolveRecursiveDrafts } from '@/SetUtils';
 import { useFomod } from '../../loaders/index';
 import { XmlRepresentation } from 'fomod/dist/definitions/lib/XmlRepresentation';
 
@@ -24,7 +23,7 @@ function tryCallingEdit(f: () => unknown) {
     try {
         return f();
     } catch (e) {
-        console.error('Error while calling the edit function provided by the parent element', e);
+        console.error('Error while calling the edit() function provided by the parent element', e);
         throw e;
     }
 }
@@ -48,9 +47,7 @@ export default function BuilderChildren<
     const addChild = React.useCallback(() => {
         tryCallingEdit(()=> edit(draft => {
             const set = draft[childKey] as TrueDraft<Set<TChildInstance>>;
-
             set.add(createChildClass());
-            resolveRecursiveDrafts(set);
         }));
     }, [createChildClass, childKey, edit]);
 
@@ -69,7 +66,8 @@ export default function BuilderChildren<
             const thisChild = Array.from(set.values())[i];
             if (!thisChild) throw new Error(`Tried to edit child (${type}) ${i} in a ${set.size}-item set`);
 
-            editSetByIndex(set, i, tryMutation(()=> produce(thisChild, recipe) ));
+            const result = tryMutation(recipe.bind(null, thisChild)) || thisChild;
+            editSetByIndex(set, i, result);
         }));
     };
 
@@ -102,8 +100,6 @@ export default function BuilderChildren<
                     thisChild.getElementForDocument?.(loader.infoDoc)?.remove();
                 }
             }
-
-            resolveRecursiveDrafts(set);
         }));
     };
 
