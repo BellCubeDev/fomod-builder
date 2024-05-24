@@ -192,7 +192,10 @@ export default class FileSystemFolderLoader extends FomodLoader {
     static override readonly Name = 'loader_filesystem' satisfies keyof TranslationTableKeys;
 
     static override async LoaderUIClickEvent(eventTarget: FomodEventTarget, e: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<[false, FileSystemFolderLoader] | [Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges>]> {
-        let folder = await window.showDirectoryPicker().catch((e) => e instanceof DOMException && e.name === 'AbortError' ? null : Promise.reject(e));
+        let folder = await window.showDirectoryPicker({
+            id: 'fomod_builder_project_0d7b14zge4',
+            mode: 'readwrite',
+        }).catch((e) => e instanceof DOMException && e.name === 'AbortError' ? null : Promise.reject(e));
         if (!folder) return [FomodLoadRejectReason.NoFolderSelected];
 
         const loader = new FileSystemFolderLoader(eventTarget, folder);
