@@ -1,44 +1,99 @@
+'use client';
+
 import React from 'react';
 import styles from './DynamicWidthInput.module.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFileImport, faHashtag, faSearch } from '@fortawesome/free-solid-svg-icons';
 
-export default function DynamicWidthInput({ value, onChange, className, ...props }: {onChange: (value: string, event: React.ChangeEvent<HTMLInputElement>) => unknown} & Omit<React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, 'ref'|'onChange'>) {
+export default function DynamicWidthInput({ value, onChange, className, doFancyWidth = false, onClickFilePicker, ...props }:
+    {
+        /** If enabled, will extend some when hovered and further when focused */
+        doFancyWidth?: boolean,
+        /** If provided, will show a file picker button. When this button is clicked, this event is fired.  */
+        onClickFilePicker?: React.MouseEventHandler<HTMLButtonElement>,
+        /** Event fired when the value changes (handles both input and change events) */
+        onChange: (value: string, event: React.ChangeEvent<HTMLInputElement>) => unknown
+    } & Omit<React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, 'ref'|'onChange'>
+) {
+
+    const [wasLastUpdateForced, forceUpdate] = React.useReducer((x) => !x, false);
+    const [,eventBasedRerender] = React.useReducer((x) => !x, false);
+
     const inputRef = React.useRef<HTMLInputElement>(null);
+    value ??= inputRef.current?.value;
 
     const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         onChange(e.target.value, e);
     }, [onChange]);
 
-    const oldWidthStore = React.useRef(0);
-
-    const hadOffsetParentLastRenderRef = React.useRef(false);
-    const [hasOffsetParent, setHasOffsetParent] = React.useState(false);
-
     const widthShare = useWidthSharing();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- it doesn't understand my GRAND PLAN 👿 Mwuahhahaha!
     const widthShareIndex = React.useMemo(() => widthShare?.fetchIndex() ?? 0, [widthShare?.indexMap]);
 
+    const oldWidthStore = React.useRef(widthShare?.width ?? 0);
+    const oldWidthPaddingStore = React.useRef('0px');
+
+    const hadOffsetParentLastRenderRef = React.useRef(false);
+    const [hasOffsetParent, setHasOffsetParent] = React.useState(false);
+
+    const hasFocus = doFancyWidth && !!(inputRef.current && inputRef.current.matches(':focus, :focus-within'));
+    const hasHover = doFancyWidth && !!(inputRef.current && inputRef.current.matches(':hover'));
+
+
+
+
+
     React.useEffect(() => {
         const el = inputRef.current;
-        if (!el) return;
+        if (!el){
+            if (wasLastUpdateForced) return;
+            else return forceUpdate();
+        }
 
         const keydownPropStopper = (e: KeyboardEvent) => {
             e.stopPropagation();
         };
 
         el.addEventListener('keydown', keydownPropStopper);
-        return ()=> { el.removeEventListener('keydown', keydownPropStopper); };
-    }, [inputRef]);
+
+
+
+        const rerenderOnEvent = () => {
+            eventBasedRerender();
+        };
+
+        el.addEventListener('focus', rerenderOnEvent);
+        el.addEventListener('blur', rerenderOnEvent);
+
+        el.addEventListener('mouseenter', rerenderOnEvent);
+        el.addEventListener('mouseleave', rerenderOnEvent);
+
+        return ()=> {
+            el.removeEventListener('keydown', keydownPropStopper);
+
+            el.removeEventListener('focus', rerenderOnEvent);
+            el.removeEventListener('blur', rerenderOnEvent);
+
+            el.removeEventListener('mouseenter', rerenderOnEvent);
+            el.removeEventListener('mouseleave', rerenderOnEvent);
+        };
+    }, [inputRef, wasLastUpdateForced]);
+
+
+
+
 
     React.useEffect(() => {
         const input = inputRef.current;
-        if (!input || !hasOffsetParent) {
+        if (!input || (!widthShare?.width && !hasOffsetParent)) {
             hadOffsetParentLastRenderRef.current = false;
-            return;
+            if (wasLastUpdateForced) return;
+            else return forceUpdate();
         }
 
         input.style.width = '0';
         input.style.transitionProperty = 'none';
-        window.getComputedStyle(input);
+        const computedStyle = window.getComputedStyle(input);
 
         widthShare?.submitWidth(input.scrollWidth, widthShareIndex);
         const newWidth = widthShare?.width || input.scrollWidth;
@@ -46,31 +101,61 @@ export default function DynamicWidthInput({ value, onChange, className, ...props
         const hadOffsetParent = hadOffsetParentLastRenderRef.current;
         hadOffsetParentLastRenderRef.current = true;
 
-        if (!hadOffsetParent) {
-            input.style.width =  `calc(${newWidth}px + 1ch)`;
+        const oldWidthPadding = oldWidthPaddingStore.current;
+        const widthPadding = hasFocus ? `max(${computedStyle.getPropertyValue('--width-padding')}, 1ch)` : hasHover ? `max((calc(${computedStyle.getPropertyValue('--width-padding')} * 2/3)), 1ch)` : `1ch`;
+
+        const newValue = `calc(${newWidth}px + ${widthPadding})`;
+        const oldValue = oldWidthStore.current ? `calc(${oldWidthStore.current}px + ${oldWidthPadding})` : '';
+
+        if (!hadOffsetParent || wasLastUpdateForced) {
+            input.style.width = newValue;
             input.style.padding = '';
-            input.style.transitionProperty = '';
-            window.getComputedStyle(input);
-            oldWidthStore.current = newWidth;
-        } else {
-            input.style.width = oldWidthStore.current ? `calc(${oldWidthStore.current}px + 1ch)` : '';
-            input.style.padding = '';
-            window.getComputedStyle(input);
-            oldWidthStore.current = newWidth;
-            requestAnimationFrame(() => requestAnimationFrame(() =>{
+
+            requestAnimationFrame(() => requestAnimationFrame(() =>{ // have to let it realize that changes actually happened before we can animate them
                 input.style.transitionProperty = '';
-                requestAnimationFrame(() => requestAnimationFrame(() =>{
-                    input.style.width = `calc(${newWidth}px + 1ch)`;
-                    input.style.transitionProperty = '';
-                }));
+            }));
+
+            oldWidthStore.current = newWidth;
+            oldWidthPaddingStore.current = widthPadding;
+        } else {
+            input.style.width = oldValue;
+            input.style.padding = '';
+
+            window.getComputedStyle(input);
+            oldWidthStore.current = newWidth;
+            oldWidthPaddingStore.current = widthPadding;
+
+            requestAnimationFrame(() => requestAnimationFrame(() =>{ // have to let it realize that changes actually happened before we can animate them
+                input.style.transitionProperty = '';
+                input.style.width = newValue;
+                input.style.transitionProperty = '';
             }));
         }
-    }, [value, inputRef, oldWidthStore, hasOffsetParent, hadOffsetParentLastRenderRef, widthShare, widthShareIndex]);
+    }, [value, inputRef, hasFocus, hasHover, oldWidthStore, oldWidthPaddingStore, hasOffsetParent, hadOffsetParentLastRenderRef, widthShare, widthShareIndex, wasLastUpdateForced]);
 
     const hasOffsetParentThisRender = !!inputRef.current?.offsetParent || !!inputRef.current?.parentElement?.offsetParent;
     if (hasOffsetParentThisRender !== hasOffsetParent) setHasOffsetParent(hasOffsetParentThisRender);
 
-    return <input type="text" {...props} value={value} className={`${className} ${styles.input}`} onInput={handleChange} onChange={handleChange} ref={inputRef} />;
+    const onClickFileClickerWithBlur = !onClickFilePicker ? undefined : React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+        e.currentTarget.blur();
+        onClickFilePicker(e);
+    }, [onClickFilePicker]);
+
+    return <div className={styles.wrapper}>
+        <input type="text" {...props} value={value} className={`${className} ${styles.input}`} onInput={handleChange} onChange={handleChange} ref={inputRef} />
+        {(()=>{
+            if (!props.type || props.type === 'text') return <></>;
+
+            switch (props.type) {
+                case 'search': return <FontAwesomeIcon icon={faSearch} className={styles.icon} />;
+                case 'number': return <FontAwesomeIcon icon={faHashtag} className={styles.icon} />;
+                default: return <></>;
+            }
+        })()}
+        {onClickFilePicker && <button type="button" className={styles.filePickerButton} onClick={onClickFileClickerWithBlur}>
+            <FontAwesomeIcon icon={faFileImport} className={styles.icon} />
+        </button>}
+    </div>;
 }
 
 

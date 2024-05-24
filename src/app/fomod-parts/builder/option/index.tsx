@@ -11,6 +11,9 @@ import { useTranslate } from '../../../localization/index';
 import DynamicImageDisplay from '../../DynamicImageDisplay';
 import HeaderLikeInput from '@/app/components/header-like-input/index';
 import BuilderChildren from '../BuilderChildren';
+import Dropdown from '@/app/components/dropdown/index';
+import DynamicWidthInput from '@/app/components/dynamic-width-input';
+import { useFomod } from '@/app/loaders';
 
 export default function BuilderOption({option, edit}: {option: Immutable<Option<false>>, edit: (recipe: (draft: Draft<Option<false>>) => Draft<Option<false>> | undefined | void) => void}) {
     const settings = useSettings();
@@ -35,16 +38,34 @@ export default function BuilderOption({option, edit}: {option: Immutable<Option<
         });
     }, [edit]);
 
+    const [isPickingImage, setIsPickingImage] = React.useState(false);
+    const pickImageFile = React.useCallback(async () => {
+        setIsPickingImage(true);
+        try {
+            const file = await loader?.pickFile();
+            if (file) {
+                const [path] = file;
+                editImage(path);
+            }
+        } finally {
+            setIsPickingImage(false);
+        }
+    }, []);
+
+
     const optionFlagName = loader?.moduleDoc ? option.existingOptionFlagSetterByDocument.get(loader.moduleDoc)?.name : undefined;
 
-    return <div>
-        <div>
-            <HeaderLikeInput value={option.name} noValue={<T tkey='option_header' params={[option.name]} />} onChange={editName} className={styles.stepName} />
-            <textarea className={styles.optionDescription} value={option.description} onChange={editDescription} placeholder={useTranslate('option_description_placeholder', option)} />
+    return <div className={styles.optionBody}>
+        <HeaderLikeInput value={option.name} noValue={<T tkey='option_header' params={[option.name]} />} onChange={editName} className={styles.stepName} />
+        <div className={styles.optionImageInputAndDisplay}>
+            <DynamicImageDisplay className={styles.optionImage} path={option.image} alt={useTranslate('option_image_alt', option)} />
+            <DynamicWidthInput className={styles.imageInput} value={option.image || ''} onChange={editImage} onClickFilePicker={pickImageFile} placeholder={useTranslate('option_image_placeholder', option)} />
+            <div>
+                Name of option flag: {optionFlagName}
+            </div>
         </div>
         <div>
-            <DynamicImageDisplay path={option.image} alt={useTranslate('option_image_alt', option)} />
-            <DynamicWidthInput value={option.image || ''} onChange={editImage} placeholder={useTranslate('option_image_placeholder', option)} />
+            <textarea className={styles.optionDescription} value={option.description} onChange={editDescription} placeholder={useTranslate('option_description_placeholder', option)}  />
         </div>
         <div>
             <BuilderChildren
@@ -55,13 +76,9 @@ export default function BuilderOption({option, edit}: {option: Immutable<Option<
                 createChildClass={createNewFlag.bind(null, settings)}
                 className={styles.flagWrapper}
                 showAll={true}
-
             >
                 {option.flagsToSet}
             </BuilderChildren>
-        </div>
-        <div>
-            Name of option flag: {optionFlagName}
         </div>
     </div>;
 }
@@ -91,10 +108,6 @@ export function BuilderFlag({flag, edit}: {flag: Immutable<FlagSetter>, edit: (r
         ]}/>
     </div>;
 }
-
-import Dropdown from '@/app/components/dropdown/index';
-import DynamicWidthInput from '@/app/components/dynamic-width-input';
-import { useFomod } from '@/app/loaders';
 
 export const OptionBehaviorTypes = Object.values(OptionType).reverse() as OptionType[];
 

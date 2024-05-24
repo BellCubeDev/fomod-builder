@@ -1,7 +1,9 @@
 .dropdown {
     color: #fff;
     width: max-content;
-    min-width: 400px;
+    min-width: 15rem;
+
+    font-size: 1rem; // make whole dropdown use rem now
 }
 
 .container {
@@ -9,8 +11,8 @@
 }
 
 .control {
-    background: #282828;
-    border-radius: 6px;
+    background: #181818;
+    border-radius: .25rem;
 }
 
 .dropdownIndicator {
@@ -27,7 +29,7 @@
 
 .indicatorsContainer {
     color: #fff;
-    padding: 0 16px;
+    padding: 0 8px;
 }
 
 .indicatorSeparator {
@@ -36,16 +38,16 @@
 
 .input {
     color: #fff;
-    padding: 14px;
+    padding: .8rem;
 }
 
 .menu {
     color: #fff;
-    background: #181818;
-    border-radius: 8px;
+    background: #111;
+    border-radius: .3rem;
     overflow: clip;
-    border: 2px solid #383838;
-    margin-top: 4px;
+    border: .15rem solid #222;
+    margin-top: .4rem;
 }
 
 .menuList {
@@ -58,10 +60,10 @@
 
 .option {
     color: #fff;
-    padding: 16px;
+    padding: .8rem;
 
     &--focused {
-        background: #282828;
+        background: #181818;
 
     }
 
@@ -74,17 +76,13 @@
     }
 }
 
-.placeholder {
-    color: #fff;
+.placeholder, .singleValue {
+    color: #fff !important;
+    padding: .8rem;
 }
 
-.singleValue {
-    color: #fff !important;
-    padding: 10px 16px;
-
-    &:has(+.input > [aria-expanded="true"]) {
-        color: #888 !important;
-    }
+.placeholder, .singleValue:has(+.input > [aria-expanded="true"]) {
+    color: #888 !important;
 }
 
 .valueContainer {

@@ -61,6 +61,22 @@ export default class FileSystemFolderLoader extends FomodLoader {
         else return null;
     }
 
+    async pickFile(): Promise<[path: string, file: File, extraData: BCDFile] | null> {
+        try {
+            const fileHandle = await window.showOpenFilePicker({
+                startIn: this.folder.handle,
+                multiple: false,
+                id: 'fomod_builder_d66687d6556542b99e',
+            });
+            const file = new BCDFile(fileHandle[0]);
+            const pathParts = await this.folder.handle.resolve(file.handle);
+            return [!pathParts ? 'ERROR: Outside of project root' : BCDFileSystemObjectBase.normalizePath(pathParts.join('/')), await file.handle.getFile(), file];
+        } catch (e) {
+            if (e instanceof DOMException && e.name === 'AbortError') return null;
+            else throw e;
+        }
+    }
+
     reloadFromText(text: string, info?: boolean | undefined): false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges> {
         let result;
 
@@ -220,6 +236,10 @@ abstract class BCDFileSystemObjectBase {
         this.thisIsExplicitlyWritable = permissionRequestResult;
         return permissionRequestResult ;
     }
+
+    static normalizePath(pathString: string): string {
+        return path.normalize(pathString).replace(/\\/g, '/');
+    }
 }
 
 export class ExpectedFolderInMiddleOfPathError extends Error {
@@ -261,9 +281,14 @@ export class BCDFolder extends BCDFileSystemObjectBase {
         }
     }
 
-    async getBypath(relativePath: string, create?: false): Promise<BCDFileSystemObject | null>
-    async getBypath(relativePath: string, create: true): Promise<BCDFileSystemObject>
-    async getBypath(relativePath: string, create = false): Promise<BCDFileSystemObject | null> {
+    public getBypath(relativePath: string, create?: false): Promise<BCDFileSystemObject | null>
+    public getBypath(relativePath: string, create: true): Promise<BCDFileSystemObject>
+    public getBypath(relativePath: string, create = false): Promise<BCDFileSystemObject | null> {
+        relativePath = BCDFileSystemObjectBase.normalizePath(relativePath);
+        return this.getByNormalizedPath(relativePath, create);
+    }
+
+    private async getByNormalizedPath(relativePath: string, create: boolean): Promise<BCDFileSystemObject | null> {
         const parsed = path.parse(path.normalize(relativePath));
 
         if (!parsed.dir) return await this.getDirectChild(parsed.base, create);

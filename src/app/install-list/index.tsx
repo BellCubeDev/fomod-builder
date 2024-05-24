@@ -4,7 +4,7 @@ import { useFomod } from '../loaders';
 import React from 'react';
 import { Install, InstallInstancesByDocument, InstallPattern } from 'fomod';
 import { castDraft, current, produce } from '@/immer';
-import { FomodFileExplorer } from './files';
+//import { FomodFileExplorer } from './files';
 
 export default function InstallList() {
     const {loader, eventTarget} = useFomod();
@@ -29,9 +29,13 @@ export default function InstallList() {
 
     if (!loader) return null;
 
+    //return <>
+    //    <FomodFileExplorer installs={Array.from(loader.module?.installs ?? []).filter(i => i instanceof Install) as Install<false>[]} edit={installs => {
+    //        console.log('edit() was called on a Fomod file list', installs);
+    //    }}/>
+    //</>;
+
     return <>
-        <FomodFileExplorer installs={Array.from(loader.module?.installs ?? []).filter(i => i instanceof Install) as Install<false>[]} edit={installs => {
-            console.log('edit() was called on a Fomod file list', installs);
-        }}/>
-    </>;
+        Pardon our dust! The installs tab is a WIP.
+    </>
 }

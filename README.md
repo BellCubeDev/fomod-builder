@@ -100,8 +100,17 @@ npm run dev
 TODO: Actually make this a real thing
 Use the [test installer](https://fomod.bellcube.dev/test-installer.zip) to discover the mod manager's behavior.
 
-### Tools To Evaluate For Cool Features To ~~Steal~~ Take Inspiration From
+### Tools To Evaluate For Cool Features To ~~Cannibalize~~ Take Inspiration/Learn From
 * [X] [Fomod Creation Tool](https://www.nexusmods.com/fallout4/mods/6821)
-* [ ] [Fomod Creator](https://www.nexusmods.com/fallout4/mods/14679)
 * [ ] [Fomod Designer](https://github.com/GandaG/fomod-designer)
-* [ ] [Kortex's Fomod Module (?)](https://www.nexusmods.com/skyrim/mods/90868)
+  * Appears to be a glorified XML editor. More research is needed.
+* [ ] [Fomod Creator](https://www.nexusmods.com/fallout4/mods/14679)
+  * Appears to be an XML editor with dark mode and a usable UI. More research is needed.
+* [ ] [Kortex's Fomod Module / "Package creator"](https://www.nexusmods.com/skyrim/mods/90868)
+  * Appears similar to Fomod Designer only with unofficial names everywhere.
+* [ ] [PrettyFOMOD](https://github.com/aglowinthefield/PrettyFOMOD)
+  * From looking at the readme, it seems to just create a Fomod to install ESPs based on their deps. If this is the case, we could just write an "auto-generate" feature that does a similar thing. Would need to walk the folder and then parse the plugins but that's easy.
+
+
+## Cool Ideas for Later
+* Open the fomod from any Nexus mod? (would require an API key, 7z-wasm, and to be in the Electron app)

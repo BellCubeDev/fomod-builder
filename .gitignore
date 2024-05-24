@@ -1,5 +1,6 @@
 src/nexus-api/GraphQL.ts
 *.reference.*
+*.test.xml
 
 # Ignore for search's benefit
 src/external/xml.js

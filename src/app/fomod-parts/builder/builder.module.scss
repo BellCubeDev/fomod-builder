@@ -267,20 +267,26 @@
 .optionDescription {
     @extend %input-base;
     overflow: scroll;
+    resize: vertical;
+    margin-bottom: 16px;
+    min-height: 4lh;
 }
 
 .builderBody {
     @include bodyStyling($step-inactive, $step-background);
 
     div:not([class]) {
-        width: 100%;
         overflow: hidden;
-        display: inline-block;
+        display: block;
+        width: 100%;
+        width: -webkit-fill-available;
     }
 
     > .body {
         width: calc(100% - 32px);
     }
+
+    margin-bottom: 128px;
 }
 
 .groupWrapper {
@@ -323,4 +329,39 @@
 
 :has(> .flagToSet) {
     padding: 0 24px;
+}
+
+@media screen and (min-width: 1000px) {
+    .optionBody {
+    }
+
+    .optionImageInputAndDisplay {
+        //margin-left: 400px;
+        float: right;
+        width: 400px;
+        margin-bottom: 16px;
+    }
+
+}
+
+.optionImage {
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    min-height: 225px;
+    &:is(svg) {
+        height: 225px;
+    }
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.imageInput {
+    width: calc(100% - 24px) !important;
+}
+
+@media screen and (max-width: 1000px) {
+    .optionImageInputAndDisplay {
+        width: 320px;
+    }
 }

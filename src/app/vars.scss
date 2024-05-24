@@ -11,6 +11,7 @@ $mo2-blue: #3ebcee;
 
 %input-base {
     width: calc(100% - 40px);
+    max-width: -webkit-fill-available;
 
     background: #222;
     color: #e2e2e2;
@@ -26,7 +27,7 @@ $mo2-blue: #3ebcee;
     border-radius: 8px;
     outline: none;
 
-    &:active, &:focus {
+    &:active, &:focus, &:focus-within {
         border-color: $blue;
         color: #fff;
     }
@@ -46,4 +47,6 @@ $mo2-blue: #3ebcee;
     flex-direction: row;
     justify-content: flex-start;
     gap: 8px;
+    max-width: 100%;
+    max-width: -webkit-fill-available;
 }

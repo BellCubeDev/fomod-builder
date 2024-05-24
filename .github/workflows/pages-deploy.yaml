@@ -49,7 +49,7 @@ jobs:
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
 
       - name: Install dependencies
-        run: npm i
+        run: npm ci --legacy-peer-deps
 
       - name: Build with Next.js
         run: npm run build

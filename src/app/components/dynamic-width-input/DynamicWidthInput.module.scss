@@ -1,9 +1,11 @@
 @use '../../vars' as *;
 
-.input {
-    @extend %input-base;
+.wrapper {
+    position: relative;
+    width: max-content;
 
-    min-width: 128px;
+    @extend %input-base;
+    padding: 0;
 
     &:invalid {
         &[data-validation-warn] {
@@ -12,5 +14,92 @@
         &[data-validation-error] {
             border-color: red;
         }
+    }
+
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.input {
+
+    min-width: 256px;
+    max-width: -webkit-fill-available;
+
+    @extend %input-base;
+    border: none;
+
+    --width-padding: 2ch;
+
+    &:has(+ .icon) {
+        padding-left: 28px;
+    }
+
+    &[type='search'] {
+        padding-left: 32px;
+        padding-right: 12px;
+
+        &::-webkit-search-cancel-button {
+            position: relative;
+            right: -6px;
+
+            -webkit-appearance: none;
+            width: .7em;
+            height: 2em;
+            background: url(https://pro.fontawesome.com/releases/v5.10.0/svgs/solid/times.svg) no-repeat;
+            background-position: center;
+            background-size: contain;
+            filter: invert(1);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        &:focus::-webkit-search-cancel-button {
+            opacity: .9;
+            pointer-events: all;
+        }
+    }
+
+}
+
+.icon {
+    color: #aaa;
+
+    position: absolute;
+    top: 52%;
+
+    &:last-child:not(:only-child) {
+        right: 12px;
+        transform: translateY(-50%);
+    }
+
+    &:has(+ .filePickerButton) {
+        right: 12px + 32px;
+    }
+
+    &:only-child {
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
+
+.filePickerButton {
+    position: relative;
+    padding: 0;
+    width: 32px;
+
+    background: #1b1b1b;
+    border: none;
+    border-left: 2px solid #333;
+
+    &:hover, &:focus {
+        background: #242424;
+        outline: none;
+    }
+
+    &:active {
+        background: #282828;
     }
 }

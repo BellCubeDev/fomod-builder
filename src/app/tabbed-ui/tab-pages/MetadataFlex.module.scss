@@ -16,9 +16,15 @@
             padding-left: 16px;
             padding-right: 32px;
         }
+
+        max-width: 100%;
     }
 
     > label {
         flex-direction: column;
+    }
+
+    > * {
+        max-width: 100%;
     }
 }

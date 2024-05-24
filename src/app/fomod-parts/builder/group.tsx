@@ -35,8 +35,6 @@ export default function BuilderGroup({group, edit}: {group: Immutable<Group<fals
         edit(draft => { draft.behaviorType = resolvedBehaviorType; });
     }, [edit, group.behaviorType, settings?.defaultGroupBehavior]);
 
-    console.log(group);
-
     return <>
         <HeaderLikeInput value={group.name} noValue={<T tkey='group_header' params={[group.name]} />} onChange={editName} className={styles.stepName} />
 

@@ -56,6 +56,8 @@ export const fomodParseConfig: Required<FomodDocumentConfig> = {
 export abstract class FomodLoader {
     abstract getFileByPath(path: string): Promise<File|null>;
 
+    abstract pickFile(): Promise<[path: string, file: File, extraData: unknown]|null>;
+
     static CanUse: boolean;
     static FileSystemCapability: boolean;
 

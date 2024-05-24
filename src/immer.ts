@@ -32,7 +32,6 @@ enableMapSet();
  * @returns {any} a new state, or the initial state if nothing was modified
  */
 export const produce: typeof immer.produce = ((...args: Parameters<typeof immer.produce>) => {
-	console.log('produce() called with', args);
 	return immer.produce(...args);
 }) as any;
 

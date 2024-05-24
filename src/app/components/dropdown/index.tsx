@@ -11,7 +11,7 @@ export interface DropdownOption<T extends string> {
     value: T;
     label: string;
 }
-export default function Dropdown<T extends string>({options, value, onChange, className, ...props}: Omit<ParamsBase, 'className'|'value'|'options'|'onChange'|'classNames'|'unstyled'> & {className?: string, value: T, options: readonly DropdownOption<T>[], onChange: (value: T|null) => unknown}) {
+export default function Dropdown<T extends string>({options, value, onChange, placeholderTKey, className, ...props}: Omit<ParamsBase, 'className'|'value'|'options'|'onChange'|'classNames'|'unstyled'> & {className?: string, value: T, options: readonly DropdownOption<T>[], onChange: (value: T|null) => unknown, placeholderTKey?: keyof TranslationTableKeys}) {
     const ref = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
@@ -37,7 +37,7 @@ export default function Dropdown<T extends string>({options, value, onChange, cl
         captureMenuScroll={true}
         blurInputOnSelect={true}
         // eslint-disable-next-line react-hooks/rules-of-hooks
-        noOptionsMessage={()=>useTranslate('dropdown_no_options')}  loadingMessage={()=>useTranslate('dropdown_loading')}
+        noOptionsMessage={()=>useTranslate('dropdown_no_options')}  loadingMessage={()=>useTranslate('dropdown_loading')} placeholder={placeholderTKey ? useTranslate(placeholderTKey) : undefined}
         classNames={{
             container(props) { return styles.container!; },
             control(props) { return styles.control!; },

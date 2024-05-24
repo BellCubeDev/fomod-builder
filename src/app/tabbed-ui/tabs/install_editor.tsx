@@ -12,7 +12,6 @@ const tab: Tab = {
 
     Page() {
         return <>
-        Pardon our dust!
 
             <InstallList />
 
