@@ -18,7 +18,7 @@ type TabEntry<T extends TabName> = [T, (typeof tabs)[T]];
 
 const tabsForKeybinds = Object.entries(tabs) as TabEntry<TabName>[];
 
-export default function FomodBuilderTabbedUI({licenseInfo}: {licenseInfo: React.ReactNode}) {
+export default function FomodBuilderTabbedUI() {
     const settings = useSettings();
 
     const [, rerender_] = React.useState({});
@@ -131,7 +131,7 @@ export default function FomodBuilderTabbedUI({licenseInfo}: {licenseInfo: React.
                     }}
                     tabIndex={active ? 0 : -1}
                 >
-            {transitioningFrom || active || tab.alwaysRendered ? <tab.Page licenseInfo={licenseInfo} rerenderTabContainer={rerender} /> : null}
+            {transitioningFrom || active || tab.alwaysRendered ? <tab.Page rerenderTabContainer={rerender} /> : null}
         </div> ;
     });
 

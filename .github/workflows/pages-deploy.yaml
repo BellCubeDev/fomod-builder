@@ -25,16 +25,36 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      # ============================
+      #        Project Setup
+      # ============================
+
+      - name: Clone Repo
+        uses: actions/checkout@v4
         with:
-          node-version: "lts/*"
-          cache: npm
+          submodules: 'recursive'
+
+
+      - name: Set Up PNPM
+        uses: pnpm/action-setup@v4
+        with:
+            version: 9
+
+
+      - name: Set Up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*' # Next.js works better with LTS Node.js versions (I know because the current canary is throwing errors in v22.7.0 but not in v20.17.0)
+          cache: 'pnpm'
+
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # =============================
+      #    Workflow-Specific Stuff
+      # =============================
 
       - name: Setup Pages
         uses: actions/configure-pages@v3
@@ -48,11 +68,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
 
-      - name: Install dependencies
-        run: npm ci --legacy-peer-deps
-
       - name: Build with Next.js
-        run: npm run build
+        run: pnpm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1

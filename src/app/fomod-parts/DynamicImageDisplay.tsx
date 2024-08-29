@@ -4,16 +4,6 @@ import { useFomod } from '../loaders/index';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage } from "@fortawesome/free-solid-svg-icons";
 
-function fileToDataURI(file: File) {
-    return new Promise<string>(resolve => {
-        const reader = new FileReader();
-        reader.addEventListener('loadend', () => {
-            resolve(reader.result as string);
-        });
-        reader.readAsDataURL(file);
-    });
-}
-
 export default function DynamicImageDisplay({ path, ...props }: {path: string | null, alt: string} & Omit<React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement & SVGSVGElement>, HTMLImageElement & SVGSVGElement>, 'src'>) {
     const {loader} = useFomod();
     const [src, setSrc] = React.useState<string>('');

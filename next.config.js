@@ -28,14 +28,14 @@ const nextConfig = {
                 }
             },
         },
-        esmExternals: 'loose',
+        //esmExternals: 'loose',
     },
 
     staticPageGenerationTimeout: 600,
 
     transpilePackages: ['fomod'],
 
-    trailingSlash: true,
+    trailingSlash: false,
 
     output: 'export',
 

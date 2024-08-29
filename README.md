@@ -46,7 +46,7 @@ npm run dev
 * [X] **Step/Group/Option Editing**
   * [ ] Style the Option editor better
   * [ ] (for Folder Loader) autocomplete image paths (assume any file can be an image but prioritize Chromium-supported file extensions)
-* [ ] Blank loader - Load a completely blank installer. Used for playing around with the tool.
+* [X] Blank loader - Load a completely blank installer. Used for playing around with the tool.
 * [ ] **File/Folder Installation Tab** - edit both conditional and "required" installs
   * Note: don't try to render the conditions until the condition editor component is created
   * [ ] Button to merge duplicate condition trees
@@ -66,7 +66,7 @@ npm run dev
   * [ ] Add to the Metadata tab for installer prerequisites (include a big disclaimer that this shouldn't be used to enforce mod-to-mod or mod-to-self dependencies because this leads to awful installation UX)
   * [ ] Add to Installation tab
 * [ ] **Text Input loader** - paste your XML in. Should show two basic code font textareas (not Monaco editors) and a button to continue into loading. Saving will require downloading files and saving them manually.
-* [ ] **Single-File Input Loader** - use HTML `<input>` elements to get *Info.xml* and *ModuleConfig.xml*. Saving will require downloading files and saving them manually as a limitation of the API.
+* [X] **Single-File Input Loader** - use HTML `<input>` elements to get *Info.xml* and *ModuleConfig.xml*. Saving will require downloading files and saving them manually as a limitation of the API.
 * [ ] **Collapsing Side Navigation** - show users tab names by default and collapse the sidebar at their request
 * [ ] **Universal Mod Manager Implementation Testing** - create a fomod installer w/ integrated instructions with the goal of probing all of the quirks from a mod manager. A user should be able to follow the instructions, provide a screen capture, and send an archive to provide all of the possibly-desired information about a mod manager.
 * [ ] Create some sort of system to let users know about bad practices / anti-patterns not strictly related to the installer
@@ -94,6 +94,7 @@ npm run dev
 
 ### Potential Warnings
 * Using an ESP module at all. ESM/L modules are preferred as they are handled more gracefully by the game engine.
+  * Should parse the plugin for ESP to see if it actually has the master flag set before warning, if possible with the loader.
 * Importing more 3 or more files from a single folder in an option. Encourage using folders instead for maintainability.
 
 ### Testing New Mod Managers for Admittance
@@ -113,4 +114,4 @@ Use the [test installer](https://fomod.bellcube.dev/test-installer.zip) to disco
 
 
 ## Cool Ideas for Later
-* Open the fomod from any Nexus mod? (would require an API key, 7z-wasm, and to be in the Electron app)
+* Open the fomod from any Nexus mod? (would require an API key, 7z-wasm, and to be in the Electron app because of the current API's CORS limitations)

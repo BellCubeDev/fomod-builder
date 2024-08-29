@@ -4,6 +4,7 @@ import React from 'react';
 import styles from './DynamicWidthInput.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileImport, faHashtag, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { useFomod } from '@/app/loaders';
 
 export default function DynamicWidthInput({ value, onChange, className, doFancyWidth = false, onClickFilePicker, ...props }:
     {
@@ -15,6 +16,7 @@ export default function DynamicWidthInput({ value, onChange, className, doFancyW
         onChange: (value: string, event: React.ChangeEvent<HTMLInputElement>) => unknown
     } & Omit<React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, 'ref'|'onChange'>
 ) {
+    const fomod = useFomod();
 
     const [wasLastUpdateForced, forceUpdate] = React.useReducer((x) => !x, false);
     const [,eventBasedRerender] = React.useReducer((x) => !x, false);
@@ -152,7 +154,7 @@ export default function DynamicWidthInput({ value, onChange, className, doFancyW
                 default: return <></>;
             }
         })()}
-        {onClickFilePicker && <button type="button" className={styles.filePickerButton} onClick={onClickFileClickerWithBlur}>
+        {(!fomod.loader || fomod.loader.FileSystemCapability) && onClickFilePicker && <button type="button" className={styles.filePickerButton} onClick={onClickFileClickerWithBlur}>
             <FontAwesomeIcon icon={faFileImport} className={styles.icon} />
         </button>}
     </div>;

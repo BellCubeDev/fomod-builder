@@ -8,6 +8,7 @@ import styles from './FolderLoader.module.scss';
 import FileSystemFolderLoader from './implementations/Folder';
 import React from 'react';
 import { FomodLoadRejectReason } from './index';
+import FileInputLoader from './implementations/FileInput';
 
 export default function FomodLoaderUI() {
     const core = useFomod();
@@ -21,6 +22,9 @@ export default function FomodLoaderUI() {
         core.load(loaderResult[1]);
     }, [core]);
 
+    const startLoader_FileSystemFolderLoader = React.useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => clickEvent(FileSystemFolderLoader, e), [clickEvent]);
+    const startLoader_FileInputLoader = React.useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => clickEvent(FileInputLoader, e), [clickEvent]);
+
     return <div className={styles.wrapper}>
         <h2>{
             core.loader
@@ -29,8 +33,8 @@ export default function FomodLoaderUI() {
         }</h2>
 
         <div className={styles.loader}>
-            <FileSystemFolderLoader.LoaderUI />
-            {FileSystemFolderLoader.CanUse && <button type='button' onClick={(e) => clickEvent(FileSystemFolderLoader, e)}>Select Folder</button>}
+            <FileSystemFolderLoader.LoaderUI onButtonClick={startLoader_FileSystemFolderLoader} />
+            <FileInputLoader.LoaderUI onButtonClick={startLoader_FileInputLoader} />
         </div>
     </div>;
 }

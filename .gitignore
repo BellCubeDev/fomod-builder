@@ -1,4 +1,3 @@
-src/nexus-api/GraphQL.ts
 *.reference.*
 *.test.xml
 

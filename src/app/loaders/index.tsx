@@ -8,9 +8,15 @@ import { enableMapSet, immer } from '@/immer';
 
 export * from './LoaderBase';
 
+declare global {
+    interface Window {
+        hasUnsavedChanges: boolean;
+    }
+}
+
 export enum FomodLoadRejectReason {
     UnsavedChanges = 1,
-    NoFileSelected,
+    MissingFiles,
     NoFolderSelected,
     InvalidXML,
     FileCouldNotBeRead,
@@ -37,7 +43,7 @@ export interface FomodEventTarget extends EventTarget {
 export interface FomodLoaderContext {
     readonly loader: FomodLoader | null;
     load(newLoader: FomodLoader, discard?: boolean): Promise<false|FomodLoadRejectReason>;
-    autoSave(): Promise<false|FomodSaveRejectReason>;
+    autoSaveAndTrackUnsaved(): Promise<false|FomodSaveRejectReason>;
     eventTarget: FomodEventTarget;
     namesAreEntangled: boolean;
     setNamesEntangled(value: boolean): void;
@@ -46,7 +52,7 @@ export interface FomodLoaderContext {
 export const loaderContext = React.createContext<FomodLoaderContext>({
     loader: null,
     load() { throw new Error('Cannot call load on the default context; add a FomodLoaderProvider to the tree first!'); },
-    autoSave() { throw new Error('Cannot call autoSave on the default context; add a FomodLoaderProvider to the tree first!');},
+    autoSaveAndTrackUnsaved() { throw new Error('Cannot call autoSave on the default context; add a FomodLoaderProvider to the tree first!');},
     eventTarget: new EventTarget(),
     namesAreEntangled: false,
     setNamesEntangled() { throw new Error('Cannot call setNamesEntangled on the default context; add a FomodLoaderProvider to the tree first!');},
@@ -81,32 +87,26 @@ export function FomodLoaderProvider({ children }: { children: React.ReactNode })
         enableMapSet();
     }, []);
 
-    const load = React.useCallback((newLoader: FomodLoader, discard = false) => {
-        if (loader && !discard) return Promise.resolve<false>(false);
+    const load = React.useCallback(async (newLoader: FomodLoader): Promise<false | FomodLoadRejectReason> => {
+        if (loader) await loader.decommission();
 
-        return new Promise<false | FomodLoadRejectReason>(async (resolve, reject) => {
-            try {
-                if (loader) await loader.decommission();
+        const reason = await newLoader.commission?.();
+        if (!reason) setLoader(newLoader);
 
-                const reason = await newLoader.commission?.();
-                if (!reason) setLoader(newLoader);
-
-                return resolve(reason ?? false);
-            } catch (e) {
-                reject(e);
-            }
-        });
+        return reason ?? false;
     }, [loader]);
 
     const settings = useSettings();
-    const doAutoSave = settings?.autoSave;
+    const doAutoSave = settings?.autoSave && (!loader || loader.FileSystemCapability);
     const autoSaveInterval = settings?.autoSaveInterval;
 
     const eventTarget = React.useMemo(()=> new EventTarget(), []);
 
     let autoSaveTimer = React.useRef<ReturnType<typeof setTimeout>|null>(null);
 
-    const autoSave = React.useCallback(() => {
+    const autoSaveAndTrackUnsaved = React.useCallback(() => {
+        window.hasUnsavedChanges = true;
+
         if (!loader) return Promise.resolve(FomodSaveRejectReason.NoLoader);
         if (!doAutoSave) return Promise.resolve<false>(false);
 
@@ -114,20 +114,41 @@ export function FomodLoaderProvider({ children }: { children: React.ReactNode })
 
         return new Promise<Awaited<ReturnType<FomodLoader['save']>>>((resolve, reject) => {
             if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
-            autoSaveTimer.current = setTimeout(  () => loader.save().then(resolve, reject), autoSaveInterval);
+            autoSaveTimer.current = setTimeout(  () => {
+                loader.save().then(resolve, reject)
+                autoSaveTimer.current = null;
+            }, autoSaveInterval);
         });
     }, [loader, doAutoSave, autoSaveInterval]);
 
+    const preventUnload = React.useCallback((e: BeforeUnloadEvent) => {
+        if (loader && window.hasUnsavedChanges) {
+            e.preventDefault();
+            e.returnValue = '';
+            if (autoSaveTimer.current) {
+                clearTimeout(autoSaveTimer.current);
+                loader?.save();
+            }
+        }
+    }, [loader]);
+
     React.useEffect(() => {
-        eventTarget.addEventListener('info-update', () => autoSave());
-        eventTarget.addEventListener('module-update', () => autoSave());
-    }, [autoSave, eventTarget]);
+        eventTarget.addEventListener('info-update', autoSaveAndTrackUnsaved);
+        eventTarget.addEventListener('module-update', autoSaveAndTrackUnsaved);
+        window.addEventListener('beforeunload', preventUnload);
+
+        return () => {
+            eventTarget.removeEventListener('info-update', autoSaveAndTrackUnsaved);
+            eventTarget.removeEventListener('module-update', autoSaveAndTrackUnsaved);
+            window.removeEventListener('beforeunload', preventUnload);
+        };
+    }, [autoSaveAndTrackUnsaved, preventUnload, eventTarget]);
 
     const [namesAreEntangled, setNamesEntangled] = React.useState(false);
 
     const value = React.useMemo(() => ({
-        loader, load, autoSave, eventTarget, namesAreEntangled, setNamesEntangled }
-    ), [loader, load, autoSave, eventTarget, namesAreEntangled, setNamesEntangled]);
+        loader, load, autoSaveAndTrackUnsaved, eventTarget, namesAreEntangled, setNamesEntangled }
+    ), [loader, load, autoSaveAndTrackUnsaved, eventTarget, namesAreEntangled, setNamesEntangled]);
 
     React.useEffect(() => {
         window.fomod = value;

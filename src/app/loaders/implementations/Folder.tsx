@@ -40,10 +40,8 @@ export default class FileSystemFolderLoader extends FomodLoader {
             moduleFile.handle.getFile().then(v => v.text()),
         ]);
 
-        const [infoResult, moduleResult] = await Promise.all([
-            this.reloadInfoFromText(infoText),
-            this.reloadModuleFromText(moduleText),
-        ]);
+        const infoResult = this.reloadInfoFromText(infoText);
+        const moduleResult = this.reloadModuleFromText(moduleText);
 
         this.history.add([this.module, this.info]);
 
@@ -51,7 +49,9 @@ export default class FileSystemFolderLoader extends FomodLoader {
     }
 
     async decommission(): Promise<void> {
-        if (this.moduleDoc) this._module?.decommission(this.moduleDoc);
+        if (this._moduleDoc && this._module) {
+            produce(this._module!, (draft) => { draft.decommission(this._moduleDoc!); });
+        }
     }
 
     async getFileByPath(path: string): Promise<File | null> {
@@ -77,102 +77,7 @@ export default class FileSystemFolderLoader extends FomodLoader {
         }
     }
 
-    reloadFromText(text: string, info?: boolean | undefined): false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges> {
-        let result;
-
-        if (info) result = this.reloadInfoFromText(text);
-        else result = this.reloadModuleFromText(text);
-
-        if (result) return result;
-
-        this.history.add([this._module!, this._info!]);
-
-        return false;
-    }
-
-    // TODO: Come up with some clever way to notify the user when their Monaco-edited XML is invalid
-
-    reloadInfoFromText(text: string): false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges> {
-        try {
-                text ||= BlankInfoDoc;
-
-            let doc: Document;
-
-            try {
-                doc = new DOMParser().parseFromString(text, 'application/xml');
-                if (doc.body?.firstElementChild?.tagName === 'parsererror' || doc.documentElement?.firstElementChild?.tagName === 'parsererror') return FomodLoadRejectReason.InvalidXML;
-            } catch (e) {
-                if (e instanceof Error && e.name === 'SyntaxError') return FomodLoadRejectReason.InvalidXML;
-                else throw e;
-            }
-
-            let result = parseInfoDoc(doc, fomodParseConfig);
-            if (!result) {
-                if (doc.documentElement.getElementsByTagName(FomodInfo.tagName).length) return FomodLoadRejectReason.UnsalvageableInfoDoc;
-                result = new FomodInfo();
-                result.assignElement(getOrCreateElementByTagName(doc.documentElement, FomodInfo.tagName));
-            }
-
-            let asElement!: Element;
-            const immutableResult = produce(result, d => {
-                asElement = d.asElement(doc, fomodParseConfig);
-                return d;
-            });
-
-            this._info = immutableResult;
-            this._infoDoc = asElement.ownerDocument!;
-            this._infoText = asElement.outerHTML;
-
-            return false;
-        } catch (e) {
-            console.error(e); // TODO: Show a notification to the user
-            return FomodLoadRejectReason.UnsalvageableInfoDoc;
-        }
-    }
-
-    reloadModuleFromText(text: string): false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges> {
-        try {
-            text ||=  BlankModuleConfig;
-
-            let doc: Document;
-
-            try {
-                doc = new DOMParser().parseFromString(text, 'application/xml');
-                if (doc.body?.firstElementChild?.tagName === 'parsererror' || doc.documentElement?.firstElementChild?.tagName === 'parsererror')
-                    return FomodLoadRejectReason.InvalidXML;
-            } catch (e) {
-                if (e instanceof Error && e.name === 'SyntaxError') return FomodLoadRejectReason.InvalidXML;
-                else throw e;
-            }
-
-
-            let result = parseModuleDoc(doc, fomodParseConfig);
-            if (!result) {
-                if (doc.documentElement.getElementsByTagName(Fomod.tagName).length) return FomodLoadRejectReason.UnsalvageableModuleDoc;
-                result = new Fomod();
-                result.assignElement(getOrCreateElementByTagName(doc.documentElement, Fomod.tagName));
-            }
-
-            reorganizeInstalls(result);
-
-            let asElement!: Element;
-            const immutableResult = produce(result, d => {
-                asElement = d.asElement(doc, fomodParseConfig);
-                return d;
-            });
-
-            this._module = immutableResult;
-            this._moduleDoc = asElement.ownerDocument!;
-            this._moduleText = this.formatXMLForEditing(asElement.outerHTML);
-
-            return false;
-        } catch (e) {
-            console.error(e); // TODO: Show a notification to the user
-            return FomodLoadRejectReason.UnsalvageableModuleDoc;
-        }
-    }
-
-    async save(): Promise<false | Exclude<FomodSaveRejectReason, FomodSaveRejectReason.NoLoader> > {
+    async save_(): Promise<false | Exclude<FomodSaveRejectReason, FomodSaveRejectReason.NoLoader> > {
         const [infoFile, moduleFile] = await Promise.all([
             this.folder.getBypath('fomod/Info.xml', true),
             this.folder.getBypath('fomod/ModuleConfig.xml', true),
@@ -205,12 +110,13 @@ export default class FileSystemFolderLoader extends FomodLoader {
         return [false, loader];
     }
 
-    static override LoaderUI() {
+    static override LoaderUI({onButtonClick}: {onButtonClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void}): JSX.Element {
         return <div className={styles.fsLoaderError}>
             <h3><T tkey='loader_filesystem' params={[true]} /></h3>
             <div suppressHydrationWarning>
                 <T tkey={FileSystemFolderLoader.CanUse ? 'loader_filesystem_description' : 'loader_filesystem_no_support'} />
             </div>
+            {FileSystemFolderLoader.CanUse && <button type='button' onClick={onButtonClick}><T tkey='loader_filesystem_select_folder' /></button>}
         </div>;
     }
 

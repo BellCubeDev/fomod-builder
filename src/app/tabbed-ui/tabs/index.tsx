@@ -8,7 +8,7 @@ export interface TabDisabledContext {
 
 export interface Tab {
     name: Extract<keyof TranslationTableKeys, TabName>;
-    Page: React.FunctionComponent<{licenseInfo: React.ReactNode, rerenderTabContainer: () => unknown}>;
+    Page: React.FunctionComponent<{rerenderTabContainer: () => unknown}>;
     icon: JSX.Element,
     disabled?: (context: TabDisabledContext) => boolean;
 

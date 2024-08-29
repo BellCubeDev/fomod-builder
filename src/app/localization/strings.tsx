@@ -67,10 +67,11 @@ export interface TranslationTableKeys {
 
     loader_file_input: (inPopup: boolean) => React.ReactNode;
     loader_file_input_description: () => React.ReactNode;
-    loader_file_input_create_module_config: () => React.ReactNode
-    loader_file_input_select_module_config: () => React.ReactNode
-    loader_file_input_create_info: () => React.ReactNode
-    loader_file_input_select_info: () => React.ReactNode
+    loader_file_input_header_module_config: () => React.ReactNode
+    loader_file_input_header_info: () => React.ReactNode
+    loader_file_input_button_create_module_config: () => React.ReactNode
+    loader_file_input_button_create_info: () => React.ReactNode
+    loader_file_input_button_load: () => React.ReactNode
 
 
     loader_text_input: (inPopup: boolean) => React.ReactNode;
@@ -253,7 +254,7 @@ export const translationTable: RecursiveReadonly<TranslationTable> = {
                 The Fomod Builder is licensed under the MIT license.
             </p>
             <p>
-                The Fomod Builder <u><b>would not be possible</b></u> without the following open-source projects:
+                The Fomod Builder <u><b>would not be possible</b></u> without the following open-source projects and their dependencies:
             </p>
         </>,
     },
@@ -358,20 +359,24 @@ export const translationTable: RecursiveReadonly<TranslationTable> = {
         en: ()=> <>Select or create ModuleConfig.xml and Info.xml in a folder named <code>fomod</code> and place that folder at the root of your archive</>
     },
 
-    loader_file_input_create_module_config: {
-        en: ()=> 'Create ModuleConfig.xml',
+    loader_file_input_header_module_config: {
+        en: ()=> 'ModuleConfig.xml',
     },
 
-    loader_file_input_select_module_config: {
-        en: ()=> 'Select ModuleConfig.xml',
+    loader_file_input_header_info: {
+        en: ()=> 'Info.xml',
     },
 
-    loader_file_input_create_info: {
-        en: ()=> 'Create Info.xml',
+    loader_file_input_button_create_module_config: {
+        en: ()=> 'Create New ModuleConfig.xml',
     },
 
-    loader_file_input_select_info: {
-        en: ()=> 'Select Info.xml',
+    loader_file_input_button_create_info: {
+        en: ()=> 'Create New Info.xml',
+    },
+
+    loader_file_input_button_load: {
+        en: ()=> 'Load Fomod',
     },
 
     loader_text_input: {

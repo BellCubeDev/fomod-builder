@@ -2,7 +2,7 @@
 
 import React from "react";
 import xmlFormat from 'xml-formatter';
-import { Immutable, immerable, createDraft, Immer, current } from '@/immer';
+import { Immutable, immerable, createDraft, Immer, current, produce } from '@/immer';
 
 import { TranslationTableKeys } from '../localization/strings';
 import { FomodLoadRejectReason, FomodSaveRejectReason } from '.';
@@ -58,20 +58,124 @@ export abstract class FomodLoader {
 
     abstract pickFile(): Promise<[path: string, file: File, extraData: unknown]|null>;
 
+    /** Whether this loader can be used in any capacity */
     static CanUse: boolean;
+    get CanUse() { return (this.constructor as typeof FomodLoader).CanUse; }
+    /** Whether the code has access to the file system to do arbitrary reads/writes */
     static FileSystemCapability: boolean;
+    get FileSystemCapability() { return (this.constructor as typeof FomodLoader).FileSystemCapability; }
 
     static Name: keyof TranslationTableKeys & `loader_${string}`;
-    static LoaderUI: React.FunctionComponent<{}>;
+    static LoaderUI: React.FunctionComponent<{onButtonClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void}>;
+
     static LoaderUIClickEvent: (eventTarget: FomodEventTarget, ...params: Parameters<React.MouseEventHandler<HTMLButtonElement>>) => Promise<[false, FomodLoader] | [Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges>]>;
 
     abstract commission?(): Promise<false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges> >;
     abstract decommission(): Promise<unknown>;
 
-    abstract save(): Promise<false | Exclude<FomodSaveRejectReason, FomodSaveRejectReason.NoLoader> >;
+    abstract save_(): Promise<false | Exclude<FomodSaveRejectReason, FomodSaveRejectReason.NoLoader> >;
+
+    async save(): Promise<false | Exclude<FomodSaveRejectReason, FomodSaveRejectReason.NoLoader> > {
+        const result = await this.save_();
+        if (result === false) window.hasUnsavedChanges = false;
+        return result;
+    }
 
     /** This MUST set the _x, _xDoc, and _xText properties. MUST! */
-    abstract reloadFromText(text: string, info?: boolean): false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges>;
+    reloadFromText(text: string, info?: boolean | undefined): false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges> {
+        let result;
+
+        if (info) result = this.reloadInfoFromText(text);
+        else result = this.reloadModuleFromText(text);
+
+        if (result) return result;
+
+        this.history.add([this._module!, this._info!]);
+
+        return false;
+    }
+
+    // TODO: Come up with some clever way to notify the user when their Monaco-edited XML is invalid
+
+    reloadInfoFromText(text: string): false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges> {
+        try {
+                text ||= BlankInfoDoc;
+
+            let doc: Document;
+
+            try {
+                doc = new DOMParser().parseFromString(text, 'application/xml');
+                if (doc.body?.firstElementChild?.tagName === 'parsererror' || doc.documentElement?.firstElementChild?.tagName === 'parsererror') return FomodLoadRejectReason.InvalidXML;
+            } catch (e) {
+                if (e instanceof Error && e.name === 'SyntaxError') return FomodLoadRejectReason.InvalidXML;
+                else throw e;
+            }
+
+            let result = fomodLib.parseInfoDoc(doc, fomodParseConfig);
+            if (!result) {
+                if (doc.documentElement.getElementsByTagName(FomodInfo.tagName).length) return FomodLoadRejectReason.UnsalvageableInfoDoc;
+                result = new FomodInfo();
+                result.assignElement(fomodLib.getOrCreateElementByTagName(doc.documentElement, FomodInfo.tagName));
+            }
+
+            let asElement!: Element;
+            const immutableResult = produce(result, d => {
+                asElement = d.asElement(doc, fomodParseConfig);
+                return d;
+            });
+
+            this._info = immutableResult;
+            this._infoDoc = asElement.ownerDocument!;
+            this._infoText = asElement.outerHTML;
+
+            return false;
+        } catch (e) {
+            console.error(e); // TODO: Show a notification to the user
+            return FomodLoadRejectReason.UnsalvageableInfoDoc;
+        }
+    }
+
+    reloadModuleFromText(text: string): false | Exclude<FomodLoadRejectReason, FomodLoadRejectReason.UnsavedChanges> {
+        try {
+            text ||=  BlankModuleConfig;
+
+            let doc: Document;
+
+            try {
+                doc = new DOMParser().parseFromString(text, 'application/xml');
+                if (doc.body?.firstElementChild?.tagName === 'parsererror' || doc.documentElement?.firstElementChild?.tagName === 'parsererror')
+                    return FomodLoadRejectReason.InvalidXML;
+            } catch (e) {
+                if (e instanceof Error && e.name === 'SyntaxError') return FomodLoadRejectReason.InvalidXML;
+                else throw e;
+            }
+
+
+            let result = fomodLib.parseModuleDoc(doc, fomodParseConfig);
+            if (!result) {
+                if (doc.documentElement.getElementsByTagName(Fomod.tagName).length) return FomodLoadRejectReason.UnsalvageableModuleDoc;
+                result = new Fomod();
+                result.assignElement(fomodLib.getOrCreateElementByTagName(doc.documentElement, Fomod.tagName));
+            }
+
+            reorganizeInstalls(result);
+
+            let asElement!: Element;
+            const immutableResult = produce(result, d => {
+                asElement = d.asElement(doc, fomodParseConfig);
+                return d;
+            });
+
+            this._module = immutableResult;
+            this._moduleDoc = asElement.ownerDocument!;
+            this._moduleText = this.formatXMLForEditing(asElement.outerHTML);
+
+            return false;
+        } catch (e) {
+            console.error(e); // TODO: Show a notification to the user
+            return FomodLoadRejectReason.UnsalvageableModuleDoc;
+        }
+    }
 
 
     constructor(protected eventTarget: FomodEventTarget) {
